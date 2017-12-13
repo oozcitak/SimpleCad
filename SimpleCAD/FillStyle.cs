@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
-    public struct FillStyle
+    public partial struct FillStyle
     {
         public enum FillType
         {
@@ -17,8 +17,6 @@ namespace SimpleCAD
         public Color Color { get; set; }
         public Color FillColor { get; set; }
         public HatchStyle HatchStyle { get; set; }
-
-        public static FillStyle Default { get { return new FillStyle(Color.White); } }
 
         public FillStyle(Color color)
             : this()

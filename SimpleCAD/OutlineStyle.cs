@@ -4,13 +4,11 @@ using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
-    public struct OutlineStyle
+    public partial struct OutlineStyle
     {
         public Color Color { get; set; }
         public float LineWeight { get; set; }
         public DashStyle DashStyle { get; set; }
-
-        public static OutlineStyle Default { get { return new OutlineStyle(Color.Black); } }
 
         public OutlineStyle(Color color, float lineWeight, DashStyle dashStyle)
             : this()

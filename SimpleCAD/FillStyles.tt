@@ -1,0 +1,24 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Drawing" #>
+<#@ import namespace="System.Drawing" #>
+<#@ output extension=".cs" #>
+using System.Drawing;
+
+namespace SimpleCAD
+{
+    public partial struct FillStyle
+    {
+<#
+	foreach (KnownColor col in Enum.GetValues(typeof(KnownColor)))
+	{
+		string colorName = Enum.GetName(typeof(KnownColor), col);
+#>
+		public static FillStyle <#= colorName #> { get { return new FillStyle(Color.FromKnownColor(KnownColor.<#= colorName #>)); } }
+<#
+	}
+
+#>
+	}
+}
