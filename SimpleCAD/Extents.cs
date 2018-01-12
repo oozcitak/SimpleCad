@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace SimpleCAD
 {
@@ -38,7 +39,7 @@ namespace SimpleCAD
             Add(pt.X, pt.Y);
         }
 
-        public void Add(Point2D[] points)
+        public void Add(IEnumerable<Point2D> points)
         {
             foreach (Point2D pt in points)
             {

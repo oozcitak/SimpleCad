@@ -55,7 +55,7 @@ namespace SimpleCAD
 
         public void CopyTo(Drawable[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            items.CopyTo(array, arrayIndex);
         }
 
         public int Count

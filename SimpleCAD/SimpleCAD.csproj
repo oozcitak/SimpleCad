@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Point2DCollection.cs" />
     <Compile Include="CADModel.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">
@@ -74,7 +75,9 @@
     </Compile>
     <Compile Include="Parabola.cs" />
     <Compile Include="MultiLineText.cs" />
-    <Compile Include="Primitives.cs" />
+    <Compile Include="Point2D.cs" />
+    <Compile Include="Vector2D.cs" />
+    <Compile Include="Matrix2D.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="Dimension.cs" />
     <Compile Include="Ellipse.cs" />

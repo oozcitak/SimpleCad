@@ -20,12 +20,14 @@ namespace SimpleCAD
             {
                 mZoomFactor = value;
 
-                if (float.IsNaN(mZoomFactor) || float.IsNegativeInfinity(mZoomFactor) || float.IsPositiveInfinity(mZoomFactor) || mZoomFactor < float.Epsilon * 1000.0f || mZoomFactor > float.MaxValue / 1000.0f)
+                if (float.IsNaN(mZoomFactor) || float.IsNegativeInfinity(mZoomFactor) || float.IsPositiveInfinity(mZoomFactor) || 
+                    mZoomFactor < float.Epsilon * 1000.0f || mZoomFactor > float.MaxValue / 1000.0f)
                 {
                     mZoomFactor = 1;
                 }
             }
         }
+
         public PointF CameraPosition
         {
             get
@@ -37,11 +39,13 @@ namespace SimpleCAD
                 mCameraPosition = value;
                 float x = mCameraPosition.X;
                 float y = mCameraPosition.Y;
-                if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) || x < float.MinValue / 1000.0f || x > float.MaxValue / 1000.0f)
+                if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) || 
+                    x < float.MinValue / 1000.0f || x > float.MaxValue / 1000.0f)
                 {
                     x = 0;
                 }
-                if (float.IsNaN(y) || float.IsNegativeInfinity(y) || float.IsPositiveInfinity(y) || y < float.MinValue / 1000.0f || y > float.MaxValue / 1000.0f)
+                if (float.IsNaN(y) || float.IsNegativeInfinity(y) || float.IsPositiveInfinity(y) || 
+                    y < float.MinValue / 1000.0f || y > float.MaxValue / 1000.0f)
                 {
                     y = 0;
                 }
@@ -95,17 +99,17 @@ namespace SimpleCAD
         /// <param name="x">X coordinate in world coordinates.</param>
         /// <param name="y">Y coordinate in world coordinates.</param>
         /// <returns>A Point in screen coordinates.</returns>
-        public System.Drawing.Point WorldToScreen(float x, float y)
+        public Point WorldToScreen(float x, float y)
         {
-            return new System.Drawing.Point((int)((x - CameraPosition.X) / ZoomFactor) + Width / 2,
-                                 -(int)((y - CameraPosition.Y) / ZoomFactor) + Height / 2);
+            return new Point((int)((x - CameraPosition.X) / ZoomFactor) + Width / 2,
+                -(int)((y - CameraPosition.Y) / ZoomFactor) + Height / 2);
         }
         /// <summary>
         /// Converts the given point from world coordinates to screen coordinates.
         /// </summary>
         /// <param name="pt">Location in world coordinates.</param>
         /// <returns>A Point in screen coordinates.</returns>
-        public System.Drawing.Point WorldToScreen(PointF pt) { return WorldToScreen(pt.X, pt.Y); }
+        public Point WorldToScreen(PointF pt) { return WorldToScreen(pt.X, pt.Y); }
         /// <summary>
         /// Converts the given vector from world coordinates to screen coordinates.
         /// </summary>
@@ -113,8 +117,8 @@ namespace SimpleCAD
         /// <returns>A Size in screen coordinates.</returns>
         public Size WorldToScreen(SizeF sz)
         {
-            System.Drawing.Point pt1 = WorldToScreen(0.0f, 0.0f);
-            System.Drawing.Point pt2 = WorldToScreen(sz.Width, sz.Height);
+            Point pt1 = WorldToScreen(0.0f, 0.0f);
+            Point pt2 = WorldToScreen(sz.Width, sz.Height);
             return new Size(pt2.X - pt1.X, pt2.Y - pt1.Y);
         }
 
@@ -126,8 +130,8 @@ namespace SimpleCAD
         /// <returns>A PointF in world coordinates.</returns>
         public PointF ScreenToWorld(int x, int y)
         {
-            return new PointF((float)(x - Width / 2) * ZoomFactor + CameraPosition.X,
-                                  -(float)(y - Height / 2) * ZoomFactor + CameraPosition.Y);
+            return new PointF((x - Width / 2) * ZoomFactor + CameraPosition.X,
+                -(y - Height / 2) * ZoomFactor + CameraPosition.Y);
         }
         /// <summary>
         /// Converts the given point from screen coordinates to world coordinates.
@@ -170,7 +174,7 @@ namespace SimpleCAD
             float w = Math.Abs(x1 - x2);
             CameraPosition = new PointF((x1 + x2) / 2, (y1 + y2) / 2);
             if ((Height != 0) && (Width != 0))
-                ZoomFactor = Math.Max(h / (float)(Height), w / (float)(Width));
+                ZoomFactor = Math.Max(h / Height, w / Width);
             else
                 ZoomFactor = 1;
         }

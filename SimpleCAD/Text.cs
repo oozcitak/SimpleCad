@@ -51,7 +51,7 @@ namespace SimpleCAD
                 float y = pt[0].Y;
 
                 // Revert transformation to identity while drawing text
-                System.Drawing.Drawing2D.Matrix oldMatrix = param.Graphics.Transform;
+                Matrix oldMatrix = param.Graphics.Transform;
                 param.Graphics.ResetTransform();
 
                 // Calculate alignment in pixel coordinates

@@ -123,7 +123,7 @@ namespace SimpleCAD
         {
             if (AllowZoomAndPan)
             {
-                System.Drawing.Point pt = e.Location;
+                Point pt = e.Location;
                 PointF ptw = View.ScreenToWorld(pt);
 
                 if (e.Delta > 0)
