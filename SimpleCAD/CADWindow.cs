@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.Collections.Generic;
 
 namespace SimpleCAD
 {
@@ -15,7 +11,7 @@ namespace SimpleCAD
         public event ItemClickEventHandler ItemClick;
 
         private bool panning;
-        private System.Drawing.Point lastMouse;
+        private Point lastMouse;
         private Drawable mouseDownItem;
 
         public CADView View { get; private set; }
@@ -152,8 +148,7 @@ namespace SimpleCAD
 
         protected virtual void OnItemClick(ItemClickEventArgs e)
         {
-            if (ItemClick != null)
-                ItemClick(this, e);
+            ItemClick?.Invoke(this, e);
         }
 
         void CadView_Paint(object sender, PaintEventArgs e)
@@ -169,12 +164,11 @@ namespace SimpleCAD
         public Drawable FindItemAtScreenCoordinates(int x, int y)
         {
             PointF pt = View.ScreenToWorld(x, y);
-            Drawable item = null;
             foreach (Drawable d in Model)
             {
-                if (d.Contains(pt)) item = d;
+                if (d.Contains(pt)) return d;
             }
-            return item;
+            return null;
         }
     }
 }

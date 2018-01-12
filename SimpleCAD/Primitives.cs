@@ -201,7 +201,7 @@ namespace SimpleCAD
 
         public static Matrix2D Translation(float dx, float dy)
         {
-            return new Matrix2D(0, 0, 0, 0, dx, dy);
+            return new Matrix2D(1, 0, 0, 1, dx, dy);
         }
 
         public override string ToString()
