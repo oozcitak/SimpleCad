@@ -35,7 +35,7 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            PointF[] ptf = points;
+            PointF[] ptf = points.ToPointF();
             using (Brush brush = FillStyle.CreateBrush(param))
             {
                 param.Graphics.FillPolygon(brush, ptf);

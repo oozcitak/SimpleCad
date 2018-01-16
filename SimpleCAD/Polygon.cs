@@ -9,18 +9,17 @@ namespace SimpleCAD
 
         public Polygon(Point2D[] pts)
         {
-            Points = pts;
+            Points = new Point2DCollection(pts);
         }
 
         public Polygon(PointF[] pts)
         {
-            Points = pts;
+            Points = new Point2DCollection(pts);
         }
 
         public override void Draw(DrawParams param)
         {
-            PointF[] pts = Points;
-
+            PointF[] pts = Points.ToPointF();
             using (Brush brush = FillStyle.CreateBrush(param))
             {
                 param.Graphics.FillPolygon(brush, pts);

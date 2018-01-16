@@ -13,7 +13,6 @@ namespace SimpleCAD
         public static Vector2D YAxis { get { return new Vector2D(0, 1); } }
 
         public Vector2D(float x, float y)
-            : this()
         {
             X = x;
             Y = y;

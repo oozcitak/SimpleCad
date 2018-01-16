@@ -19,6 +19,15 @@ namespace SimpleCAD
             items = new List<Point2D>(elements);
         }
 
+        public Point2DCollection(IEnumerable<System.Drawing.PointF> elements)
+        {
+            items = new List<Point2D>();
+            foreach (System.Drawing.PointF item in elements)
+            {
+                items.Add(new Point2D(item));
+            }
+        }
+
         public Extents GetExtents()
         {
             Extents ex = new Extents();
@@ -96,34 +105,14 @@ namespace SimpleCAD
             return GetEnumerator();
         }
 
-        public static implicit operator System.Drawing.PointF[] (Point2DCollection coll)
+        public System.Drawing.PointF[] ToPointF()
         {
-            System.Drawing.PointF[] items = new System.Drawing.PointF[coll.items.Count];
-            for (int i = 0; i < coll.items.Count; i++)
+            System.Drawing.PointF[] points = new System.Drawing.PointF[items.Count];
+            for (int i = 0; i < items.Count; i++)
             {
-                items[i] = coll.items[i];
+                points[i] = items[i].ToPointF();
             }
-            return items;
-        }
-
-        public static implicit operator Point2D[] (Point2DCollection coll)
-        {
-            return coll.items.ToArray();
-        }
-
-        public static implicit operator Point2DCollection(Point2D[] items)
-        {
-            return new Point2DCollection(items);
-        }
-
-        public static implicit operator Point2DCollection(System.Drawing.PointF[] items)
-        {
-            Point2DCollection coll = new Point2DCollection();
-            foreach (System.Drawing.PointF item in items)
-            {
-                coll.Add(item);
-            }
-            return coll;
+            return points;
         }
 
         public void TransformBy(Matrix2D transformation)

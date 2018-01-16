@@ -10,10 +10,15 @@ namespace SimpleCAD
         public static Point2D Zero { get { return new Point2D(0, 0); } }
 
         public Point2D(float x, float y)
-            : this()
         {
             X = x;
             Y = y;
+        }
+
+        public Point2D(System.Drawing.PointF pt)
+        {
+            X = pt.X;
+            Y = pt.Y;
         }
 
         public void TransformBy(Matrix2D transformation)
@@ -59,17 +64,12 @@ namespace SimpleCAD
             return new Point2D(p.X / f, p.Y / f);
         }
 
-        public static implicit operator System.Drawing.PointF(Point2D p)
+        public System.Drawing.PointF ToPointF()
         {
-            return new System.Drawing.PointF(p.X, p.Y);
+            return new System.Drawing.PointF(X, Y);
         }
 
-        public static implicit operator Point2D(System.Drawing.PointF p)
-        {
-            return new Point2D(p.X, p.Y);
-        }
-
-        public Vector2D AsVector2D()
+        public Vector2D ToVector2D()
         {
             return new Vector2D(X, Y);
         }
