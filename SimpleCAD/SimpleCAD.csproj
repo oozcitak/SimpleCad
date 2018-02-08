@@ -77,7 +77,7 @@
     <Compile Include="MultiLineText.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Vector2D.cs" />
-    <Compile Include="Matrix2D.cs" />
+    <Compile Include="TransformationMatrix2D.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="Dimension.cs" />
     <Compile Include="Ellipse.cs" />

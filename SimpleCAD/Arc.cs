@@ -43,7 +43,7 @@ namespace SimpleCAD
             return extents;
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             Point2D p = Center;
             p.TransformBy(transformation);

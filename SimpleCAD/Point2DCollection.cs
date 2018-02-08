@@ -115,7 +115,7 @@ namespace SimpleCAD
             return points;
         }
 
-        public void TransformBy(Matrix2D transformation)
+        public void TransformBy(TransformationMatrix2D transformation)
         {
             for (int i = 0; i < items.Count; i++)
             {

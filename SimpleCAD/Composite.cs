@@ -30,7 +30,7 @@ namespace SimpleCAD
             return extents;
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             foreach (Drawable item in items)
             {

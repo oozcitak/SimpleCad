@@ -47,7 +47,7 @@ namespace SimpleCAD
             return extents;
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             Point2D p1 = P1;
             Point2D p2 = P2;

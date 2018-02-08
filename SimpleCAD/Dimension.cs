@@ -46,7 +46,7 @@ namespace SimpleCAD
             float angle = dir.Angle;
             float len = dir.Length;
 
-            Matrix2D trans = Matrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
 
             // Dimension line
             Line dim = new Line(0, Offset, len, Offset);
@@ -89,7 +89,7 @@ namespace SimpleCAD
             Point2D p2 = new Point2D(len, 0);
             Point2D p3 = p1 + new Vector2D(0, offset);
             Point2D p4 = p2 + new Vector2D(0, offset);
-            Matrix2D trans = Matrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
             p1.TransformBy(trans);
             p2.TransformBy(trans);
             p3.TransformBy(trans);
@@ -103,7 +103,7 @@ namespace SimpleCAD
             return extents;
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             Point2D p1 = P1;
             Point2D p2 = P2;

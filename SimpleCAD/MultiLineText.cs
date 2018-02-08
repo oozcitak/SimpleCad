@@ -91,7 +91,7 @@ namespace SimpleCAD
             Point2D p2 = new Point2D(thWidth, 0);
             Point2D p3 = new Point2D(0, -thHeight);
             Point2D p4 = new Point2D(thWidth, -thHeight);
-            Matrix2D trans = Matrix2D.Transformation(1, 1, angle, P.X, P.Y);
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P.X, P.Y);
             p1.TransformBy(trans);
             p2.TransformBy(trans);
             p3.TransformBy(trans);
@@ -105,7 +105,7 @@ namespace SimpleCAD
             return extents;
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             Point2D p = P;
             p.TransformBy(transformation);

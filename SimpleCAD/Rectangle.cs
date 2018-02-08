@@ -51,7 +51,7 @@ namespace SimpleCAD
             return points.GetExtents();
         }
 
-        public override void TransformBy(Matrix2D transformation)
+        public override void TransformBy(TransformationMatrix2D transformation)
         {
             points.TransformBy(transformation);
         }
