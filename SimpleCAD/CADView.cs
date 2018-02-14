@@ -56,9 +56,9 @@ namespace SimpleCAD
         public int Width { get; private set; }
         public int Height { get; private set; }
 
-        public CADModel Model { get; private set; }
+        public Composite Model { get; private set; }
 
-        public CADView(CADModel model, int width, int height)
+        public CADView(Composite model, int width, int height)
         {
             Model = model;
 
@@ -87,10 +87,7 @@ namespace SimpleCAD
             ScaleGraphics(graphics);
 
             // Render drawing objects
-            foreach (Drawable item in Model)
-            {
-                if (item.Visible) item.Draw(param);
-            }
+            Model.Draw(param);
         }
 
         /// <summary>

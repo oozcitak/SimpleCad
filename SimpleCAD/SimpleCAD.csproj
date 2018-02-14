@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Point2DCollection.cs" />
-    <Compile Include="CADModel.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">
       <SubType>UserControl</SubType>

@@ -15,7 +15,7 @@ namespace SimpleCAD
         private Drawable mouseDownItem;
 
         public CADView View { get; private set; }
-        public CADModel Model { get; private set; }
+        public Composite Model { get; private set; }
         public float DrawingScale { get { return View.ZoomFactor; } }
 
         public bool AllowZoomAndPan { get; set; }
@@ -27,7 +27,7 @@ namespace SimpleCAD
 
             DoubleBuffered = true;
 
-            Model = new CADModel();
+            Model = new Composite();
             View = new CADView(Model, ClientRectangle.Width, ClientRectangle.Height);
 
             AllowZoomAndPan = true;
