@@ -41,6 +41,9 @@ x64/
 *.msi
 *.msm
 
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
 # Visual C++ cache files
 ipch/
 *.aps
