@@ -5,56 +5,65 @@ namespace SimpleCAD
 {
     public class Ellipse : Drawable
     {
-        public Point2D P1 { get; set; }
-        public Point2D P2 { get; set; }
+        public Point2D Center { get; set; }
 
-        public float X1 { get { return P1.X; } }
-        public float Y1 { get { return P1.Y; } }
-        public float X2 { get { return P2.X; } }
-        public float Y2 { get { return P2.Y; } }
-        public float Width { get { return Math.Abs(X2 - X1); } }
-        public float Height { get { return Math.Abs(Y2 - Y1); } }
+        public float X { get { return Center.X; } }
+        public float Y { get { return Center.Y; } }
 
-        public Ellipse(Point2D p1, Point2D p2)
+        private Vector2D dir;
+
+        public float SemiMajorAxis { get; set; }
+        public float SemiMinorAxis { get; set; }
+
+        public Ellipse(Point2D center, float semiMajor, float semiMinor)
         {
-            P1 = p1;
-            P2 = p2;
+            Center = center;
+            SemiMajorAxis = semiMajor;
+            SemiMinorAxis = semiMinor;
+            dir = Vector2D.XAxis;
         }
 
-        public Ellipse(float x1, float y1, float x2, float y2)
-            : this(new Point2D(x1, y1), new Point2D(x2, y2))
+        public Ellipse(float x, float y, float semiMajor, float semiMinor)
+            : this(new Point2D(x, y), semiMajor, semiMinor)
         {
             ;
         }
 
         public override void Draw(DrawParams param)
         {
+            System.Drawing.Drawing2D.Matrix orgTr = param.Graphics.Transform;
+            param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
             using (Brush brush = FillStyle.CreateBrush(param))
             {
-                param.Graphics.FillEllipse(brush, Math.Min(X1, X2), Math.Min(Y1, Y2), Width, Height);
+                param.Graphics.FillEllipse(brush, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis);
             }
             using (Pen pen = OutlineStyle.CreatePen(param))
             {
-                param.Graphics.DrawEllipse(pen, Math.Min(X1, X2), Math.Min(Y1, Y2), Width, Height);
+                param.Graphics.DrawEllipse(pen, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis);
             }
+            param.Graphics.Transform = orgTr;
         }
 
         public override Extents GetExtents()
         {
             Extents extents = new Extents();
-            extents.Add(P1);
-            extents.Add(P2);
+            extents.Add(X - SemiMajorAxis, Y - SemiMinorAxis);
+            extents.Add(X + SemiMajorAxis, Y + SemiMinorAxis);
             return extents;
         }
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p1 = P1;
-            Point2D p2 = P2;
-            p1.TransformBy(transformation);
-            p2.TransformBy(transformation);
-            P1 = p1;
-            P2 = p2;
+            Point2D p = Center;
+            p.TransformBy(transformation);
+            Center = p;
+
+            dir.TransformBy(transformation);
+
+            Vector2D unit = Vector2D.XAxis;
+            unit.TransformBy(transformation);
+            SemiMajorAxis = dir.Length * SemiMajorAxis;
+            SemiMinorAxis = dir.Length * SemiMinorAxis;
         }
     }
 }
