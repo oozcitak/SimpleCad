@@ -12,6 +12,8 @@ namespace SimpleCAD
         public float DY { get; set; }
         public float RotationAngle { get { return -(float)Math.Asin(M12); } }
 
+        public static TransformationMatrix2D Identity { get { return new TransformationMatrix2D(1, 0, 0, 1, 0, 0); } }
+
         public TransformationMatrix2D(float m11, float m12, float m21, float m22, float dx, float dy)
         {
             M11 = m11; M12 = m12;
