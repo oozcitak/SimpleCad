@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
@@ -52,6 +53,22 @@ namespace SimpleCAD
         public static TransformationMatrix2D Translation(float dx, float dy)
         {
             return new TransformationMatrix2D(1, 0, 0, 1, dx, dy);
+        }
+
+        public TransformationMatrix2D Multiply(TransformationMatrix2D m)
+        {
+            float m11 = M11 * m.M11 + M12 * m.M21 + DX * 0;
+            float m12 = M11 * m.M12 + M22 * m.M21 + DX * 0;
+            float dx = M11 * m.DX + M22 * m.DY + DX * 1;
+            float m21 = M21 * m.M11 + M22 * m.M21 + DY * 0;
+            float m22 = M21 * m.M12 + M22 * m.M22 + DY * 0;
+            float dy = M21 * m.DX + M22 * m.DY + DY * 1;
+            return new TransformationMatrix2D(m11, m12, m21, m22, dx, dy);
+        }
+
+        public static explicit operator Matrix(TransformationMatrix2D t)
+        {
+            return new Matrix(t.M11, t.M12, t.M21, t.M22, t.DX, t.DY);
         }
 
         public override string ToString()

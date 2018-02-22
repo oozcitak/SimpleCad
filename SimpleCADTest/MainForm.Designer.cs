@@ -33,26 +33,26 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawArc = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawCircle = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawEllipse = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawEllipticArc = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawCircle = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawEllipse = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawArc = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawEllipticArc = new System.Windows.Forms.ToolStripButton();
             this.btnDrawText = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -102,72 +102,6 @@
             this.statusCoords.Size = new System.Drawing.Size(25, 17);
             this.statusCoords.Text = "0, 0";
             // 
-            // toolStrip1
-            // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnDrawLine,
-            this.btnDrawCircle,
-            this.btnDrawEllipse,
-            this.btnDrawArc,
-            this.btnDrawEllipticArc,
-            this.btnDrawText});
-            this.toolStrip1.Location = new System.Drawing.Point(3, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(289, 25);
-            this.toolStrip1.TabIndex = 0;
-            // 
-            // btnDrawLine
-            // 
-            this.btnDrawLine.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawLine.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawLine.Image")));
-            this.btnDrawLine.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawLine.Name = "btnDrawLine";
-            this.btnDrawLine.Size = new System.Drawing.Size(33, 22);
-            this.btnDrawLine.Text = "Line";
-            this.btnDrawLine.ToolTipText = "Draw Line";
-            this.btnDrawLine.Click += new System.EventHandler(this.btnDrawLine_Click);
-            // 
-            // btnDrawArc
-            // 
-            this.btnDrawArc.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawArc.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawArc.Image")));
-            this.btnDrawArc.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawArc.Name = "btnDrawArc";
-            this.btnDrawArc.Size = new System.Drawing.Size(29, 22);
-            this.btnDrawArc.Text = "Arc";
-            this.btnDrawArc.Click += new System.EventHandler(this.btnDrawArc_Click);
-            // 
-            // btnDrawCircle
-            // 
-            this.btnDrawCircle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawCircle.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawCircle.Image")));
-            this.btnDrawCircle.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawCircle.Name = "btnDrawCircle";
-            this.btnDrawCircle.Size = new System.Drawing.Size(41, 22);
-            this.btnDrawCircle.Text = "Circle";
-            this.btnDrawCircle.Click += new System.EventHandler(this.btnDrawCircle_Click);
-            // 
-            // btnDrawEllipse
-            // 
-            this.btnDrawEllipse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawEllipse.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawEllipse.Image")));
-            this.btnDrawEllipse.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawEllipse.Name = "btnDrawEllipse";
-            this.btnDrawEllipse.Size = new System.Drawing.Size(44, 22);
-            this.btnDrawEllipse.Text = "Ellipse";
-            this.btnDrawEllipse.Click += new System.EventHandler(this.btnDrawEllipse_Click);
-            // 
-            // btnDrawEllipticArc
-            // 
-            this.btnDrawEllipticArc.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawEllipticArc.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawEllipticArc.Image")));
-            this.btnDrawEllipticArc.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawEllipticArc.Name = "btnDrawEllipticArc";
-            this.btnDrawEllipticArc.Size = new System.Drawing.Size(67, 22);
-            this.btnDrawEllipticArc.Text = "Elliptic Arc";
-            this.btnDrawEllipticArc.Click += new System.EventHandler(this.btnDrawEllipticArc_Click);
-            // 
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -208,6 +142,72 @@
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnDrawLine,
+            this.btnDrawCircle,
+            this.btnDrawEllipse,
+            this.btnDrawArc,
+            this.btnDrawEllipticArc,
+            this.btnDrawText});
+            this.toolStrip1.Location = new System.Drawing.Point(3, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(258, 25);
+            this.toolStrip1.TabIndex = 0;
+            // 
+            // btnDrawLine
+            // 
+            this.btnDrawLine.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawLine.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawLine.Image")));
+            this.btnDrawLine.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawLine.Name = "btnDrawLine";
+            this.btnDrawLine.Size = new System.Drawing.Size(33, 22);
+            this.btnDrawLine.Text = "Line";
+            this.btnDrawLine.ToolTipText = "Draw Line";
+            this.btnDrawLine.Click += new System.EventHandler(this.btnDrawLine_Click);
+            // 
+            // btnDrawCircle
+            // 
+            this.btnDrawCircle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawCircle.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawCircle.Image")));
+            this.btnDrawCircle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawCircle.Name = "btnDrawCircle";
+            this.btnDrawCircle.Size = new System.Drawing.Size(41, 22);
+            this.btnDrawCircle.Text = "Circle";
+            this.btnDrawCircle.Click += new System.EventHandler(this.btnDrawCircle_Click);
+            // 
+            // btnDrawEllipse
+            // 
+            this.btnDrawEllipse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawEllipse.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawEllipse.Image")));
+            this.btnDrawEllipse.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawEllipse.Name = "btnDrawEllipse";
+            this.btnDrawEllipse.Size = new System.Drawing.Size(44, 22);
+            this.btnDrawEllipse.Text = "Ellipse";
+            this.btnDrawEllipse.Click += new System.EventHandler(this.btnDrawEllipse_Click);
+            // 
+            // btnDrawArc
+            // 
+            this.btnDrawArc.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawArc.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawArc.Image")));
+            this.btnDrawArc.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawArc.Name = "btnDrawArc";
+            this.btnDrawArc.Size = new System.Drawing.Size(29, 22);
+            this.btnDrawArc.Text = "Arc";
+            this.btnDrawArc.Click += new System.EventHandler(this.btnDrawArc_Click);
+            // 
+            // btnDrawEllipticArc
+            // 
+            this.btnDrawEllipticArc.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawEllipticArc.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawEllipticArc.Image")));
+            this.btnDrawEllipticArc.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawEllipticArc.Name = "btnDrawEllipticArc";
+            this.btnDrawEllipticArc.Size = new System.Drawing.Size(67, 22);
+            this.btnDrawEllipticArc.Text = "Elliptic Arc";
+            this.btnDrawEllipticArc.Click += new System.EventHandler(this.btnDrawEllipticArc_Click);
+            // 
             // btnDrawText
             // 
             this.btnDrawText.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -224,8 +224,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1008, 516);
             this.Controls.Add(this.toolStripContainer1);
+            this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "SimpleCAD Test Form";
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
             this.toolStripContainer1.BottomToolStripPanel.PerformLayout();
             this.toolStripContainer1.ContentPanel.ResumeLayout(false);
@@ -235,12 +237,12 @@
             this.toolStripContainer1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }

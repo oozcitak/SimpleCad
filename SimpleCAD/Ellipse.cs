@@ -35,7 +35,9 @@ namespace SimpleCAD
         public override void Draw(DrawParams param)
         {
             System.Drawing.Drawing2D.Matrix orgTr = param.Graphics.Transform;
-            param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
+            param.Graphics.TranslateTransform(-X, -Y);
+            param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI);
+            param.Graphics.TranslateTransform(X, Y);
             using (Brush brush = FillStyle.CreateBrush(param))
             {
                 param.Graphics.FillEllipse(brush, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis);
@@ -65,8 +67,8 @@ namespace SimpleCAD
 
             Vector2D unit = Vector2D.XAxis;
             unit.TransformBy(transformation);
-            SemiMajorAxis = dir.Length * SemiMajorAxis;
-            SemiMinorAxis = dir.Length * SemiMinorAxis;
+            SemiMajorAxis = unit.Length * SemiMajorAxis;
+            SemiMinorAxis = unit.Length * SemiMinorAxis;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
@@ -16,7 +17,10 @@ namespace SimpleCAD
         {
             foreach (Drawable item in items)
             {
-                if (item.Visible) item.Draw(param);
+                if (item.Visible)
+                {
+                    item.Draw(param);
+                }
             }
         }
 

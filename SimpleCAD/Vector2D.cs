@@ -22,8 +22,8 @@ namespace SimpleCAD
 
         public void TransformBy(TransformationMatrix2D transformation)
         {
-            float x = transformation.M11 * X + transformation.M12 * Y + transformation.DX;
-            float y = transformation.M21 * X + transformation.M22 * Y + transformation.DY;
+            float x = transformation.M11 * X + transformation.M12 * Y;
+            float y = transformation.M21 * X + transformation.M22 * Y;
             X = x;
             Y = y;
         }
