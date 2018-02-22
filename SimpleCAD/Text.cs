@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -8,13 +9,16 @@ namespace SimpleCAD
     {
         public Point2D P { get; set; }
 
+        [Browsable(false)]
         public float X { get { return P.X; } }
+        [Browsable(false)]
         public float Y { get { return P.Y; } }
 
         public string String { get; set; }
         public string FontFamily { get; set; }
         public FontStyle FontStyle { get; set; }
         public float Height { get; set; }
+        public float Width { get; private set; }
         public float Rotation { get; set; }
         public StringAlignment HorizontalAlignment { get; set; }
         public StringAlignment VerticalAlignment { get; set; }
@@ -23,6 +27,7 @@ namespace SimpleCAD
         {
             P = p;
             Height = height;
+            Width = height;
             String = text;
             Rotation = 0;
             HorizontalAlignment = StringAlignment.Near;
@@ -58,6 +63,7 @@ namespace SimpleCAD
                 float dx = 0;
                 float dy = 0;
                 SizeF sz = param.Graphics.MeasureString(String, font);
+                Width = param.ViewToModel(sz.Width);
                 if (HorizontalAlignment == StringAlignment.Far)
                     dx = -sz.Width;
                 else if (HorizontalAlignment == StringAlignment.Center)
@@ -68,7 +74,7 @@ namespace SimpleCAD
                     dy = -sz.Height / 2;
 
                 param.Graphics.TranslateTransform(dx, dy, MatrixOrder.Append);
-                param.Graphics.RotateTransform(-Rotation, MatrixOrder.Append);
+                param.Graphics.RotateTransform(-Rotation * 180 / (float)Math.PI, MatrixOrder.Append);
                 param.Graphics.TranslateTransform(x, y, MatrixOrder.Append);
 
                 // Fill background
@@ -82,7 +88,7 @@ namespace SimpleCAD
 
         public override Extents GetExtents()
         {
-            float angle = Rotation / 180 * (float)Math.PI;
+            float angle = Rotation;
             float thHeight = Height;
             float thWidth = String.Length * thHeight / 2;
             Point2D p1 = new Point2D(0, 0);
@@ -123,7 +129,7 @@ namespace SimpleCAD
             Point2D p = P;
             p.TransformBy(transformation);
             P = p;
-            Rotation += transformation.RotationAngle * 180 / (float)Math.PI;
+            Rotation += transformation.RotationAngle;
         }
     }
 }

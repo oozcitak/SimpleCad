@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -7,7 +8,9 @@ namespace SimpleCAD
     {
         public Point2D Center { get; set; }
 
+        [Browsable(false)]
         public float X { get { return Center.X; } }
+        [Browsable(false)]
         public float Y { get { return Center.Y; } }
 
         private Vector2D dir;
@@ -64,6 +67,18 @@ namespace SimpleCAD
             unit.TransformBy(transformation);
             SemiMajorAxis = dir.Length * SemiMajorAxis;
             SemiMinorAxis = dir.Length * SemiMinorAxis;
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            float a1 = SemiMajorAxis - pickBoxSize / 2;
+            float a2 = SemiMajorAxis + pickBoxSize / 2;
+            float b1 = SemiMinorAxis - pickBoxSize / 2;
+            float b2 = SemiMinorAxis + pickBoxSize / 2;
+            float rot = dir.Angle;
+            float xx = (pt.X - X) * (float)Math.Cos(rot) + (pt.Y - Y) * (float)Math.Sin(rot);
+            float yy = (pt.X - X) * (float)Math.Sin(rot) - (pt.Y - Y) * (float)Math.Cos(rot);
+            return (xx * xx / a1 / a1 + yy * yy / b1 / b1 >= 1) && (xx * xx / a2 / a2 + yy * yy / b2 / b2 <= 1);
         }
     }
 }

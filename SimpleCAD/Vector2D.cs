@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SimpleCAD
 {
+    [TypeConverter(typeof(Vector2DConverter))]
     public struct Vector2D
     {
         public float X { get; set; }
@@ -26,6 +28,12 @@ namespace SimpleCAD
             Y = y;
         }
 
+        public Vector2D GetNormalized()
+        {
+            float len = Length;
+            return new Vector2D(X / len, Y / len);
+        }
+
         public void Normalize()
         {
             float len = Length;
@@ -40,7 +48,12 @@ namespace SimpleCAD
 
         public float AngleTo(Vector2D v)
         {
-            return (float)Math.Acos(DotProduct(v) / Length / v.Length);
+            float dot = this.DotProduct(v);
+            float det = X * v.Y - v.X * Y;
+            float ang = -(float)Math.Atan2(det, dot);
+            while (ang < 0) ang += 2 * (float)Math.PI;
+            while (ang > 2 * (float)Math.PI) ang -= 2 * (float)Math.PI;
+            return ang;
         }
 
         public static Vector2D FromAngle(float angle)
@@ -51,6 +64,16 @@ namespace SimpleCAD
         public Vector2D GetPerpendicularVector()
         {
             return new Vector2D(-Y, X);
+        }
+
+        public static Vector2D operator +(Vector2D a, Vector2D b)
+        {
+            return new Vector2D(a.X + b.X, a.Y + b.Y);
+        }
+
+        public static Vector2D operator -(Vector2D a, Vector2D b)
+        {
+            return new Vector2D(a.X - b.X, a.Y - b.Y);
         }
 
         public static Vector2D operator *(Vector2D p, float f)

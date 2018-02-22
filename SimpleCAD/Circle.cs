@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -8,7 +9,9 @@ namespace SimpleCAD
         public Point2D Center { get; set; }
         public float Radius { get; set; }
 
+        [Browsable(false)]
         public float X { get { return Center.X; } }
+        [Browsable(false)]
         public float Y { get { return Center.Y; } }
 
         public Circle(Point2D center, float radius)
@@ -52,6 +55,12 @@ namespace SimpleCAD
             Vector2D dir = Vector2D.XAxis * Radius;
             dir.TransformBy(transformation);
             Radius = dir.Length;
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            float dist = (pt - Center).Length;
+            return dist <= Radius + pickBoxSize / 2 && dist >= Radius - pickBoxSize / 2;
         }
     }
 }

@@ -70,7 +70,7 @@ namespace SimpleCAD
                 return new RectangleF(extents.XMin, extents.YMin, extents.XMax - extents.XMin, extents.YMax - extents.YMin);
         }
 
-        public bool Contains(PointF pt)
+        public bool Contains(Point2D pt)
         {
             return Contains(pt.X, pt.Y);
         }

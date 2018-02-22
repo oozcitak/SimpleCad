@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SimpleCAD
 {
+    [TypeConverter(typeof(Point2DConverter))]
     public struct Point2D
     {
         public float X { get; set; }

@@ -7,6 +7,11 @@ namespace SimpleCAD
     {
         public Point2DCollection Points { get; private set; }
 
+        public Polygon()
+        {
+            Points = new Point2DCollection();
+        }
+
         public Polygon(Point2D[] pts)
         {
             Points = new Point2DCollection(pts);
@@ -19,15 +24,18 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            PointF[] pts = Points.ToPointF();
-            using (Brush brush = FillStyle.CreateBrush(param))
+            if (Points.Count > 0)
             {
-                param.Graphics.FillPolygon(brush, pts);
-            }
+                PointF[] pts = Points.ToPointF();
+                using (Brush brush = FillStyle.CreateBrush(param))
+                {
+                    param.Graphics.FillPolygon(brush, pts);
+                }
 
-            using (Pen pen = OutlineStyle.CreatePen(param))
-            {
-                param.Graphics.DrawPolygon(pen, pts);
+                using (Pen pen = OutlineStyle.CreatePen(param))
+                {
+                    param.Graphics.DrawPolygon(pen, pts);
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SimpleCAD
 {
@@ -9,9 +10,13 @@ namespace SimpleCAD
         public Point2D P1 { get; set; }
         public Point2D P2 { get; set; }
 
+        [Browsable(false)]
         public float X1 { get { return P1.X; } }
+        [Browsable(false)]
         public float Y1 { get { return P1.Y; } }
+        [Browsable(false)]
         public float X2 { get { return P2.X; } }
+        [Browsable(false)]
         public float Y2 { get { return P2.Y; } }
 
         public float Offset { get; set; }
@@ -40,42 +45,7 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            float tickSize = 0.5f * TextHeight;
-
-            Vector2D dir = P2 - P1;
-            float angle = dir.Angle;
-            float len = dir.Length;
-
-            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
-
-            // Dimension line
-            Line dim = new Line(0, Offset, len, Offset);
-            dim.OutlineStyle = OutlineStyle;
-            dim.TransformBy(trans);
-            dim.Draw(param);
-
-            // Left tick
-            Line tick1 = new Line(0, -tickSize + Offset, 0, tickSize + Offset);
-            tick1.OutlineStyle = OutlineStyle;
-            tick1.TransformBy(trans);
-            tick1.Draw(param);
-
-            // Right tick
-            Line tick2 = new Line(len, -tickSize + Offset, len, tickSize + Offset);
-            tick2.OutlineStyle = OutlineStyle;
-            tick2.TransformBy(trans);
-            tick2.Draw(param);
-
-            // Text
-            Text textObj = new Text(len / 2, Offset, String, TextHeight);
-            textObj.FontFamily = FontFamily;
-            textObj.FontStyle = FontStyle;
-            textObj.HorizontalAlignment = StringAlignment.Center;
-            textObj.VerticalAlignment = StringAlignment.Center;
-            textObj.FillStyle = FillStyle;
-            textObj.OutlineStyle = OutlineStyle;
-            textObj.TransformBy(trans);
-            textObj.Draw(param);
+            GetSubItems().Draw(param);
         }
 
         public override Extents GetExtents()
@@ -111,6 +81,52 @@ namespace SimpleCAD
             p2.TransformBy(transformation);
             P1 = p1;
             P2 = p2;
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            return GetSubItems().Contains(pt, pickBoxSize);
+        }
+
+        private Composite GetSubItems()
+        {
+            Composite items = new Composite();
+
+            float tickSize = 0.5f * TextHeight;
+
+            Vector2D dir = P2 - P1;
+            float angle = dir.Angle;
+            float len = dir.Length;
+
+            // Dimension line
+            Line dim = new Line(0, Offset, len, Offset);
+            dim.OutlineStyle = OutlineStyle;
+            items.Add(dim);
+
+            // Left tick
+            Line tick1 = new Line(0, -tickSize + Offset, 0, tickSize + Offset);
+            tick1.OutlineStyle = OutlineStyle;
+            items.Add(tick1);
+
+            // Right tick
+            Line tick2 = new Line(len, -tickSize + Offset, len, tickSize + Offset);
+            tick2.OutlineStyle = OutlineStyle;
+            items.Add(tick2);
+
+            // Text
+            Text textObj = new Text(len / 2, Offset, String, TextHeight);
+            textObj.FontFamily = FontFamily;
+            textObj.FontStyle = FontStyle;
+            textObj.HorizontalAlignment = StringAlignment.Center;
+            textObj.VerticalAlignment = StringAlignment.Center;
+            textObj.FillStyle = FillStyle;
+            textObj.OutlineStyle = OutlineStyle;
+            items.Add(textObj);
+
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
+            items.TransformBy(trans);
+
+            return items;
         }
     }
 }

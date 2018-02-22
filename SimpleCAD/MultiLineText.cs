@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -9,19 +10,23 @@ namespace SimpleCAD
     {
         public Point2D P { get; set; }
 
+        [Browsable(false)]
         public float X { get { return P.X; } }
+        [Browsable(false)]
         public float Y { get { return P.Y; } }
 
         public string[] Lines { get; set; }
         public string FontFamily { get; set; }
         public FontStyle FontStyle { get; set; }
         public float Height { get; set; }
+        public float Width { get; private set; }
         public float Rotation { get; set; }
 
         public MultiLineText(Point2D p, string[] lines, float height)
         {
             P = p;
             Height = height;
+            Width = height;
             Lines = lines;
             Rotation = 0;
             FontFamily = "Arial";
@@ -57,6 +62,7 @@ namespace SimpleCAD
                 {
                     thWidth = Math.Max(thWidth, param.Graphics.MeasureString(Lines[0], font).Width);
                 }
+                Width = param.ViewToModel(thWidth);
                 float dy = param.Graphics.MeasureString(Lines[0], font).Height;
                 float thHeight = dy * Lines.Length;
 
@@ -80,12 +86,7 @@ namespace SimpleCAD
         public override Extents GetExtents()
         {
             float thHeight = Height * Lines.Length * 1.425f;
-            float thWidth = 0;
-            foreach (string line in Lines)
-            {
-                thWidth = Math.Max(thWidth, line.Length * Height / 2);
-            }
-
+            float thWidth = Width;
             float angle = Rotation / 180 * (float)Math.PI;
             Point2D p1 = new Point2D(0, 0);
             Point2D p2 = new Point2D(thWidth, 0);

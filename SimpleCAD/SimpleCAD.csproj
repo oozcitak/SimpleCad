@@ -49,6 +49,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FillStyleConverter.cs" />
+    <Compile Include="Vector2DConverter.cs" />
+    <Compile Include="Point2DConverter.cs" />
+    <Compile Include="OutlineStyleConverter.cs" />
     <Compile Include="Point2DCollection.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">

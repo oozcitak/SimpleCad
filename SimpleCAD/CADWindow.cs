@@ -3,22 +3,30 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SimpleCAD
 {
+    [Docking(DockingBehavior.Ask)]
     public partial class CADWindow : UserControl
     {
+        [Category("Action"), Description("Occurs when an item is clicked with the mouse.")]
         public event ItemClickEventHandler ItemClick;
 
         private bool panning;
         private Point lastMouse;
         private Drawable mouseDownItem;
 
+        [Browsable(false)]
         public CADView View { get; private set; }
+        [Browsable(false)]
         public Composite Model { get; private set; }
+        [Browsable(false)]
         public float DrawingScale { get { return View.ZoomFactor; } }
 
+        [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control allows zooming and panning using the mouse.")]
         public bool AllowZoomAndPan { get; set; }
+        [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control allows picking items using the mouse.")]
         public bool AllowItemClick { get; set; }
 
         public CADWindow()
@@ -34,6 +42,7 @@ namespace SimpleCAD
             panning = false;
             AllowItemClick = true;
 
+            BorderStyle = BorderStyle.Fixed3D;
             BackColor = Color.White;
             Cursor = Cursors.Cross;
 
@@ -81,7 +90,7 @@ namespace SimpleCAD
 
             if (AllowItemClick)
             {
-                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y);
+                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, 4);
             }
         }
 
@@ -97,7 +106,7 @@ namespace SimpleCAD
 
             if (AllowItemClick && mouseDownItem != null)
             {
-                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y);
+                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, 4);
                 if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem))
                 {
                     OnItemClick(new ItemClickEventArgs(mouseUpItem, e.Button, e.Clicks, e.X, e.Y, e.Delta));
@@ -161,12 +170,13 @@ namespace SimpleCAD
             View.Render(e.Graphics);
         }
 
-        public Drawable FindItemAtScreenCoordinates(int x, int y)
+        public Drawable FindItemAtScreenCoordinates(int x, int y, int pickBox)
         {
             PointF pt = View.ScreenToWorld(x, y);
+            float pickBoxWorld = View.ScreenToWorld(new Size(pickBox, 0)).Width;
             foreach (Drawable d in Model)
             {
-                if (d.Contains(pt)) return d;
+                if (d.Contains(new Point2D(pt), pickBoxWorld)) return d;
             }
             return null;
         }

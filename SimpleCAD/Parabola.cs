@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -13,19 +14,24 @@ namespace SimpleCAD
             {
                 Point2D p3 = P1 + Vector2D.FromAngle(StartAngle);
                 Point2D p4 = P2 + Vector2D.FromAngle(EndAngle);
-                Point2D c;
-                Intersect(P1, p3, P2, p4, out c);
+                Intersect(P1, p3, P2, p4, out Point2D c);
                 return c;
             }
         }
         public float StartAngle { get; set; }
         public float EndAngle { get; set; }
 
+        [Browsable(false)]
         public float X1 { get { return P1.X; } }
+        [Browsable(false)]
         public float Y1 { get { return P1.Y; } }
+        [Browsable(false)]
         public float X2 { get { return P2.X; } }
+        [Browsable(false)]
         public float Y2 { get { return P2.Y; } }
+        [Browsable(false)]
         public float XC { get { return PC.X; } }
+        [Browsable(false)]
         public float YC { get { return PC.Y; } }
 
         public Parabola(Point2D p1, Point2D p2, float startAngle, float endAngle)

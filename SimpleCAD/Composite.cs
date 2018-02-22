@@ -30,6 +30,15 @@ namespace SimpleCAD
             return extents;
         }
 
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            foreach (Drawable d in items)
+            {
+                if (d.Contains(pt, pickBoxSize)) return true;
+            }
+            return false;
+        }
+
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             foreach (Drawable item in items)

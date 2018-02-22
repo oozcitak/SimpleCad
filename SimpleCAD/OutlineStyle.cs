@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
+    [TypeConverter(typeof(OutlineStyleConverter))]
     public partial struct OutlineStyle
     {
         public Color Color { get; set; }

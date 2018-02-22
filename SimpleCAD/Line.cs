@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -8,9 +9,13 @@ namespace SimpleCAD
         public Point2D P1 { get; set; }
         public Point2D P2 { get; set; }
 
+        [Browsable(false)]
         public float X1 { get { return P1.X; } }
+        [Browsable(false)]
         public float Y1 { get { return P1.Y; } }
+        [Browsable(false)]
         public float X2 { get { return P2.X; } }
+        [Browsable(false)]
         public float Y2 { get { return P2.Y; } }
 
         public Line(Point2D p1, Point2D p2)
@@ -49,6 +54,15 @@ namespace SimpleCAD
             p2.TransformBy(transformation);
             P1 = p1;
             P2 = p2;
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            Vector2D w = pt - P1;
+            Vector2D vL = (P2 - P1);
+            float b = w.DotProduct(vL) / vL.DotProduct(vL);
+            float dist = (w - b * vL).Length;
+            return b >= 0 && b <= 1 && dist <= pickBoxSize / 2;
         }
     }
 }

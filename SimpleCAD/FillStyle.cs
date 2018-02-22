@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
+    [TypeConverter(typeof(FillStyleConverter))]
     public partial struct FillStyle
     {
         public enum FillType

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -10,12 +11,18 @@ namespace SimpleCAD
         public Point2D P1 { get { return points[0]; } set { points[0] = value; } }
         public Point2D P2 { get { return points[1]; } set { points[1] = value; } }
 
+        [Browsable(false)]
         public float X1 { get { return P1.X; } }
+        [Browsable(false)]
         public float Y1 { get { return P1.Y; } }
+        [Browsable(false)]
         public float X2 { get { return P2.X; } }
+        [Browsable(false)]
         public float Y2 { get { return P2.Y; } }
 
+        [Browsable(false)]
         public float Width { get { return Math.Abs(X2 - X1); } }
+        [Browsable(false)]
         public float Height { get { return Math.Abs(Y2 - Y1); } }
 
         public Rectangle(Point2D p1, Point2D p2)
