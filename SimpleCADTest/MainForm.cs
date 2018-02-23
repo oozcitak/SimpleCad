@@ -358,6 +358,7 @@ namespace SimpleCADTest
                     }
                     break;
             }
+            propertyGrid1.Refresh();
             cadWindow1.Refresh();
         }
 

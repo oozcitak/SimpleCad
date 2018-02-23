@@ -35,10 +35,13 @@ namespace SimpleCAD
             using (Pen pen = OutlineStyle.CreatePen(param))
             {
                 // Represent curved features by at most 4 pixels
-                float curveLength = param.ModelToView(Math.Abs(EndAngle - StartAngle) * Radius);
+                float sweep = EndAngle - StartAngle;
+                while (sweep < 0) sweep += 2 * (float)Math.PI;
+                while (sweep > 2 * (float)Math.PI) sweep -= 2 * (float)Math.PI;
+                float curveLength = param.ModelToView(sweep * Radius);
                 int n = (int)Math.Max(4, curveLength / 4);
                 float a = StartAngle;
-                float da = (EndAngle - StartAngle) / (float)n;
+                float da = sweep / (float)n;
                 PointF[] pts = new PointF[n + 1];
                 for (int i = 0; i <= n; i++)
                 {
