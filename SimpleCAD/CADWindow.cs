@@ -56,6 +56,23 @@ namespace SimpleCAD
             MouseWheel += CadView_MouseWheel;
             KeyDown += CADWindow_KeyDown;
             Paint += CadView_Paint;
+
+            Model.CollectionChanged += Model_CollectionChanged;
+        }
+
+        private void Model_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (Drawable item in e.OldItems)
+                {
+                    Editor.Selection.Remove(item);
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                Editor.Selection.Clear();
+            }
         }
 
         public void ZoomIn()

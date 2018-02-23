@@ -146,7 +146,7 @@ namespace SimpleCAD
         /// </summary>
         /// <param name="pt">Location in screen coordinates.</param>
         /// <returns>A PointF in world coordinates.</returns>
-        public PointF ScreenToWorld(System.Drawing.Point pt) { return ScreenToWorld(pt.X, pt.Y); }
+        public PointF ScreenToWorld(Point pt) { return ScreenToWorld(pt.X, pt.Y); }
         /// <summary>
         /// Converts the given vector from screen coordinates to world coordinates.
         /// </summary>

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
-    public class Composite : Drawable, ICollection<Drawable>
+    public class Composite : Drawable, ICollection<Drawable>, INotifyCollectionChanged
     {
         List<Drawable> items = new List<Drawable>();
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public Composite()
         {
@@ -54,11 +57,13 @@ namespace SimpleCAD
         public void Add(Drawable item)
         {
             items.Add(item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
         public void Clear()
         {
             items.Clear();
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public bool Contains(Drawable item)
@@ -83,7 +88,12 @@ namespace SimpleCAD
 
         public bool Remove(Drawable item)
         {
-            return items.Remove(item);
+            bool check = items.Remove(item);
+            if (check)
+            {
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
+            }
+            return check;
         }
 
         public IEnumerator<Drawable> GetEnumerator()
@@ -94,6 +104,11 @@ namespace SimpleCAD
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged?.Invoke(this, e);
         }
     }
 }
