@@ -20,7 +20,7 @@ namespace SimpleCAD
             {
                 mZoomFactor = value;
 
-                if (float.IsNaN(mZoomFactor) || float.IsNegativeInfinity(mZoomFactor) || float.IsPositiveInfinity(mZoomFactor) || 
+                if (float.IsNaN(mZoomFactor) || float.IsNegativeInfinity(mZoomFactor) || float.IsPositiveInfinity(mZoomFactor) ||
                     mZoomFactor < float.Epsilon * 1000.0f || mZoomFactor > float.MaxValue / 1000.0f)
                 {
                     mZoomFactor = 1;
@@ -39,12 +39,12 @@ namespace SimpleCAD
                 mCameraPosition = value;
                 float x = mCameraPosition.X;
                 float y = mCameraPosition.Y;
-                if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) || 
+                if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) ||
                     x < float.MinValue / 1000.0f || x > float.MaxValue / 1000.0f)
                 {
                     x = 0;
                 }
-                if (float.IsNaN(y) || float.IsNegativeInfinity(y) || float.IsPositiveInfinity(y) || 
+                if (float.IsNaN(y) || float.IsNegativeInfinity(y) || float.IsPositiveInfinity(y) ||
                     y < float.MinValue / 1000.0f || y > float.MaxValue / 1000.0f)
                 {
                     y = 0;
@@ -57,10 +57,12 @@ namespace SimpleCAD
         public int Height { get; private set; }
 
         public Composite Model { get; private set; }
+        public Editor Editor { get; private set; }
 
-        public CADView(Composite model, int width, int height)
+        public CADView(Composite model, Editor editor, int width, int height)
         {
             Model = model;
+            Editor = editor;
 
             Width = width;
             Height = height;
@@ -88,6 +90,15 @@ namespace SimpleCAD
 
             // Render drawing objects
             Model.Draw(param);
+
+            // Render selected objects
+            param.SelectionColor = Editor.SelectionHighlight;
+            param.SelectionMode = true;
+            foreach (Drawable selected in Editor.Selection)
+            {
+                selected.Draw(param);
+            }
+            param.SelectionMode = false;
         }
 
         /// <summary>

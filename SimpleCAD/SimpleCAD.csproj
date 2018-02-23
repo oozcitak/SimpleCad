@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="FillStyleConverter.cs" />
     <Compile Include="Vector2DConverter.cs" />
     <Compile Include="Point2DConverter.cs" />
@@ -65,7 +67,6 @@
     <Compile Include="Circle.cs" />
     <Compile Include="Arc.cs" />
     <Compile Include="EllipticArc.cs" />
-    <Compile Include="ItemClickEventArgs.cs" />
     <Compile Include="FillStyles.cs">
       <DependentUpon>FillStyles.tt</DependentUpon>
       <AutoGen>True</AutoGen>

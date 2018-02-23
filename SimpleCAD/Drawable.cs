@@ -17,7 +17,7 @@ namespace SimpleCAD
 
         protected Drawable()
         {
-            OutlineStyle = OutlineStyle.Black;
+            OutlineStyle = OutlineStyle.White;
             FillStyle = FillStyle.Transparent;
             Visible = true;
         }

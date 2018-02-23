@@ -34,7 +34,6 @@
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
@@ -43,6 +42,7 @@
             this.btnDrawArc = new System.Windows.Forms.ToolStripButton();
             this.btnDrawEllipticArc = new System.Windows.Forms.ToolStripButton();
             this.btnDrawText = new System.Windows.Forms.ToolStripButton();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -119,19 +119,6 @@
             this.splitContainer1.Size = new System.Drawing.Size(1008, 469);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BackColor = System.Drawing.Color.White;
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 469);
-            this.cadWindow1.TabIndex = 0;
-            this.cadWindow1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseClick);
-            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
             // propertyGrid1
             // 
@@ -217,6 +204,19 @@
             this.btnDrawText.Size = new System.Drawing.Size(32, 22);
             this.btnDrawText.Text = "Text";
             this.btnDrawText.Click += new System.EventHandler(this.btnDrawText_Click);
+            // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 469);
+            this.cadWindow1.TabIndex = 0;
+            this.cadWindow1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseClick);
+            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
             // MainForm
             // 

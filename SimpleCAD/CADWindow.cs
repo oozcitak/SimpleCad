@@ -10,24 +10,27 @@ namespace SimpleCAD
     [Docking(DockingBehavior.Ask)]
     public partial class CADWindow : UserControl
     {
-        [Category("Action"), Description("Occurs when an item is clicked with the mouse.")]
-        public event ItemClickEventHandler ItemClick;
-
         private bool panning;
         private Point lastMouse;
         private Drawable mouseDownItem;
+
+        public event SelectionChangedEventHandler SelectionChanged;
 
         [Browsable(false)]
         public CADView View { get; private set; }
         [Browsable(false)]
         public Composite Model { get; private set; }
         [Browsable(false)]
+        public Editor Editor { get; private set; }
+        [Browsable(false)]
         public float DrawingScale { get { return View.ZoomFactor; } }
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control allows zooming and panning using the mouse.")]
-        public bool AllowZoomAndPan { get; set; }
-        [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control allows picking items using the mouse.")]
-        public bool AllowItemClick { get; set; }
+        public bool AllowZoomAndPan { get; set; } = true;
+        [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control allows selecting items using the mouse.")]
+        public bool AllowSelect { get; set; } = true;
+        [Category("Behavior"), DefaultValue(4), Description("Determines the size of the pick box around the selection cursor.")]
+        public int PickBoxSize { get; set; } = 4;
 
         public CADWindow()
         {
@@ -36,23 +39,23 @@ namespace SimpleCAD
             DoubleBuffered = true;
 
             Model = new Composite();
-            View = new CADView(Model, ClientRectangle.Width, ClientRectangle.Height);
+            Editor = new Editor();
+            View = new CADView(Model, Editor, ClientRectangle.Width, ClientRectangle.Height);
 
-            AllowZoomAndPan = true;
             panning = false;
-            AllowItemClick = true;
 
             BorderStyle = BorderStyle.Fixed3D;
-            BackColor = Color.White;
+            BackColor = Color.FromArgb(33, 40, 48);
             Cursor = Cursors.Cross;
 
-            Resize += new EventHandler(CadView_Resize);
-            MouseDown += new MouseEventHandler(CadView_MouseDown);
-            MouseUp += new MouseEventHandler(CadView_MouseUp);
-            MouseMove += new MouseEventHandler(CadView_MouseMove);
-            MouseDoubleClick += new MouseEventHandler(CadView_MouseDoubleClick);
-            MouseWheel += new MouseEventHandler(CadView_MouseWheel);
-            Paint += new PaintEventHandler(CadView_Paint);
+            Resize += CadView_Resize;
+            MouseDown += CadView_MouseDown;
+            MouseUp += CadView_MouseUp;
+            MouseMove += CadView_MouseMove;
+            MouseDoubleClick += CadView_MouseDoubleClick;
+            MouseWheel += CadView_MouseWheel;
+            KeyDown += CADWindow_KeyDown;
+            Paint += CadView_Paint;
         }
 
         public void ZoomIn()
@@ -81,22 +84,22 @@ namespace SimpleCAD
 
         void CadView_MouseDown(object sender, MouseEventArgs e)
         {
-            if (((e.Button & MouseButtons.Middle) != MouseButtons.None) && AllowZoomAndPan)
+            if (e.Button == MouseButtons.Middle && AllowZoomAndPan)
             {
                 panning = true;
                 lastMouse = e.Location;
                 Cursor = Cursors.NoMove2D;
             }
 
-            if (AllowItemClick)
+            if (e.Button == MouseButtons.Left && AllowSelect)
             {
-                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, 4);
+                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
             }
         }
 
         void CadView_MouseUp(object sender, MouseEventArgs e)
         {
-            if (((e.Button & MouseButtons.Middle) != MouseButtons.None) && panning)
+            if (e.Button == MouseButtons.Middle && panning)
             {
                 panning = false;
                 Invalidate();
@@ -104,19 +107,24 @@ namespace SimpleCAD
 
             Cursor = Cursors.Cross;
 
-            if (AllowItemClick && mouseDownItem != null)
+            if (e.Button == MouseButtons.Left && AllowSelect && mouseDownItem != null)
             {
-                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, 4);
+                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
                 if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem))
                 {
-                    OnItemClick(new ItemClickEventArgs(mouseUpItem, e.Button, e.Clicks, e.X, e.Y, e.Delta));
+                    if ((ModifierKeys & Keys.Shift) != Keys.None)
+                        Editor.Selection.Remove(mouseDownItem);
+                    else
+                        Editor.Selection.Add(mouseDownItem);
+                    Invalidate();
+                    OnSelectionChanged(new SelectionChangedEventArgs(Editor.Selection));
                 }
             }
         }
 
         void CadView_MouseMove(object sender, MouseEventArgs e)
         {
-            if (((e.Button & MouseButtons.Middle) != MouseButtons.None) && panning)
+            if (e.Button == MouseButtons.Middle && panning)
             {
                 // Relative mouse movement
                 PointF cloc = View.ScreenToWorld(e.Location);
@@ -149,15 +157,20 @@ namespace SimpleCAD
 
         void CadView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (((e.Button & MouseButtons.Middle) != MouseButtons.None) && AllowZoomAndPan)
+            if (e.Button == MouseButtons.Middle && AllowZoomAndPan)
             {
                 View.ZoomToExtents();
             }
         }
 
-        protected virtual void OnItemClick(ItemClickEventArgs e)
+        private void CADWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            ItemClick?.Invoke(this, e);
+            if (e.KeyCode == Keys.Escape)
+            {
+                Editor.Selection.Clear();
+                Invalidate();
+                OnSelectionChanged(new SelectionChangedEventArgs(Editor.Selection));
+            }
         }
 
         void CadView_Paint(object sender, PaintEventArgs e)
@@ -179,6 +192,12 @@ namespace SimpleCAD
                 if (d.Contains(new Point2D(pt), pickBoxWorld)) return d;
             }
             return null;
+        }
+
+        protected void OnSelectionChanged(SelectionChangedEventArgs e)
+        {
+            if (SelectionChanged != null)
+                SelectionChanged.Invoke(this, e);
         }
     }
 }

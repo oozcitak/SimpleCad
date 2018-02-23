@@ -40,7 +40,9 @@ namespace SimpleCAD
 
         public Brush CreateBrush(DrawParams param)
         {
-            if (Type == FillType.Solid)
+            if (param.SelectionMode)
+                return new SolidBrush(param.SelectionColor);
+            else if (Type == FillType.Solid)
                 return new SolidBrush(Color);
             else if (Type == FillType.Hatch)
                 return new HatchBrush(HatchStyle, Color, FillColor);

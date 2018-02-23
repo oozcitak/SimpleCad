@@ -45,7 +45,8 @@ namespace SimpleCAD
         public override void Draw(DrawParams param)
         {
             float height = param.ModelToView(Height);
-            using (Brush brush = new SolidBrush(OutlineStyle.Color))
+            using (Pen pen = OutlineStyle.CreatePen(param))
+            using (Brush brush = new SolidBrush(pen.Color))
             using (Brush back = new SolidBrush(FillStyle.Color))
             using (Font font = new Font(FontFamily, height, FontStyle, GraphicsUnit.Pixel))
             {

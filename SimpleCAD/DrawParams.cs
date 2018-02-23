@@ -8,6 +8,8 @@ namespace SimpleCAD
         public Graphics Graphics { get; private set; }
         public bool ScaleLineWeights { get; private set; }
         public float ZoomFactor { get; private set; }
+        internal bool SelectionMode { get; set; }
+        internal Color SelectionColor { get; set; }
 
         public DrawParams(Graphics graphics, bool scaleLineWeights, float zoomFactor)
         {

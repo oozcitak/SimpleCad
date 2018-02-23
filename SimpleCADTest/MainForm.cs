@@ -16,8 +16,6 @@ namespace SimpleCADTest
         int commandStep = 0;
         Point2D[] pickedPoints = new Point2D[20];
         Drawable newItem;
-        Drawable hoverItem;
-        OutlineStyle hoverItemStyle;
         Circle trPoint;
 
         public MainForm()
@@ -27,6 +25,12 @@ namespace SimpleCADTest
             trPoint.FillStyle = FillStyle.Orange;
             trPoint.OutlineStyle = new OutlineStyle(Color.Red, 3);
             cadWindow1.Model.Add(trPoint);
+            cadWindow1.SelectionChanged += CadWindow1_SelectionChanged;
+        }
+
+        private void CadWindow1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            propertyGrid1.SelectedObjects = e.SelectedItems.ToArray();
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -43,26 +47,6 @@ namespace SimpleCADTest
             {
                 pickedPoints[commandStep] = pt;
                 ApplyCommand();
-            }
-            else
-            {
-                Drawable sel = cadWindow1.FindItemAtScreenCoordinates(e.X, e.Y, 5);
-                if (sel != trPoint && sel != hoverItem)
-                {
-                    if (hoverItem != null)
-                    {
-                        hoverItem.OutlineStyle = hoverItemStyle;
-                        cadWindow1.Refresh();
-                    }
-                    hoverItem = sel;
-                    if (hoverItem != null)
-                    {
-                        hoverItemStyle = hoverItem.OutlineStyle;
-                        hoverItem.OutlineStyle = OutlineStyle.CornflowerBlue;
-                        propertyGrid1.SelectedObject = hoverItem;
-                        cadWindow1.Refresh();
-                    }
-                }
             }
         }
 
@@ -84,158 +68,202 @@ namespace SimpleCADTest
         {
             if (currentCommand == "LINE" && commandStep == 0)
             {
-                statusLabel.Text = "Select start point of line";
                 newItem = new Line(pickedPoints[0], pickedPoints[0]);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "LINE" && commandStep == 1)
             {
-                statusLabel.Text = "Select end point of line";
+                statusLabel.Text = "Select start point of line";
                 Line line = newItem as Line;
+                line.P1 = pickedPoints[1];
                 line.P2 = pickedPoints[1];
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "LINE" && commandStep == 2)
             {
+                statusLabel.Text = "Select end point of line";
+                Line line = newItem as Line;
+                line.P2 = pickedPoints[2];
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "LINE" && commandStep == 3)
+            {
                 ResetCommand();
             }
             else if (currentCommand == "ARC" && commandStep == 0)
             {
-                statusLabel.Text = "Select center point of arc";
-                newItem = new Arc(pickedPoints[0], 0, 0, 2 * (float)Math.PI);
+                newItem = new Arc(pickedPoints[0], 1, 0, 2 * (float)Math.PI);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "ARC" && commandStep == 1)
             {
-                statusLabel.Text = "Select radius of arc";
+                statusLabel.Text = "Select center point of arc";
                 Arc arc = newItem as Arc;
-                arc.Radius = (pickedPoints[1] - pickedPoints[0]).Length;
+                arc.Center = pickedPoints[1];
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ARC" && commandStep == 2)
             {
-                statusLabel.Text = "Select start angle of arc";
+                statusLabel.Text = "Select radius of arc";
                 Arc arc = newItem as Arc;
-                arc.StartAngle = (pickedPoints[2] - pickedPoints[0]).Angle;
+                arc.Radius = (pickedPoints[2] - pickedPoints[1]).Length;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ARC" && commandStep == 3)
             {
-                statusLabel.Text = "Select end angle of arc";
+                statusLabel.Text = "Select start angle of arc";
                 Arc arc = newItem as Arc;
-                arc.EndAngle = (pickedPoints[3] - pickedPoints[0]).Angle;
+                arc.StartAngle = (pickedPoints[3] - pickedPoints[1]).Angle;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ARC" && commandStep == 4)
+            {
+                statusLabel.Text = "Select end angle of arc";
+                Arc arc = newItem as Arc;
+                arc.EndAngle = (pickedPoints[4] - pickedPoints[1]).Angle;
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "ARC" && commandStep == 5)
             {
                 ResetCommand();
             }
             else if (currentCommand == "CIRCLE" && commandStep == 0)
             {
-                statusLabel.Text = "Select center point of circle";
-                newItem = new Circle(pickedPoints[0], 0);
+                newItem = new Circle(pickedPoints[0], 1);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "CIRCLE" && commandStep == 1)
             {
-                statusLabel.Text = "Select radius of circle";
+                statusLabel.Text = "Select center point of circle";
                 Circle cir = newItem as Circle;
-                cir.Radius = (pickedPoints[1] - pickedPoints[0]).Length;
+                cir.Center = pickedPoints[1];
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "CIRCLE" && commandStep == 2)
+            {
+                statusLabel.Text = "Select radius of circle";
+                Circle cir = newItem as Circle;
+                cir.Radius = (pickedPoints[2] - pickedPoints[1]).Length;
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "CIRCLE" && commandStep == 3)
             {
                 ResetCommand();
             }
             else if (currentCommand == "ELLIPSE" && commandStep == 0)
             {
-                statusLabel.Text = "Select center point of ellipse";
-                newItem = new Ellipse(pickedPoints[0], 0, 0);
+                newItem = new Ellipse(pickedPoints[0], 1, 1);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "ELLIPSE" && commandStep == 1)
             {
-                statusLabel.Text = "Select semi-major axis of ellipse";
+                statusLabel.Text = "Select center point of ellipse";
                 Ellipse eli = newItem as Ellipse;
-                eli.SemiMajorAxis = (pickedPoints[1] - pickedPoints[0]).Length;
+                eli.Center = pickedPoints[1];
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPSE" && commandStep == 2)
             {
-                statusLabel.Text = "Select semi-minor axis of ellipse";
+                statusLabel.Text = "Select semi-major axis of ellipse";
                 Ellipse eli = newItem as Ellipse;
-                eli.SemiMinorAxis = (pickedPoints[2] - pickedPoints[0]).Length;
+                eli.SemiMajorAxis = (pickedPoints[2] - pickedPoints[1]).Length;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPSE" && commandStep == 3)
+            {
+                statusLabel.Text = "Select semi-minor axis of ellipse";
+                Ellipse eli = newItem as Ellipse;
+                eli.SemiMinorAxis = (pickedPoints[3] - pickedPoints[1]).Length;
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "ELLIPSE" && commandStep == 4)
             {
                 ResetCommand();
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 0)
             {
-                statusLabel.Text = "Select center point of elliptic arc";
-                newItem = new EllipticArc(pickedPoints[0], 0, 0, 0, 2 * (float)Math.PI);
+                newItem = new EllipticArc(pickedPoints[0], 1, 1, 0, 2 * (float)Math.PI);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 1)
             {
-                statusLabel.Text = "Select semi-major axis of elliptic arc";
+                statusLabel.Text = "Select center point of elliptic arc";
                 EllipticArc eli = newItem as EllipticArc;
-                eli.SemiMajorAxis = (pickedPoints[1] - pickedPoints[0]).Length;
+                eli.Center = pickedPoints[1];
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 2)
             {
-                statusLabel.Text = "Select semi-minor axis of elliptic arc";
+                statusLabel.Text = "Select semi-major axis of elliptic arc";
                 EllipticArc eli = newItem as EllipticArc;
-                eli.SemiMinorAxis = (pickedPoints[2] - pickedPoints[0]).Length;
+                eli.SemiMajorAxis = (pickedPoints[2] - pickedPoints[1]).Length;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 3)
             {
-                statusLabel.Text = "Select start angle of elliptic arc";
-                EllipticArc arc = newItem as EllipticArc;
-                arc.StartAngle = (pickedPoints[3] - pickedPoints[0]).Angle;
+                statusLabel.Text = "Select semi-minor axis of elliptic arc";
+                EllipticArc eli = newItem as EllipticArc;
+                eli.SemiMinorAxis = (pickedPoints[3] - pickedPoints[1]).Length;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 4)
             {
-                statusLabel.Text = "Select end angle of elliptic arc";
+                statusLabel.Text = "Select start angle of elliptic arc";
                 EllipticArc arc = newItem as EllipticArc;
-                arc.EndAngle = (pickedPoints[4] - pickedPoints[0]).Angle;
+                arc.StartAngle = (pickedPoints[4] - pickedPoints[1]).Angle;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 5)
+            {
+                statusLabel.Text = "Select end angle of elliptic arc";
+                EllipticArc arc = newItem as EllipticArc;
+                arc.EndAngle = (pickedPoints[5] - pickedPoints[1]).Angle;
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 6)
             {
                 ResetCommand();
             }
             else if (currentCommand == "TEXT" && commandStep == 0)
             {
-                statusLabel.Text = "Select insertion point of text";
                 newItem = new Text(pickedPoints[0], "abc", 1);
                 cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
+                commandStep++;
             }
             else if (currentCommand == "TEXT" && commandStep == 1)
             {
-                statusLabel.Text = "Select text rotation";
+                statusLabel.Text = "Select insertion point of text";
                 Text txt = newItem as Text;
-                txt.Rotation = (pickedPoints[1] - pickedPoints[0]).Angle;
+                txt.P = pickedPoints[1];
+                cadWindow1.Model.Add(newItem);
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "TEXT" && commandStep == 2)
             {
-                statusLabel.Text = "Select text height";
+                statusLabel.Text = "Select text rotation";
                 Text txt = newItem as Text;
-                txt.Height = (pickedPoints[2] - pickedPoints[0]).Length;
+                txt.Rotation = (pickedPoints[2] - pickedPoints[1]).Angle;
                 cadWindow1.Refresh();
             }
             else if (currentCommand == "TEXT" && commandStep == 3)
+            {
+                statusLabel.Text = "Select text height";
+                Text txt = newItem as Text;
+                txt.Height = (pickedPoints[3] - pickedPoints[1]).Length;
+                cadWindow1.Refresh();
+            }
+            else if (currentCommand == "TEXT" && commandStep == 4)
             {
                 ResetCommand();
             }
@@ -289,45 +317,45 @@ namespace SimpleCADTest
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (hoverItem != null)
+            foreach (Drawable item in cadWindow1.Editor.Selection)
             {
                 switch (e.KeyCode)
                 {
                     case Keys.Right:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(20, 0));
+                        item.TransformBy(TransformationMatrix2D.Translation(20, 0));
                         break;
                     case Keys.Left:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(-20, 0));
+                        item.TransformBy(TransformationMatrix2D.Translation(-20, 0));
                         break;
                     case Keys.Down:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(0, -20));
+                        item.TransformBy(TransformationMatrix2D.Translation(0, -20));
                         break;
                     case Keys.Up:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(0, 20));
+                        item.TransformBy(TransformationMatrix2D.Translation(0, 20));
                         break;
                     case Keys.PageDown:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                        hoverItem.TransformBy(TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
+                        item.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                         break;
                     case Keys.PageUp:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                        hoverItem.TransformBy(TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
+                        item.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                         break;
                     case Keys.Home:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                        hoverItem.TransformBy(TransformationMatrix2D.Scale(0.8f, 0.8f));
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Scale(0.8f, 0.8f));
+                        item.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                         break;
                     case Keys.End:
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                        hoverItem.TransformBy(TransformationMatrix2D.Scale(1.2f, 1.2f));
-                        hoverItem.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                        item.TransformBy(TransformationMatrix2D.Scale(1.2f, 1.2f));
+                        item.TransformBy(TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                         break;
                 }
-                cadWindow1.Refresh();
             }
+            cadWindow1.Refresh();
         }
     }
 }
