@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CADDocument.cs" />
+    <Compile Include="SelectionSet.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="FillStyleConverter.cs" />

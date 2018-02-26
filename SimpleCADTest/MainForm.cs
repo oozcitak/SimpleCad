@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 
@@ -24,13 +27,13 @@ namespace SimpleCADTest
             trPoint = new Circle(0, 0, 20);
             trPoint.FillStyle = FillStyle.Orange;
             trPoint.OutlineStyle = new OutlineStyle(Color.Red, 3);
-            cadWindow1.Model.Add(trPoint);
-            cadWindow1.SelectionChanged += CadWindow1_SelectionChanged;
+            cadWindow1.Document.Model.Add(trPoint);
+            cadWindow1.Document.SelectionChanged += CadWindow1_SelectionChanged;
         }
 
-        private void CadWindow1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CadWindow1_SelectionChanged(object sender, EventArgs e)
         {
-            propertyGrid1.SelectedObjects = e.SelectedItems.ToArray();
+            propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.Selection.ToArray();
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -69,7 +72,7 @@ namespace SimpleCADTest
             if (currentCommand == "LINE" && commandStep == 0)
             {
                 newItem = new Line(pickedPoints[0], pickedPoints[0]);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -95,7 +98,7 @@ namespace SimpleCADTest
             else if (currentCommand == "ARC" && commandStep == 0)
             {
                 newItem = new Arc(pickedPoints[0], 1, 0, 2 * (float)Math.PI);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -134,7 +137,7 @@ namespace SimpleCADTest
             else if (currentCommand == "CIRCLE" && commandStep == 0)
             {
                 newItem = new Circle(pickedPoints[0], 1);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -159,7 +162,7 @@ namespace SimpleCADTest
             else if (currentCommand == "ELLIPSE" && commandStep == 0)
             {
                 newItem = new Ellipse(pickedPoints[0], 1, 1);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -191,7 +194,7 @@ namespace SimpleCADTest
             else if (currentCommand == "ELLIPTIC_ARC" && commandStep == 0)
             {
                 newItem = new EllipticArc(pickedPoints[0], 1, 1, 0, 2 * (float)Math.PI);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -237,7 +240,7 @@ namespace SimpleCADTest
             else if (currentCommand == "TEXT" && commandStep == 0)
             {
                 newItem = new Text(pickedPoints[0], "abc", 1);
-                cadWindow1.Model.Add(newItem);
+                cadWindow1.Document.Model.Add(newItem);
                 cadWindow1.Refresh();
                 commandStep++;
             }
@@ -319,42 +322,42 @@ namespace SimpleCADTest
             switch (e.KeyCode)
             {
                 case Keys.Right:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(20, 0));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(20, 0));
                     break;
                 case Keys.Left:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(-20, 0));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-20, 0));
                     break;
                 case Keys.Down:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(0, -20));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(0, -20));
                     break;
                 case Keys.Up:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(0, 20));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(0, 20));
                     break;
                 case Keys.PageDown:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.PageUp:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.Home:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Scale(0.8f, 0.8f));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Scale(0.8f, 0.8f));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.End:
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Scale(1.2f, 1.2f));
-                    TransformItems(cadWindow1.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Scale(1.2f, 1.2f));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.Delete:
-                    Drawable[] toDelete = cadWindow1.Editor.Selection.ToArray();
+                    Drawable[] toDelete = cadWindow1.Document.Editor.Selection.ToArray();
                     foreach (Drawable item in toDelete)
                     {
-                        cadWindow1.Model.Remove(item);
+                        cadWindow1.Document.Model.Remove(item);
                     }
                     break;
             }
@@ -367,6 +370,25 @@ namespace SimpleCADTest
             foreach (Drawable item in items)
             {
                 item.TransformBy(trans);
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Save(SaveFileName);
+        }
+
+        private void ReadFile()
+        {
+            cadWindow1.Document.Open(SaveFileName);
+        }
+
+        private string SaveFileName
+        {
+            get
+            {
+                string path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                return Path.Combine(path, "save.bin");
             }
         }
     }
