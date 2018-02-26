@@ -2,14 +2,26 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.ComponentModel;
 
 namespace SimpleCAD
 {
     public class CADView
     {
+        private Control control;
         private PointF mCameraPosition;
         private float mZoomFactor;
 
+        private bool panning;
+        private Point lastMouse;
+        private Drawable mouseDownItem;
+
+        [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
+        public bool Interactive { get; set; } = true;
+        [Category("Behavior"), DefaultValue(4), Description("Determines the size of the pick box around the selection cursor.")]
+        public int PickBoxSize { get; set; } = 4;
+
+        [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
         public float ZoomFactor
         {
             get
@@ -28,6 +40,7 @@ namespace SimpleCAD
             }
         }
 
+        [Category("Appearance"), DefaultValue(typeof(PointF), "0,0"), Description("Determines the location of the camera.")]
         public PointF CameraPosition
         {
             get
@@ -53,20 +66,48 @@ namespace SimpleCAD
             }
         }
 
+        [Browsable(false)]
         public int Width { get; private set; }
+        [Browsable(false)]
         public int Height { get; private set; }
 
+        [Browsable(false)]
         public CADDocument Document { get; private set; }
 
-        public CADView(CADDocument document, int width, int height)
+        public CADView(CADDocument document)
         {
             Document = document;
 
-            Width = width;
-            Height = height;
+            Width = 1;
+            Height = 1;
 
             mZoomFactor = 5.0f / 3.0f;
             mCameraPosition = new PointF(0, 0);
+
+            panning = false;
+
+            Document.DocumentChanged += Document_Changed;
+            Document.SelectionChanged += Document_SelectionChanged;
+        }
+
+        public void Attach(Control ctrl)
+        {
+            control = ctrl;
+
+            Width = ctrl.ClientRectangle.Width;
+            Height = ctrl.ClientRectangle.Height;
+
+            mZoomFactor = 5.0f / 3.0f;
+            mCameraPosition = new PointF(0, 0);
+
+            ctrl.Resize += CadView_Resize;
+            ctrl.MouseDown += CadView_MouseDown;
+            ctrl.MouseUp += CadView_MouseUp;
+            ctrl.MouseMove += CadView_MouseMove;
+            ctrl.MouseDoubleClick += CadView_MouseDoubleClick;
+            ctrl.MouseWheel += CadView_MouseWheel;
+            ctrl.KeyDown += CADWindow_KeyDown;
+            ctrl.Paint += CadView_Paint;
         }
 
         public void Render(Graphics graphics)
@@ -227,6 +268,130 @@ namespace SimpleCAD
             g.TranslateTransform(-CameraPosition.X, -CameraPosition.Y);
             g.ScaleTransform(1.0f / ZoomFactor, -1.0f / ZoomFactor, MatrixOrder.Append);
             g.TranslateTransform(Width / 2, Height / 2, MatrixOrder.Append);
+        }
+
+        private void Document_SelectionChanged(object sender, EventArgs e)
+        {
+            control.Invalidate();
+        }
+
+        private void Document_Changed(object sender, EventArgs e)
+        {
+            control.Invalidate();
+        }
+
+        void CadView_Resize(object sender, EventArgs e)
+        {
+            Resize(control.ClientRectangle.Width, control.ClientRectangle.Height);
+            control.Invalidate();
+        }
+
+        void CadView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle && Interactive)
+            {
+                panning = true;
+                lastMouse = e.Location;
+                control.Cursor = Cursors.NoMove2D;
+            }
+
+            if (e.Button == MouseButtons.Left && Interactive)
+            {
+                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
+            }
+        }
+
+        void CadView_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle && panning)
+            {
+                panning = false;
+                control.Invalidate();
+            }
+
+            control.Cursor = Cursors.Cross;
+
+            if (e.Button == MouseButtons.Left && Interactive && mouseDownItem != null)
+            {
+                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
+                if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem))
+                {
+                    if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
+                        Document.Editor.Selection.Remove(mouseDownItem);
+                    else
+                        Document.Editor.Selection.Add(mouseDownItem);
+                }
+            }
+        }
+
+        void CadView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle && panning)
+            {
+                // Relative mouse movement
+                PointF cloc = ScreenToWorld(e.Location);
+                PointF ploc = ScreenToWorld(lastMouse);
+                SizeF delta = new SizeF(cloc.X - ploc.X, cloc.Y - ploc.Y);
+                Pan(delta);
+                lastMouse = e.Location;
+                control.Invalidate();
+            }
+        }
+
+        void CadView_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (Interactive)
+            {
+                Point pt = e.Location;
+                PointF ptw = ScreenToWorld(pt);
+
+                if (e.Delta > 0)
+                {
+                    ZoomIn();
+                }
+                else
+                {
+                    ZoomOut();
+                }
+                control.Invalidate();
+            }
+        }
+
+        void CadView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle && Interactive)
+            {
+                ZoomToExtents();
+            }
+        }
+
+        private void CADWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                Document.Editor.Selection.Clear();
+            }
+        }
+
+        void CadView_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            e.Graphics.Clear(control.BackColor);
+
+            Render(e.Graphics);
+        }
+
+        public Drawable FindItemAtScreenCoordinates(int x, int y, int pickBox)
+        {
+            PointF pt = ScreenToWorld(x, y);
+            float pickBoxWorld = ScreenToWorld(new Size(pickBox, 0)).Width;
+            foreach (Drawable d in Document.Model)
+            {
+                if (d.Contains(new Point2D(pt), pickBoxWorld)) return d;
+            }
+            return null;
         }
     }
 }
