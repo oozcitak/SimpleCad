@@ -110,6 +110,27 @@ namespace SimpleCAD
             ctrl.Paint += CadView_Paint;
         }
 
+        public void Detach()
+        {
+            if (control != null)
+            {
+                Width = 1;
+                Height = 1;
+
+                mZoomFactor = 5.0f / 3.0f;
+                mCameraPosition = new PointF(0, 0);
+
+                control.Resize -= CadView_Resize;
+                control.MouseDown -= CadView_MouseDown;
+                control.MouseUp -= CadView_MouseUp;
+                control.MouseMove -= CadView_MouseMove;
+                control.MouseDoubleClick -= CadView_MouseDoubleClick;
+                control.MouseWheel -= CadView_MouseWheel;
+                control.KeyDown -= CADWindow_KeyDown;
+                control.Paint -= CadView_Paint;
+            }
+        }
+
         public void Render(Graphics graphics)
         {
             DrawParams param = new DrawParams(graphics, false, ZoomFactor);
