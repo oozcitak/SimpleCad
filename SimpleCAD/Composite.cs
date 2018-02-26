@@ -14,6 +14,7 @@ namespace SimpleCAD
 
         public Composite()
         {
+            ;
         }
 
         public override void Draw(DrawParams param)

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Drawing;
+using System.Runtime.Serialization;
 
 namespace SimpleCAD
 {
     public abstract class Drawable
     {
-        public virtual OutlineStyle OutlineStyle { get; set; }
-        public virtual FillStyle FillStyle { get; set; }
-        public virtual bool Visible { get; set; }
+        public virtual OutlineStyle OutlineStyle { get; set; } = OutlineStyle.White;
+        public virtual FillStyle FillStyle { get; set; } = FillStyle.Transparent;
+        public virtual bool Visible { get; set; } = true;
 
         public abstract void Draw(DrawParams param);
         public abstract Extents GetExtents();
@@ -17,9 +16,7 @@ namespace SimpleCAD
 
         protected Drawable()
         {
-            OutlineStyle = OutlineStyle.White;
-            FillStyle = FillStyle.Transparent;
-            Visible = true;
+            ;
         }
     }
 }
