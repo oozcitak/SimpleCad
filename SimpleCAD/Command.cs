@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    public abstract class Command
+    public abstract partial class Command
     {
+        public abstract string RegisteredName { get; }
         public abstract string Name { get; }
 
         public virtual Task Apply(CADDocument doc)

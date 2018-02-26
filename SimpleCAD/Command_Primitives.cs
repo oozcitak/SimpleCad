@@ -6,21 +6,25 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    public class Command_Line : Command
+    public partial class Command
     {
-        public override string Name => "Line";
-
-        public override async Task Apply(CADDocument doc)
+        public class DrawLine : Command
         {
-            Editor ed = doc.Editor;
+            public override string RegisteredName => "Primitives.Line";
+            public override string Name => "Line";
 
-            Editor.PointResult p1 = await ed.GetPoint("Start point: ");
-            if (!p1.Success) return;
-            Editor.PointResult p2 = await ed.GetPoint("End point: ");
-            if (!p2.Success) return;
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
 
-            Drawable newItem = new Line(p1.Location, p2.Location);
-            doc.Model.Add(newItem);
+                Editor.PointResult p1 = await ed.GetPoint("Start point: ");
+                if (!p1.Success) return;
+                Editor.PointResult p2 = await ed.GetPoint("End point: ");
+                if (!p2.Success) return;
+
+                Drawable newItem = new Line(p1.Location, p2.Location);
+                doc.Model.Add(newItem);
+            }
         }
     }
 }
