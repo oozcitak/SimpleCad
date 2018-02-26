@@ -108,6 +108,8 @@ namespace SimpleCAD
             ctrl.MouseWheel += CadView_MouseWheel;
             ctrl.KeyDown += CADWindow_KeyDown;
             ctrl.Paint += CadView_Paint;
+
+            ctrl.MouseClick += CadView_MouseClick;
         }
 
         public void Detach()
@@ -357,6 +359,19 @@ namespace SimpleCAD
                 lastMouse = e.Location;
                 control.Invalidate();
             }
+
+            if (Document.Editor.Mode != Editor.InputMode.None)
+            {
+                Document.Editor.OnViewMouseMove(this, e, new Point2D(ScreenToWorld(e.Location)));
+            }
+        }
+
+        private void CadView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (Document.Editor.Mode != Editor.InputMode.None)
+            {
+                Document.Editor.OnViewMouseClick(this, e, new Point2D(ScreenToWorld(e.Location)));
+            }
         }
 
         void CadView_MouseWheel(object sender, MouseEventArgs e)
@@ -388,7 +403,11 @@ namespace SimpleCAD
 
         private void CADWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            if (Document.Editor.Mode != Editor.InputMode.None)
+            {
+                Document.Editor.OnViewKeyDown(this, e);
+            }
+            else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.Selection.Clear();
             }

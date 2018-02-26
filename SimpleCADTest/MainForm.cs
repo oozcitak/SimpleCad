@@ -287,9 +287,9 @@ namespace SimpleCADTest
             cadWindow1.Refresh();
         }
 
-        private void btnDrawLine_Click(object sender, EventArgs e)
+        private async void btnDrawLine_Click(object sender, EventArgs e)
         {
-            BeginCommand("LINE");
+            await new Command_Line().Apply(cadWindow1.Document);
         }
 
         private void btnDrawArc_Click(object sender, EventArgs e)
