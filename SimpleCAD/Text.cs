@@ -130,6 +130,11 @@ namespace SimpleCAD
             Point2D p = P;
             p.TransformBy(transformation);
             P = p;
+
+            Vector2D dir = Vector2D.XAxis * Height;
+            dir.TransformBy(transformation);
+            Height = dir.Length;
+
             Rotation += transformation.RotationAngle;
         }
     }
