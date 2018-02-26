@@ -82,19 +82,8 @@ namespace SimpleCAD
         {
             Vector2D dir = pt - Center;
             float dist = dir.Length;
-            if (dist > Radius + pickBoxSize / 2 || dist < Radius - pickBoxSize / 2)
-            {
-                return false;
-            }
-            float ang = dir.Angle;
-            if (StartAngle < EndAngle)
-            {
-                return ang >= StartAngle && ang <= EndAngle;
-            }
-            else
-            {
-                return ang >= EndAngle && ang <= StartAngle;
-            }
+            return (dist >= Radius - pickBoxSize / 2 && dist <= Radius + pickBoxSize / 2 &&
+                dir.IsBetween(Vector2D.FromAngle(StartAngle), Vector2D.FromAngle(EndAngle)));
         }
     }
 }

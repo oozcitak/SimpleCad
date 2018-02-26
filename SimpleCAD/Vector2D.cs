@@ -46,13 +46,42 @@ namespace SimpleCAD
             return X * v.X + Y * v.Y;
         }
 
+        public float CrossProduct(Vector2D v)
+        {
+            return X * v.Y - Y * v.X;
+        }
+
         public float AngleTo(Vector2D v)
+        {
+            return ClampAngle(SignedAngleTo(v));
+        }
+
+        public bool IsBetween(Vector2D a, Vector2D b)
+        {
+            float ang = ClampAngle(b.SignedAngleTo(a), true, false);
+            float ang1 = ClampAngle(this.SignedAngleTo(a), true, false);
+            float ang2 = ClampAngle(b.SignedAngleTo(this), true, false);
+
+            return Math.Abs(ang2 + ang1 - ang) < 0.0001f;
+        }
+
+        private float SignedAngleTo(Vector2D v)
         {
             float dot = this.DotProduct(v);
             float det = X * v.Y - v.X * Y;
             float ang = -(float)Math.Atan2(det, dot);
-            while (ang < 0) ang += 2 * (float)Math.PI;
-            while (ang > 2 * (float)Math.PI) ang -= 2 * (float)Math.PI;
+            return ang;
+        }
+
+        private static float ClampAngle(float ang)
+        {
+            return ClampAngle(ang, true, true);
+        }
+
+        private static float ClampAngle(float ang, bool low, bool high)
+        {
+            if (low) { while (ang < 0) ang += 2 * (float)Math.PI; }
+            if (high) { while (ang > 2 * (float)Math.PI) ang -= 2 * (float)Math.PI; }
             return ang;
         }
 
