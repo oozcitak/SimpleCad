@@ -104,12 +104,12 @@ namespace SimpleCAD
             ctrl.MouseDown += CadView_MouseDown;
             ctrl.MouseUp += CadView_MouseUp;
             ctrl.MouseMove += CadView_MouseMove;
+            ctrl.MouseClick += CadView_MouseClick;
             ctrl.MouseDoubleClick += CadView_MouseDoubleClick;
             ctrl.MouseWheel += CadView_MouseWheel;
-            ctrl.KeyDown += CADWindow_KeyDown;
+            ctrl.KeyDown += CadView_KeyDown;
+            ctrl.KeyPress += CadView_KeyPress;
             ctrl.Paint += CadView_Paint;
-
-            ctrl.MouseClick += CadView_MouseClick;
         }
 
         public void Detach()
@@ -126,9 +126,11 @@ namespace SimpleCAD
                 control.MouseDown -= CadView_MouseDown;
                 control.MouseUp -= CadView_MouseUp;
                 control.MouseMove -= CadView_MouseMove;
+                control.MouseClick -= CadView_MouseClick;
                 control.MouseDoubleClick -= CadView_MouseDoubleClick;
                 control.MouseWheel -= CadView_MouseWheel;
-                control.KeyDown -= CADWindow_KeyDown;
+                control.KeyDown -= CadView_KeyDown;
+                control.KeyPress -= CadView_KeyPress;
                 control.Paint -= CadView_Paint;
             }
         }
@@ -401,7 +403,7 @@ namespace SimpleCAD
             }
         }
 
-        private void CADWindow_KeyDown(object sender, KeyEventArgs e)
+        private void CadView_KeyDown(object sender, KeyEventArgs e)
         {
             if (Document.Editor.Mode != Editor.InputMode.None)
             {
@@ -410,6 +412,14 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.Selection.Clear();
+            }
+        }
+
+        private void CadView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (Document.Editor.Mode != Editor.InputMode.None)
+            {
+                Document.Editor.OnViewKeyPress(this, e);
             }
         }
 
