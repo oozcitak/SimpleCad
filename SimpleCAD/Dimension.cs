@@ -7,8 +7,11 @@ namespace SimpleCAD
 {
     public class Dimension : Drawable
     {
-        public Point2D P1 { get; set; }
-        public Point2D P2 { get; set; }
+        private Point2D p1;
+        private Point2D p2;
+
+        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return P1.X; } }
@@ -19,11 +22,17 @@ namespace SimpleCAD
         [Browsable(false)]
         public float Y2 { get { return P2.Y; } }
 
-        public float Offset { get; set; }
-        public string String { get; set; }
-        public string FontFamily { get; set; }
-        public FontStyle FontStyle { get; set; }
-        public float TextHeight { get; set; }
+        private float offset;
+        private string str;
+        private string fontFamily;
+        private FontStyle fontStyle;
+        private float textHeight;
+
+        public float Offset { get => offset; set { offset = value; NotifyPropertyChanged(); } }
+        public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
+        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
+        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
+        public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
 
         public Dimension(Point2D p1, Point2D p2, string text, float textHeight)
         {

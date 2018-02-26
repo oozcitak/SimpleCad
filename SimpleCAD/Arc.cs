@@ -6,10 +6,15 @@ namespace SimpleCAD
 {
     public class Arc : Drawable
     {
-        public Point2D Center { get; set; }
-        public float Radius { get; set; }
-        public float StartAngle { get; set; }
-        public float EndAngle { get; set; }
+        private Point2D center;
+        private float radius;
+        private float startAngle;
+        private float endAngle;
+
+        public Point2D Center { get => center; set { center = value; NotifyPropertyChanged(); } }
+        public float Radius { get => radius; set { radius = value; NotifyPropertyChanged(); } }
+        public float StartAngle { get => startAngle; set { startAngle = value; NotifyPropertyChanged(); } }
+        public float EndAngle { get => endAngle; set { endAngle = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return Center.X; } }

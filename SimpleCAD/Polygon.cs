@@ -10,16 +10,24 @@ namespace SimpleCAD
         public Polygon()
         {
             Points = new Point2DCollection();
+            Points.CollectionChanged += Points_CollectionChanged;
         }
 
         public Polygon(Point2D[] pts)
         {
             Points = new Point2DCollection(pts);
+            Points.CollectionChanged += Points_CollectionChanged;
         }
 
         public Polygon(PointF[] pts)
         {
             Points = new Point2DCollection(pts);
+            Points.CollectionChanged += Points_CollectionChanged;
+        }
+
+        private void Points_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifyPropertyChanged("Points");
         }
 
         public override void Draw(DrawParams param)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -26,6 +27,7 @@ namespace SimpleCAD
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
         public Color SelectionHighlight { get; set; } = Color.FromArgb(64, 46, 116, 251);
+        public OutlineStyle TransientStyle { get; set; }=new OutlineStyle(Color.Orange, 1, DashStyle.Dash);
 
         static Editor()
         {
@@ -75,10 +77,17 @@ namespace SimpleCAD
         {
             Mode = InputMode.Point;
             inputHasBasePoint = options.HasBasePoint;
-            if (options.HasBasePoint) inputBasePoint = options.BasePoint;
+            if (options.HasBasePoint)
+            {
+                inputBasePoint = options.BasePoint;
+                Line consItem = new Line(inputBasePoint, inputBasePoint);
+                consItem.OutlineStyle = TransientStyle;
+                Document.Transients.Add(consItem);
+            }
             pointCompletion = new TaskCompletionSource<PointResult>();
             PointResult res = await pointCompletion.Task;
             Mode = InputMode.None;
+            Document.Transients.Clear();
             return res;
         }
 
@@ -92,9 +101,13 @@ namespace SimpleCAD
             Mode = InputMode.Angle;
             inputHasBasePoint = true;
             inputBasePoint = options.BasePoint;
+            Line consItem = new Line(inputBasePoint, inputBasePoint);
+            consItem.OutlineStyle = TransientStyle;
+            Document.Transients.Add(consItem);
             angleCompletion = new TaskCompletionSource<AngleResult>();
             AngleResult res = await angleCompletion.Task;
             Mode = InputMode.None;
+            Document.Transients.Clear();
             return res;
         }
 
@@ -117,6 +130,24 @@ namespace SimpleCAD
         internal void OnViewMouseMove(object sender, MouseEventArgs e, Point2D point)
         {
             lastMouseLocation = point;
+            switch (Mode)
+            {
+                case InputMode.Point:
+                    {
+                        if (inputHasBasePoint)
+                        {
+                            Line consLine = Document.Transients.First() as Line;
+                            consLine.P2 = lastMouseLocation;
+                        }
+                        break;
+                    }
+                case InputMode.Angle:
+                    {
+                        Line consLine = Document.Transients.First() as Line;
+                        consLine.P2 = lastMouseLocation;
+                        break;
+                    }
+            }
         }
 
         internal void OnViewMouseClick(object sender, MouseEventArgs e, Point2D point)

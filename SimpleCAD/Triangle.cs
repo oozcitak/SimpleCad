@@ -8,9 +8,9 @@ namespace SimpleCAD
     {
         private Point2DCollection points;
 
-        public Point2D P1 { get { return points[0]; } set { points[0] = value; } }
-        public Point2D P2 { get { return points[1]; } set { points[1] = value; } }
-        public Point2D P3 { get { return points[2]; } set { points[2] = value; } }
+        public Point2D P1 { get { return points[0]; } set { points[0] = value; NotifyPropertyChanged(); } }
+        public Point2D P2 { get { return points[1]; } set { points[1] = value; NotifyPropertyChanged(); } }
+        public Point2D P3 { get { return points[2]; } set { points[2] = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return P1.X; } }

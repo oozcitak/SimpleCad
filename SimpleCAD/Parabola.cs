@@ -6,8 +6,12 @@ namespace SimpleCAD
 {
     public class Parabola : Drawable
     {
-        public Point2D P1 { get; set; }
-        public Point2D P2 { get; set; }
+        private Point2D p1;
+        private Point2D p2;
+
+        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+
         public Point2D PC
         {
             get
@@ -18,8 +22,12 @@ namespace SimpleCAD
                 return c;
             }
         }
-        public float StartAngle { get; set; }
-        public float EndAngle { get; set; }
+
+        private float startAngle;
+        private float endAngle;
+
+        public float StartAngle { get => startAngle; set { startAngle = value; NotifyPropertyChanged(); } }
+        public float EndAngle { get => endAngle; set { endAngle = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return P1.X; } }

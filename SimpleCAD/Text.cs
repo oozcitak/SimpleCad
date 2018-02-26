@@ -7,21 +7,31 @@ namespace SimpleCAD
 {
     public class Text : Drawable
     {
-        public Point2D P { get; set; }
+        private Point2D p;
+
+        public Point2D P { get => p; set { p = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return P.X; } }
         [Browsable(false)]
         public float Y { get { return P.Y; } }
 
-        public string String { get; set; }
-        public string FontFamily { get; set; }
-        public FontStyle FontStyle { get; set; }
-        public float Height { get; set; }
+        private string str;
+        private string fontFamily;
+        private FontStyle fontStyle;
+        private float textHeight;
+        private float rotation;
+        private StringAlignment horizontalAlignment;
+        private StringAlignment verticalAlignment;
+
+        public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
+        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
+        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
+        public float Height { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
-        public float Rotation { get; set; }
-        public StringAlignment HorizontalAlignment { get; set; }
-        public StringAlignment VerticalAlignment { get; set; }
+        public float Rotation { get => rotation; set { rotation = value; NotifyPropertyChanged(); } }
+        public StringAlignment HorizontalAlignment { get => horizontalAlignment; set { horizontalAlignment = value; NotifyPropertyChanged(); } }
+        public StringAlignment VerticalAlignment { get => verticalAlignment; set { verticalAlignment = value; NotifyPropertyChanged(); } }
 
         public Text(Point2D p, string text, float height)
         {

@@ -6,7 +6,9 @@ namespace SimpleCAD
 {
     public class Ellipse : Drawable
     {
-        public Point2D Center { get; set; }
+        private Point2D center;
+
+        public Point2D Center { get => center; set { center = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return Center.X; } }
@@ -15,8 +17,11 @@ namespace SimpleCAD
 
         private Vector2D dir;
 
-        public float SemiMajorAxis { get; set; }
-        public float SemiMinorAxis { get; set; }
+        private float semiMajorAxis;
+        private float semiMinorAxis;
+
+        public float SemiMajorAxis { get => semiMajorAxis; set { semiMajorAxis = value; NotifyPropertyChanged(); } }
+        public float SemiMinorAxis { get => semiMinorAxis; set { semiMinorAxis = value; NotifyPropertyChanged(); } }
 
         public Ellipse(Point2D center, float semiMajor, float semiMinor)
         {

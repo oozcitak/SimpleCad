@@ -8,19 +8,27 @@ namespace SimpleCAD
 {
     public class MultiLineText : Drawable
     {
-        public Point2D P { get; set; }
+        private Point2D p;
+
+        public Point2D P { get => p; set { p = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return P.X; } }
         [Browsable(false)]
         public float Y { get { return P.Y; } }
 
-        public string[] Lines { get; set; }
-        public string FontFamily { get; set; }
-        public FontStyle FontStyle { get; set; }
-        public float Height { get; set; }
+        private string[] lines;
+        private string fontFamily;
+        private FontStyle fontStyle;
+        private float textHeight;
+        private float rotation;
+
+        public string[] Lines { get => lines; set { lines = value; NotifyPropertyChanged(); } }
+        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
+        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
+        public float Height { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
-        public float Rotation { get; set; }
+        public float Rotation { get => rotation; set { rotation = value; NotifyPropertyChanged(); } }
 
         public MultiLineText(Point2D p, string[] lines, float height)
         {

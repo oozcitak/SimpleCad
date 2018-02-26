@@ -7,5 +7,6 @@ using System.Threading.Tasks;
 namespace SimpleCAD
 {
     public delegate void DocumentChangedEventHandler(object sender, EventArgs e);
+    public delegate void TransientsChangedEventHandler(object sender, EventArgs e);
     public delegate void SelectionChangedEventHandler(object sender, EventArgs e);
 }

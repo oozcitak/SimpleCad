@@ -6,8 +6,11 @@ namespace SimpleCAD
 {
     public class Line : Drawable
     {
-        public Point2D P1 { get; set; }
-        public Point2D P2 { get; set; }
+        private Point2D p1;
+        private Point2D p2;
+
+        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return P1.X; } }
