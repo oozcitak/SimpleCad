@@ -24,10 +24,11 @@ namespace SimpleCAD
         private Point2D inputBasePoint;
         private Point2D lastMouseLocation;
         private string lastText;
+        private Line consLine;
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
         public Color SelectionHighlight { get; set; } = Color.FromArgb(64, 46, 116, 251);
-        public OutlineStyle TransientStyle { get; set; }=new OutlineStyle(Color.Orange, 1, DashStyle.Dash);
+        public OutlineStyle TransientStyle { get; set; } = new OutlineStyle(Color.Orange, 1, DashStyle.Dash);
 
         static Editor()
         {
@@ -80,14 +81,14 @@ namespace SimpleCAD
             if (options.HasBasePoint)
             {
                 inputBasePoint = options.BasePoint;
-                Line consItem = new Line(inputBasePoint, inputBasePoint);
-                consItem.OutlineStyle = TransientStyle;
-                Document.Transients.Add(consItem);
+                consLine = new Line(inputBasePoint, inputBasePoint);
+                consLine.OutlineStyle = TransientStyle;
+                Document.Transients.Add(consLine);
             }
             pointCompletion = new TaskCompletionSource<PointResult>();
             PointResult res = await pointCompletion.Task;
             Mode = InputMode.None;
-            Document.Transients.Clear();
+            Document.Transients.Remove(consLine);
             return res;
         }
 
@@ -101,13 +102,13 @@ namespace SimpleCAD
             Mode = InputMode.Angle;
             inputHasBasePoint = true;
             inputBasePoint = options.BasePoint;
-            Line consItem = new Line(inputBasePoint, inputBasePoint);
-            consItem.OutlineStyle = TransientStyle;
-            Document.Transients.Add(consItem);
+            consLine = new Line(inputBasePoint, inputBasePoint);
+            consLine.OutlineStyle = TransientStyle;
+            Document.Transients.Add(consLine);
             angleCompletion = new TaskCompletionSource<AngleResult>();
             AngleResult res = await angleCompletion.Task;
             Mode = InputMode.None;
-            Document.Transients.Clear();
+            Document.Transients.Remove(consLine);
             return res;
         }
 
@@ -133,20 +134,12 @@ namespace SimpleCAD
             switch (Mode)
             {
                 case InputMode.Point:
-                    {
-                        if (inputHasBasePoint)
-                        {
-                            Line consLine = Document.Transients.First() as Line;
-                            consLine.P2 = lastMouseLocation;
-                        }
-                        break;
-                    }
-                case InputMode.Angle:
-                    {
-                        Line consLine = Document.Transients.First() as Line;
+                    if (inputHasBasePoint)
                         consLine.P2 = lastMouseLocation;
-                        break;
-                    }
+                    break;
+                case InputMode.Angle:
+                    consLine.P2 = lastMouseLocation;
+                    break;
             }
         }
 
