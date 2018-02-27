@@ -70,6 +70,10 @@ namespace SimpleCAD
                     Editor.Selection.Clear();
                     OnDocumentChanged(new EventArgs());
                     break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    OnDocumentChanged(new EventArgs());
+                    break;
             }
         }
 
