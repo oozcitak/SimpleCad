@@ -34,7 +34,6 @@ namespace SimpleCAD
             DoubleBuffered = true;
             BorderStyle = BorderStyle.Fixed3D;
             BackColor = Color.FromArgb(33, 40, 48);
-            Cursor = Cursors.Cross;
 
             Document = new CADDocument();
         }

@@ -15,11 +15,16 @@ namespace SimpleCAD
         private bool panning;
         private Point lastMouse;
         private Drawable mouseDownItem;
+        private Point2D currentMouseLocationWorld;
+        private bool hasMouse;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
         [Category("Behavior"), DefaultValue(4), Description("Determines the size of the pick box around the selection cursor.")]
         public int PickBoxSize { get; set; } = 4;
+
+        [Category("Appearance"), DefaultValue(typeof(Color), "White"), Description("Determines color of the cursor.")]
+        public Color CursorColor { get; set; } = Color.White;
 
         [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
         public float ZoomFactor
@@ -101,16 +106,18 @@ namespace SimpleCAD
             mZoomFactor = 5.0f / 3.0f;
             mCameraPosition = new PointF(0, 0);
 
-            ctrl.Resize += CadView_Resize;
-            ctrl.MouseDown += CadView_MouseDown;
-            ctrl.MouseUp += CadView_MouseUp;
-            ctrl.MouseMove += CadView_MouseMove;
-            ctrl.MouseClick += CadView_MouseClick;
-            ctrl.MouseDoubleClick += CadView_MouseDoubleClick;
-            ctrl.MouseWheel += CadView_MouseWheel;
-            ctrl.KeyDown += CadView_KeyDown;
-            ctrl.KeyPress += CadView_KeyPress;
-            ctrl.Paint += CadView_Paint;
+            control.Resize += CadView_Resize;
+            control.MouseDown += CadView_MouseDown;
+            control.MouseUp += CadView_MouseUp;
+            control.MouseMove += CadView_MouseMove;
+            control.MouseClick += CadView_MouseClick;
+            control.MouseDoubleClick += CadView_MouseDoubleClick;
+            control.MouseWheel += CadView_MouseWheel;
+            control.KeyDown += CadView_KeyDown;
+            control.KeyPress += CadView_KeyPress;
+            control.Paint += CadView_Paint;
+            control.MouseEnter += CadView_MouseEnter;
+            control.MouseLeave += CadView_MouseLeave;
         }
 
         public void Detach()
@@ -133,6 +140,8 @@ namespace SimpleCAD
                 control.KeyDown -= CadView_KeyDown;
                 control.KeyPress -= CadView_KeyPress;
                 control.Paint -= CadView_Paint;
+                control.MouseEnter -= CadView_MouseEnter;
+                control.MouseLeave -= CadView_MouseLeave;
             }
         }
 
@@ -157,6 +166,22 @@ namespace SimpleCAD
 
             // Render transient objects
             Document.Transients.Draw(param);
+
+            // Render cursor
+            DrawCursor(param);
+        }
+
+        private void DrawCursor(DrawParams param)
+        {
+            if (hasMouse)
+            {
+                using (Pen pen = new Pen(CursorColor))
+                {
+                    RectangleF ex = GetViewPort();
+                    param.Graphics.DrawLine(pen, ex.Left, currentMouseLocationWorld.Y, ex.Right, currentMouseLocationWorld.Y);
+                    param.Graphics.DrawLine(pen, currentMouseLocationWorld.X, ex.Top, currentMouseLocationWorld.X, ex.Bottom);
+                }
+            }
         }
 
         /// <summary>
@@ -360,6 +385,9 @@ namespace SimpleCAD
 
         void CadView_MouseMove(object sender, MouseEventArgs e)
         {
+            currentMouseLocationWorld = new Point2D(ScreenToWorld(e.Location));
+            control.Invalidate();
+
             if (e.Button == MouseButtons.Middle && panning)
             {
                 // Relative mouse movement
@@ -410,6 +438,19 @@ namespace SimpleCAD
             {
                 ZoomToExtents();
             }
+        }
+
+        private void CadView_MouseLeave(object sender, EventArgs e)
+        {
+            hasMouse = false;
+            Cursor.Show();
+            control.Invalidate();
+        }
+
+        private void CadView_MouseEnter(object sender, EventArgs e)
+        {
+            hasMouse = true;
+            Cursor.Hide();
         }
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)
