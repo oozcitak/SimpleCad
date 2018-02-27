@@ -20,8 +20,11 @@ namespace SimpleCAD
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
-        private bool inputHasBasePoint;
-        private Point2D inputBasePoint;
+
+        private PointOptions currentPointOptions;
+        private AngleOptions currentAngleOptions;
+        private TextOptions currentTextOptions;
+
         private Point2D lastMouseLocation;
         private string lastText;
         private Line consLine;
@@ -69,19 +72,28 @@ namespace SimpleCAD
             return await GetPoint(new PointOptions(message));
         }
 
+        public async Task<PointResult> GetPoint(string message, Action<Point2D> jig)
+        {
+            return await GetPoint(new PointOptions(message, jig));
+        }
+
         public async Task<PointResult> GetPoint(string message, Point2D basePoint)
         {
             return await GetPoint(new PointOptions(message, basePoint));
         }
 
+        public async Task<PointResult> GetPoint(string message, Point2D basePoint, Action<Point2D> jig)
+        {
+            return await GetPoint(new PointOptions(message, basePoint, jig));
+        }
+
         public async Task<PointResult> GetPoint(PointOptions options)
         {
             Mode = InputMode.Point;
-            inputHasBasePoint = options.HasBasePoint;
+            currentPointOptions = options;
             if (options.HasBasePoint)
             {
-                inputBasePoint = options.BasePoint;
-                consLine = new Line(inputBasePoint, inputBasePoint);
+                consLine = new Line(options.BasePoint, options.BasePoint);
                 consLine.OutlineStyle = TransientStyle;
                 Document.Transients.Add(consLine);
             }
@@ -92,6 +104,11 @@ namespace SimpleCAD
             return res;
         }
 
+        public async Task<AngleResult> GetAngle(string message, Point2D basePoint, Action<Vector2D> jig)
+        {
+            return await GetAngle(new AngleOptions(message, basePoint, jig));
+        }
+
         public async Task<AngleResult> GetAngle(string message, Point2D basePoint)
         {
             return await GetAngle(new AngleOptions(message, basePoint));
@@ -100,9 +117,8 @@ namespace SimpleCAD
         public async Task<AngleResult> GetAngle(AngleOptions options)
         {
             Mode = InputMode.Angle;
-            inputHasBasePoint = true;
-            inputBasePoint = options.BasePoint;
-            consLine = new Line(inputBasePoint, inputBasePoint);
+            currentAngleOptions = options;
+            consLine = new Line(options.BasePoint, options.BasePoint);
             consLine.OutlineStyle = TransientStyle;
             Document.Transients.Add(consLine);
             angleCompletion = new TaskCompletionSource<AngleResult>();
@@ -112,15 +128,20 @@ namespace SimpleCAD
             return res;
         }
 
-        public async Task<TextResult> GetText(string message)
+        public async Task<TextResult> GetText(string message, Action<string> jig)
         {
-            return await GetText(new InputOptions(message));
+            return await GetText(new TextOptions(message, jig));
         }
 
-        public async Task<TextResult> GetText(InputOptions options)
+        public async Task<TextResult> GetText(string message)
+        {
+            return await GetText(new TextOptions(message));
+        }
+
+        public async Task<TextResult> GetText(TextOptions options)
         {
             Mode = InputMode.Text;
-            inputHasBasePoint = false;
+            currentTextOptions = options;
             lastText = "";
             textCompletion = new TaskCompletionSource<TextResult>();
             TextResult res = await textCompletion.Task;
@@ -134,11 +155,13 @@ namespace SimpleCAD
             switch (Mode)
             {
                 case InputMode.Point:
-                    if (inputHasBasePoint)
+                    if (currentPointOptions.HasBasePoint)
                         consLine.P2 = lastMouseLocation;
+                    currentPointOptions.Jig(lastMouseLocation);
                     break;
                 case InputMode.Angle:
                     consLine.P2 = lastMouseLocation;
+                    currentAngleOptions.Jig(lastMouseLocation - currentAngleOptions.BasePoint);
                     break;
             }
         }
@@ -153,7 +176,7 @@ namespace SimpleCAD
                     break;
                 case InputMode.Angle:
                     if (e.Button == MouseButtons.Left)
-                        angleCompletion.SetResult(new AngleResult(true, point - inputBasePoint));
+                        angleCompletion.SetResult(new AngleResult(true, point - currentAngleOptions.BasePoint));
                     break;
             }
         }
@@ -170,9 +193,9 @@ namespace SimpleCAD
                     break;
                 case InputMode.Angle:
                     if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-                        angleCompletion.SetResult(new AngleResult(true, lastMouseLocation - inputBasePoint));
+                        angleCompletion.SetResult(new AngleResult(true, lastMouseLocation - currentAngleOptions.BasePoint));
                     else if (e.KeyCode == Keys.Escape)
-                        angleCompletion.SetResult(new AngleResult(false, lastMouseLocation - inputBasePoint));
+                        angleCompletion.SetResult(new AngleResult(false, lastMouseLocation - currentAngleOptions.BasePoint));
                     break;
                 case InputMode.Text:
                     if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
@@ -196,6 +219,7 @@ namespace SimpleCAD
                     {
                         lastText += e.KeyChar;
                     }
+                    currentTextOptions.Jig(lastText);
                     break;
             }
         }

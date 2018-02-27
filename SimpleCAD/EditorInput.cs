@@ -56,25 +56,45 @@ namespace SimpleCAD
             }
         }
 
-        public class InputOptions
+        public class InputOptions<T>
         {
             public string Message { get; private set; }
+            public Action<T> Jig { get; private set; }
 
             public InputOptions(string message)
             {
                 Message = message;
+                Jig = (p) => { };
+            }
+
+            public InputOptions(string message, Action<T> jig)
+            {
+                Message = message;
+                Jig = jig;
             }
         }
 
-        public class PointOptions : InputOptions
+        public class PointOptions : InputOptions<Point2D>
         {
             public bool HasBasePoint { get; private set; }
             public Point2D BasePoint { get; private set; }
+
+            public PointOptions(string message, Point2D basePoint, Action<Point2D> jig) : base(message, jig)
+            {
+                HasBasePoint = true;
+                BasePoint = basePoint;
+            }
 
             public PointOptions(string message, Point2D basePoint) : base(message)
             {
                 HasBasePoint = true;
                 BasePoint = basePoint;
+            }
+
+            public PointOptions(string message, Action<Point2D> jig) : base(message, jig)
+            {
+                HasBasePoint = false;
+                BasePoint = Point2D.Zero;
             }
 
             public PointOptions(string message) : base(message)
@@ -84,13 +104,31 @@ namespace SimpleCAD
             }
         }
 
-        public class AngleOptions : InputOptions
+        public class AngleOptions : InputOptions<Vector2D>
         {
             public Point2D BasePoint { get; private set; }
+
+            public AngleOptions(string message, Point2D basePoint, Action<Vector2D> jig) : base(message, jig)
+            {
+                BasePoint = basePoint;
+            }
 
             public AngleOptions(string message, Point2D basePoint) : base(message)
             {
                 BasePoint = basePoint;
+            }
+        }
+
+        public class TextOptions : InputOptions<string>
+        {
+            public TextOptions(string message, Action<string> jig) : base(message, jig)
+            {
+                ;
+            }
+
+            public TextOptions(string message) : base(message)
+            {
+                ;
             }
         }
     }
