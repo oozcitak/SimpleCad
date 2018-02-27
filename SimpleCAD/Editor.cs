@@ -17,6 +17,8 @@ namespace SimpleCAD
         public CADDocument Document { get; private set; }
         internal InputMode Mode { get; private set; }
 
+        public event EditorPromptEventHandler Prompt;
+
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
@@ -90,6 +92,7 @@ namespace SimpleCAD
         public async Task<PointResult> GetPoint(PointOptions options)
         {
             Mode = InputMode.Point;
+            OnPrompt(new EditorPromptEventArgs(options.Message));
             currentPointOptions = options;
             if (options.HasBasePoint)
             {
@@ -100,6 +103,7 @@ namespace SimpleCAD
             pointCompletion = new TaskCompletionSource<PointResult>();
             PointResult res = await pointCompletion.Task;
             Mode = InputMode.None;
+            OnPrompt(new EditorPromptEventArgs(""));
             Document.Transients.Remove(consLine);
             return res;
         }
@@ -117,6 +121,7 @@ namespace SimpleCAD
         public async Task<AngleResult> GetAngle(AngleOptions options)
         {
             Mode = InputMode.Angle;
+            OnPrompt(new EditorPromptEventArgs(options.Message));
             currentAngleOptions = options;
             consLine = new Line(options.BasePoint, options.BasePoint);
             consLine.OutlineStyle = TransientStyle;
@@ -124,6 +129,7 @@ namespace SimpleCAD
             angleCompletion = new TaskCompletionSource<AngleResult>();
             AngleResult res = await angleCompletion.Task;
             Mode = InputMode.None;
+            OnPrompt(new EditorPromptEventArgs(""));
             Document.Transients.Remove(consLine);
             return res;
         }
@@ -141,11 +147,13 @@ namespace SimpleCAD
         public async Task<TextResult> GetText(TextOptions options)
         {
             Mode = InputMode.Text;
+            OnPrompt(new EditorPromptEventArgs(options.Message));
             currentTextOptions = options;
             lastText = "";
             textCompletion = new TaskCompletionSource<TextResult>();
             TextResult res = await textCompletion.Task;
             Mode = InputMode.None;
+            OnPrompt(new EditorPromptEventArgs(""));
             return res;
         }
 
@@ -222,6 +230,11 @@ namespace SimpleCAD
                     currentTextOptions.Jig(lastText);
                     break;
             }
+        }
+
+        protected void OnPrompt(EditorPromptEventArgs e)
+        {
+            Prompt?.Invoke(this, e);
         }
     }
 }
