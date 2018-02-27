@@ -84,19 +84,19 @@ namespace SimpleCAD
         public void IntersectWith(IEnumerable<Drawable> other)
         {
             items.IntersectWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public void ExceptWith(IEnumerable<Drawable> other)
         {
             items.ExceptWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, other));
         }
 
         public void SymmetricExceptWith(IEnumerable<Drawable> other)
         {
             items.SymmetricExceptWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public bool IsSubsetOf(IEnumerable<Drawable> other)
