@@ -106,12 +106,12 @@ namespace SimpleCADTest
                     break;
                 case Keys.PageDown:
                     TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
                     TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.PageUp:
                     TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
+                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
                     TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
                     break;
                 case Keys.Home:

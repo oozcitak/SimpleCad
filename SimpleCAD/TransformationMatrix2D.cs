@@ -42,10 +42,10 @@ namespace SimpleCAD
 
         public static TransformationMatrix2D Rotation(float rotation)
         {
-            float m11 = (float)Math.Cos(rotation);
-            float m12 = (float)Math.Sin(rotation);
-            float m21 = -(float)Math.Sin(rotation);
-            float m22 = (float)Math.Cos(rotation);
+            float m11 = (float)Math.Cos(-rotation);
+            float m12 = (float)Math.Sin(-rotation);
+            float m21 = -(float)Math.Sin(-rotation);
+            float m22 = (float)Math.Cos(-rotation);
 
             return new TransformationMatrix2D(m11, m12, m21, m22, 0, 0);
         }

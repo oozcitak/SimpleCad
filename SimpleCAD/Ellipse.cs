@@ -39,19 +39,32 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            System.Drawing.Drawing2D.Matrix orgTr = param.Graphics.Transform;
-            param.Graphics.TranslateTransform(-X, -Y);
-            param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI);
-            param.Graphics.TranslateTransform(X, Y);
+            // Approximate perimeter (Ramanujan)
+            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            // Represent curved features by at most 4 pixels
+            float curveLength = param.ModelToView(p);
+            int n = (int)Math.Max(4, curveLength / 4);
+            float da = 2 * (float)Math.PI / (float)n;
+            float a = 0;
+            Point2DCollection pts = new Point2DCollection();
+            for (int i = 0; i < n; i++)
+            {
+                float x = SemiMajorAxis * (float)Math.Cos(a);
+                float y = SemiMinorAxis * (float)Math.Sin(a);
+                pts.Add(x, y);
+                a += da;
+            }
+            pts.TransformBy(TransformationMatrix2D.Rotation(dir.Angle));
+            pts.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
+            PointF[] ptfs = pts.ToPointF();
             using (Brush brush = FillStyle.CreateBrush(param))
             {
-                param.Graphics.FillEllipse(brush, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis);
+                param.Graphics.FillPolygon(brush, ptfs);
             }
             using (Pen pen = OutlineStyle.CreatePen(param))
             {
-                param.Graphics.DrawEllipse(pen, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis);
+                param.Graphics.DrawPolygon(pen, ptfs);
             }
-            param.Graphics.Transform = orgTr;
         }
 
         public override Extents GetExtents()
