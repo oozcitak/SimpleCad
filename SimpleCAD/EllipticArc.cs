@@ -47,6 +47,38 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
+            // Approximate perimeter (Ramanujan)
+            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            // Represent curved features by at most 4 pixels
+            float sweep = EndAngle - StartAngle;
+            while (sweep < 0) sweep += 2 * (float)Math.PI;
+            while (sweep > 2 * (float)Math.PI) sweep -= 2 * (float)Math.PI;
+            float curveLength = param.ModelToView(sweep / (2 * (float)Math.PI) * p);
+            int n = (int)Math.Max(4, curveLength / 4);
+            float a = StartAngle;
+            float da = sweep / (float)n;
+            Point2DCollection pts = new Point2DCollection();
+            for (int i = 0; i < n + 1; i++)
+            {
+                float dx = (float)Math.Cos(a) * SemiMinorAxis;
+                float dy = (float)Math.Sin(a) * SemiMajorAxis;
+                float t = (float)Math.Atan2(dy, dx);
+
+                float x = SemiMajorAxis * (float)Math.Cos(t);
+                float y = SemiMinorAxis * (float)Math.Sin(t);
+                pts.Add(x, y);
+                a += da;
+            }
+            pts.TransformBy(TransformationMatrix2D.Rotation(dir.Angle));
+            pts.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
+            PointF[] ptfs = pts.ToPointF();
+            using (Pen pen = OutlineStyle.CreatePen(param))
+            {
+                param.Graphics.DrawLines(pen, ptfs);
+            }
+            return;
+
+
             System.Drawing.Drawing2D.Matrix orgTr = param.Graphics.Transform;
             param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
             using (Pen pen = OutlineStyle.CreatePen(param))
@@ -77,13 +109,6 @@ namespace SimpleCAD
             unit.TransformBy(transformation);
             SemiMajorAxis = dir.Length * SemiMajorAxis;
             SemiMinorAxis = dir.Length * SemiMinorAxis;
-
-            Vector2D a1 = Vector2D.FromAngle(StartAngle);
-            Vector2D a2 = Vector2D.FromAngle(EndAngle);
-            a1.TransformBy(transformation);
-            a2.TransformBy(transformation);
-            StartAngle = a1.Angle;
-            EndAngle = a2.Angle;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
@@ -97,7 +122,7 @@ namespace SimpleCAD
             float xx = (pt.X - X) * (float)Math.Cos(rot) + (pt.Y - Y) * (float)Math.Sin(rot);
             float yy = (pt.X - X) * (float)Math.Sin(rot) - (pt.Y - Y) * (float)Math.Cos(rot);
             return (xx * xx / a1 / a1 + yy * yy / b1 / b1 >= 1) && (xx * xx / a2 / a2 + yy * yy / b2 / b2 <= 1) &&
-                ptDir.Angle >= StartAngle && ptDir.Angle <= EndAngle;
+                ptDir.IsBetween(Vector2D.FromAngle(StartAngle + rot), Vector2D.FromAngle(EndAngle + rot));
         }
     }
 }
