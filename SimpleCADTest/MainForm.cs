@@ -88,6 +88,16 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Primitives.Text");
         }
 
+        private void btnDrawDimension_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("Primitives.Dimension");
+        }
+
+        private void btnDrawParabola_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("Primitives.Parabola");
+        }
+
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)

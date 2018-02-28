@@ -27,27 +27,33 @@ namespace SimpleCAD
         private string fontFamily;
         private FontStyle fontStyle;
         private float textHeight;
+        private float scale;
+        private int precision;
 
         public float Offset { get => offset; set { offset = value; NotifyPropertyChanged(); } }
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
         public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
         public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
+        public float Scale { get => scale; set { scale = value; NotifyPropertyChanged(); } }
+        public int Precision { get => precision; set { precision = value; NotifyPropertyChanged(); } }
 
-        public Dimension(Point2D p1, Point2D p2, string text, float textHeight)
+        public Dimension(Point2D p1, Point2D p2, float textHeight)
         {
             P1 = p1;
             P2 = p2;
 
             Offset = 0.4f;
             TextHeight = textHeight;
-            String = text;
+            String = "<>";
             FontFamily = "Arial";
             FontStyle = FontStyle.Regular;
+            Scale = 1;
+            Precision = 2;
         }
 
-        public Dimension(float x1, float y1, float x2, float y2, string text, float textHeight)
-            : this(new Point2D(x1, y1), new Point2D(x2, y2), text, textHeight)
+        public Dimension(float x1, float y1, float x2, float y2, float textHeight)
+            : this(new Point2D(x1, y1), new Point2D(x2, y2), textHeight)
         {
             ;
         }
@@ -123,7 +129,9 @@ namespace SimpleCAD
             items.Add(tick2);
 
             // Text
-            Text textObj = new Text(len / 2, Offset, String, TextHeight);
+            float dist = (P1 - P2).Length * Scale;
+            string txt = String.Replace("<>", dist.ToString("F" + Precision.ToString()));
+            Text textObj = new Text(len / 2, Offset, txt, TextHeight);
             textObj.FontFamily = FontFamily;
             textObj.FontStyle = FontStyle;
             textObj.HorizontalAlignment = StringAlignment.Center;

@@ -164,5 +164,53 @@ namespace SimpleCAD
                 doc.Model.Add(newItem);
             }
         }
+
+        public class DrawDimension : Command
+        {
+            public override string RegisteredName => "Primitives.Dimension";
+            public override string Name => "Dimension";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("Start point: ");
+                if (!p1.Success) return;
+                Editor.PointResult p2 = await ed.GetPoint("End point: ", p1.Location);
+                if (!p2.Success) return;
+                Editor.PointResult p3 = await ed.GetPoint("Text height: ", p1.Location);
+                if (!p3.Success) return;
+
+                Drawable newItem = new Dimension(p1.Location, p2.Location, (p3.Location - p1.Location).Length);
+                doc.Model.Add(newItem);
+            }
+        }
+
+        public class DrawParabola : Command
+        {
+            public override string RegisteredName => "Primitives.Parabola";
+            public override string Name => "Parabola";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("Start point: ");
+                if (!p1.Success) return;
+                Editor.PointResult p2 = await ed.GetPoint("End point: ", p1.Location);
+                if (!p2.Success) return;
+                Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Location);
+                if (!a1.Success) return;
+                Parabola consPb = new Parabola(p1.Location, p2.Location, a1.Direction.Angle, 0);
+                consPb.OutlineStyle = doc.Editor.TransientStyle;
+                doc.Transients.Add(consPb);
+                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p2.Location, (p) => consPb.EndAngle = p.Angle);
+                doc.Transients.Remove(consPb);
+                if (!a2.Success) return;
+
+                Drawable newItem = new Parabola(p1.Location, p2.Location, a1.Direction.Angle, a2.Direction.Angle);
+                doc.Model.Add(newItem);
+            }
+        }
     }
 }
