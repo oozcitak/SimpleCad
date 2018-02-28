@@ -92,7 +92,7 @@ namespace SimpleCAD
         public async Task<PointResult> GetPoint(PointOptions options)
         {
             Mode = InputMode.Point;
-            OnPrompt(new EditorPromptEventArgs(options.Message));
+            OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
             currentPointOptions = options;
             if (options.HasBasePoint)
             {
@@ -121,7 +121,7 @@ namespace SimpleCAD
         public async Task<AngleResult> GetAngle(AngleOptions options)
         {
             Mode = InputMode.Angle;
-            OnPrompt(new EditorPromptEventArgs(options.Message));
+            OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
             currentAngleOptions = options;
             consLine = new Line(options.BasePoint, options.BasePoint);
             consLine.OutlineStyle = TransientStyle;
@@ -147,7 +147,7 @@ namespace SimpleCAD
         public async Task<TextResult> GetText(TextOptions options)
         {
             Mode = InputMode.Text;
-            OnPrompt(new EditorPromptEventArgs(options.Message));
+            OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
             currentTextOptions = options;
             lastText = "";
             textCompletion = new TaskCompletionSource<TextResult>();
@@ -221,7 +221,8 @@ namespace SimpleCAD
                 case InputMode.Text:
                     if (e.KeyChar == '\b') // backspace
                     {
-                        lastText.Remove(lastText.Length - 1);
+                        if (lastText.Length > 0)
+                            lastText = lastText.Remove(lastText.Length - 1);
                     }
                     else if (!char.IsControl(e.KeyChar))
                     {

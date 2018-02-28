@@ -59,18 +59,58 @@ namespace SimpleCAD
         public class InputOptions<T>
         {
             public string Message { get; private set; }
+            public List<string> Keywords { get; private set; }
+            public string DefaultKeyword { get; private set; }
             public Action<T> Jig { get; private set; }
 
             public InputOptions(string message)
             {
                 Message = message;
+                Keywords = new List<string>();
+                DefaultKeyword = "";
                 Jig = (p) => { };
             }
 
             public InputOptions(string message, Action<T> jig)
             {
                 Message = message;
+                Keywords = new List<string>();
+                DefaultKeyword = "";
                 Jig = jig;
+            }
+
+            public void AddKeyword(string keyword, bool isDefault = false)
+            {
+                Keywords.Add(keyword);
+                if (isDefault) SetDefaultKeyword(keyword);
+            }
+
+            public void SetDefaultKeyword(string keyword)
+            {
+                DefaultKeyword = keyword;
+            }
+
+            public virtual string GetFullPrompt()
+            {
+                if (Keywords.Count == 0)
+                {
+                    return Message.TrimEnd(' ', ':') + ": ";
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder(Message);
+                    sb.Append(" [");
+                    sb.Append(string.Join(", ", Keywords));
+                    sb.Append("]");
+                    if (Keywords.Contains(DefaultKeyword))
+                    {
+                        sb.Append(" <");
+                        sb.Append(DefaultKeyword);
+                        sb.Append(">");
+                    }
+                    sb.Append(": ");
+                    return sb.ToString();
+                }
             }
         }
 
@@ -129,6 +169,11 @@ namespace SimpleCAD
             public TextOptions(string message) : base(message)
             {
                 ;
+            }
+
+            public override string GetFullPrompt()
+            {
+                return Message.TrimEnd(' ', ':') + ": ";
             }
         }
     }
