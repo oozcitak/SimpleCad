@@ -3,23 +3,26 @@ using System.Drawing;
 
 namespace SimpleCAD
 {
-    public class Polygon : Drawable
+    public class Polyline : Drawable
     {
-        public Point2DCollection Points { get; private set; }
+        private bool closed;
 
-        public Polygon()
+        public Point2DCollection Points { get; private set; }
+        public bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
+
+        public Polyline()
         {
             Points = new Point2DCollection();
             Points.CollectionChanged += Points_CollectionChanged;
         }
 
-        public Polygon(Point2D[] pts)
+        public Polyline(Point2D[] pts)
         {
             Points = new Point2DCollection(pts);
             Points.CollectionChanged += Points_CollectionChanged;
         }
 
-        public Polygon(PointF[] pts)
+        public Polyline(PointF[] pts)
         {
             Points = new Point2DCollection(pts);
             Points.CollectionChanged += Points_CollectionChanged;
@@ -35,14 +38,20 @@ namespace SimpleCAD
             if (Points.Count > 0)
             {
                 PointF[] pts = Points.ToPointF();
-                using (Brush brush = FillStyle.CreateBrush(param))
+                if (Closed)
                 {
-                    param.Graphics.FillPolygon(brush, pts);
+                    using (Brush brush = FillStyle.CreateBrush(param))
+                    {
+                        param.Graphics.FillPolygon(brush, pts);
+                    }
                 }
 
                 using (Pen pen = OutlineStyle.CreatePen(param))
                 {
-                    param.Graphics.DrawPolygon(pen, pts);
+                    if (Closed)
+                        param.Graphics.DrawPolygon(pen, pts);
+                    else
+                        param.Graphics.DrawLines(pen, pts);
                 }
             }
         }
