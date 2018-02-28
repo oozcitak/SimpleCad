@@ -212,5 +212,65 @@ namespace SimpleCAD
                 doc.Model.Add(newItem);
             }
         }
+
+        public class DrawPolyline : Command
+        {
+            public override string RegisteredName => "Primitives.Polyline";
+            public override string Name => "Polyline";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("First point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Point2D pt = p1.Value;
+                Polyline consPoly = new Polyline(new Point2D[] { pt, pt });
+                consPoly.OutlineStyle = doc.Editor.TransientStyle;
+                doc.Transients.Add(consPoly);
+
+                Point2DCollection points = new Point2DCollection();
+                points.Add(pt);
+
+                bool done = false;
+                bool closed = false;
+                while (!done)
+                {
+                    Editor.PointOptions options = new Editor.PointOptions("Next point: ", pt, (p) => consPoly.Points[consPoly.Points.Count - 1] = p);
+                    options.AddKeyword("End", true);
+                    options.AddKeyword("Close");
+                    Editor.PointResult pNext = await ed.GetPoint(options);
+                    if (pNext.Result == Editor.ResultMode.OK)
+                    {
+                        pt = pNext.Value;
+                        consPoly.Points.Add(pt);
+                        points.Add(pt);
+                    }
+                    else if (pNext.Result == Editor.ResultMode.Cancel)
+                    {
+                        doc.Transients.Remove(consPoly);
+                        return;
+                    }
+                    else if (pNext.Result == Editor.ResultMode.Keyword)
+                    {
+                        if (points.Count < 2)
+                        {
+                            doc.Transients.Remove(consPoly);
+                            return;
+                        }
+
+                        if (pNext.Keyword == "End")
+                            done = true;
+                        if (pNext.Keyword == "Close")
+                            done = closed = true;
+                    }
+                }
+
+                doc.Transients.Remove(consPoly);
+                Polyline newItem = new Polyline(points);
+                if (closed) newItem.Closed = true;
+                doc.Model.Add(newItem);
+            }
+        }
     }
 }

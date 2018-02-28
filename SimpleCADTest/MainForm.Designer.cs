@@ -51,6 +51,7 @@
             this.btnDrawText = new System.Windows.Forms.ToolStripButton();
             this.btnDrawDimension = new System.Windows.Forms.ToolStripButton();
             this.btnDrawParabola = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawPolyline = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -199,10 +200,11 @@
             this.btnDrawEllipticArc,
             this.btnDrawText,
             this.btnDrawDimension,
-            this.btnDrawParabola});
+            this.btnDrawParabola,
+            this.btnDrawPolyline});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(455, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(508, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // btnSave
@@ -301,6 +303,16 @@
             this.btnDrawParabola.Text = "Parabola";
             this.btnDrawParabola.Click += new System.EventHandler(this.btnDrawParabola_Click);
             // 
+            // btnDrawPolyline
+            // 
+            this.btnDrawPolyline.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawPolyline.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawPolyline.Image")));
+            this.btnDrawPolyline.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawPolyline.Name = "btnDrawPolyline";
+            this.btnDrawPolyline.Size = new System.Drawing.Size(53, 22);
+            this.btnDrawPolyline.Text = "Polyline";
+            this.btnDrawPolyline.Click += new System.EventHandler(this.btnDrawPolyline_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -356,6 +368,7 @@
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.ToolStripButton btnDrawDimension;
         private System.Windows.Forms.ToolStripButton btnDrawParabola;
+        private System.Windows.Forms.ToolStripButton btnDrawPolyline;
     }
 }
 

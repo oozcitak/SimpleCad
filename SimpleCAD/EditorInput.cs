@@ -87,6 +87,8 @@ namespace SimpleCAD
             {
                 if (string.IsNullOrEmpty(input) && !string.IsNullOrEmpty(DefaultKeyword))
                     return DefaultKeyword;
+                if (string.IsNullOrEmpty(input))
+                    return "";
 
                 for (int i = 0; i < Aliases.Count; i++)
                 {

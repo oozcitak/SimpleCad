@@ -98,6 +98,11 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Primitives.Parabola");
         }
 
+        private void btnDrawPolyline_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("Primitives.Polyline");
+        }
+
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
