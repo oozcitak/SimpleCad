@@ -94,7 +94,7 @@
     <Compile Include="FillStyle.cs" />
     <Compile Include="OutlineStyle.cs" />
     <Compile Include="Text.cs" />
-    <Compile Include="Polygon.cs" />
+    <Compile Include="Polyline.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="Drawable.cs" />
     <Compile Include="DrawParams.cs" />
