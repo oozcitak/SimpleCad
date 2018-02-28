@@ -12,7 +12,24 @@ namespace SimpleCAD
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(Point2D);
+            return destinationType == typeof(string);
+        }
+
+        public override bool IsValid(ITypeDescriptorContext context, object value)
+        {
+            string str = value as string;
+
+            if (str == null) return false;
+
+            string[] parts = str.Replace(" ", "").Split(';', ',');
+            if (parts.Length != 2) return false;
+            foreach (string part in parts)
+            {
+                if (!float.TryParse(part, out _))
+                    return false;
+            }
+
+            return true;
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
@@ -21,7 +38,7 @@ namespace SimpleCAD
 
             if (str != null)
             {
-                string[] parts = str.Replace(" ", "").Split(';');
+                string[] parts = str.Replace(" ", "").Split(';', ',');
                 if (parts.Length == 2)
                 {
                     float x = float.Parse(parts[0]);

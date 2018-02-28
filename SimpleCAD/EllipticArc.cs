@@ -76,17 +76,6 @@ namespace SimpleCAD
             {
                 param.Graphics.DrawLines(pen, ptfs);
             }
-            return;
-
-
-            System.Drawing.Drawing2D.Matrix orgTr = param.Graphics.Transform;
-            param.Graphics.RotateTransform(dir.Angle * 180 / (float)Math.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
-            using (Pen pen = OutlineStyle.CreatePen(param))
-            {
-                param.Graphics.DrawArc(pen, X - SemiMajorAxis, Y - SemiMinorAxis, 2 * SemiMajorAxis, 2 * SemiMinorAxis,
-                    StartAngle * 180f / (float)Math.PI, (EndAngle - StartAngle) * 180f / (float)Math.PI);
-            }
-            param.Graphics.Transform = orgTr;
         }
 
         public override Extents GetExtents()

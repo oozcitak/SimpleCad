@@ -22,13 +22,11 @@ namespace SimpleCAD
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
+        private bool inputCompleted;
 
-        private PointOptions currentPointOptions;
-        private AngleOptions currentAngleOptions;
-        private TextOptions currentTextOptions;
-
-        private Point2D lastMouseLocation;
-        private string lastText;
+        private InputOptions currentOptions;
+        private Point2D currentMouseLocation;
+        private string currentText;
         private Line consLine;
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
@@ -91,20 +89,30 @@ namespace SimpleCAD
 
         public async Task<PointResult> GetPoint(PointOptions options)
         {
+            PointResult res = new PointResult(ResultMode.Cancel);
+
             Mode = InputMode.Point;
+            currentText = "";
+            currentOptions = options;
             OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
-            currentPointOptions = options;
-            if (options.HasBasePoint)
+
+            inputCompleted = false;
+            while (!inputCompleted)
             {
-                consLine = new Line(options.BasePoint, options.BasePoint);
-                consLine.OutlineStyle = TransientStyle;
-                Document.Transients.Add(consLine);
+                if (options.HasBasePoint)
+                {
+                    consLine = new Line(options.BasePoint, options.BasePoint);
+                    consLine.OutlineStyle = TransientStyle;
+                    Document.Transients.Add(consLine);
+                }
+                pointCompletion = new TaskCompletionSource<PointResult>();
+                res = await pointCompletion.Task;
+                Document.Transients.Remove(consLine);
             }
-            pointCompletion = new TaskCompletionSource<PointResult>();
-            PointResult res = await pointCompletion.Task;
+
             Mode = InputMode.None;
             OnPrompt(new EditorPromptEventArgs(""));
-            Document.Transients.Remove(consLine);
+
             return res;
         }
 
@@ -120,17 +128,27 @@ namespace SimpleCAD
 
         public async Task<AngleResult> GetAngle(AngleOptions options)
         {
+            AngleResult res = new AngleResult(ResultMode.Cancel);
+
             Mode = InputMode.Angle;
+            currentText = "";
+            currentOptions = options;
             OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
-            currentAngleOptions = options;
-            consLine = new Line(options.BasePoint, options.BasePoint);
-            consLine.OutlineStyle = TransientStyle;
-            Document.Transients.Add(consLine);
-            angleCompletion = new TaskCompletionSource<AngleResult>();
-            AngleResult res = await angleCompletion.Task;
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                consLine = new Line(options.BasePoint, options.BasePoint);
+                consLine.OutlineStyle = TransientStyle;
+                Document.Transients.Add(consLine);
+                angleCompletion = new TaskCompletionSource<AngleResult>();
+                res = await angleCompletion.Task;
+                Document.Transients.Remove(consLine);
+            }
+
             Mode = InputMode.None;
             OnPrompt(new EditorPromptEventArgs(""));
-            Document.Transients.Remove(consLine);
+
             return res;
         }
 
@@ -146,90 +164,166 @@ namespace SimpleCAD
 
         public async Task<TextResult> GetText(TextOptions options)
         {
+            TextResult res = new TextResult(ResultMode.Cancel);
+
             Mode = InputMode.Text;
+            currentText = "";
+            currentOptions = options;
             OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
-            currentTextOptions = options;
-            lastText = "";
-            textCompletion = new TaskCompletionSource<TextResult>();
-            TextResult res = await textCompletion.Task;
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                textCompletion = new TaskCompletionSource<TextResult>();
+                res = await textCompletion.Task;
+            }
+
             Mode = InputMode.None;
             OnPrompt(new EditorPromptEventArgs(""));
+
             return res;
         }
 
         internal void OnViewMouseMove(object sender, MouseEventArgs e, Point2D point)
         {
-            lastMouseLocation = point;
+            currentMouseLocation = point;
             switch (Mode)
             {
                 case InputMode.Point:
-                    if (currentPointOptions.HasBasePoint)
-                        consLine.P2 = lastMouseLocation;
-                    currentPointOptions.Jig(lastMouseLocation);
+                    if (((PointOptions)currentOptions).HasBasePoint)
+                        consLine.P2 = currentMouseLocation;
+                    ((PointOptions)currentOptions).Jig(currentMouseLocation);
                     break;
                 case InputMode.Angle:
-                    consLine.P2 = lastMouseLocation;
-                    currentAngleOptions.Jig(lastMouseLocation - currentAngleOptions.BasePoint);
+                    consLine.P2 = currentMouseLocation;
+                    ((AngleOptions)currentOptions).Jig(currentMouseLocation - ((AngleOptions)currentOptions).BasePoint);
                     break;
             }
         }
 
         internal void OnViewMouseClick(object sender, MouseEventArgs e, Point2D point)
         {
-            switch (Mode)
+            if (e.Button == MouseButtons.Left)
             {
-                case InputMode.Point:
-                    if (e.Button == MouseButtons.Left)
-                        pointCompletion.SetResult(new PointResult(true, point));
-                    break;
-                case InputMode.Angle:
-                    if (e.Button == MouseButtons.Left)
-                        angleCompletion.SetResult(new AngleResult(true, point - currentAngleOptions.BasePoint));
-                    break;
+                if (Mode == InputMode.Point)
+                {
+                    inputCompleted = true;
+                    pointCompletion.SetResult(new PointResult(point));
+                }
+                else if (Mode == InputMode.Angle)
+                {
+                    inputCompleted = true;
+                    angleCompletion.SetResult(new AngleResult(point - ((AngleOptions)currentOptions).BasePoint));
+                }
             }
         }
 
         internal void OnViewKeyDown(object sender, KeyEventArgs e)
         {
+            string keyword = currentOptions.MatchKeyword(currentText);
             switch (Mode)
             {
                 case InputMode.Point:
-                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-                        pointCompletion.SetResult(new PointResult(true, lastMouseLocation));
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || e.KeyCode == Keys.Space)
+                    {
+                        Point2DConverter conv = new Point2DConverter();
+                        if (conv.IsValid(currentText))
+                        {
+                            inputCompleted = true;
+                            pointCompletion.SetResult(new PointResult((Point2D)conv.ConvertFrom(currentText)));
+                        }
+                        else if (!string.IsNullOrEmpty(keyword))
+                        {
+                            inputCompleted = true;
+                            pointCompletion.SetResult(new PointResult(keyword));
+                        }
+                        else
+                        {
+                            currentText = "";
+                            OnPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                    }
                     else if (e.KeyCode == Keys.Escape)
-                        pointCompletion.SetResult(new PointResult(false, lastMouseLocation));
+                    {
+                        inputCompleted = true;
+                        pointCompletion.SetResult(new PointResult(ResultMode.Cancel));
+                    }
                     break;
                 case InputMode.Angle:
-                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-                        angleCompletion.SetResult(new AngleResult(true, lastMouseLocation - currentAngleOptions.BasePoint));
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || e.KeyCode == Keys.Space)
+                    {
+                        Vector2DConverter conv = new Vector2DConverter();
+                        if (conv.IsValid(currentText))
+                        {
+                            inputCompleted = true;
+                            angleCompletion.SetResult(new AngleResult((Vector2D)conv.ConvertFrom(currentText)));
+                        }
+                        if (float.TryParse(currentText, out float angle))
+                        {
+                            inputCompleted = true;
+                            angleCompletion.SetResult(new AngleResult(Vector2D.FromAngle(angle * (float)Math.PI / 180)));
+                        }
+                        else if (!string.IsNullOrEmpty(keyword))
+                        {
+                            inputCompleted = true;
+                            angleCompletion.SetResult(new AngleResult(keyword));
+                        }
+                        else
+                        {
+                            currentText = "";
+                            OnPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                    }
                     else if (e.KeyCode == Keys.Escape)
-                        angleCompletion.SetResult(new AngleResult(false, lastMouseLocation - currentAngleOptions.BasePoint));
+                    {
+                        inputCompleted = true;
+                        pointCompletion.SetResult(new PointResult(ResultMode.Cancel));
+                    }
                     break;
                 case InputMode.Text:
                     if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-                        textCompletion.SetResult(new TextResult(true, lastText));
+                    {
+                        inputCompleted = true;
+                        textCompletion.SetResult(new TextResult(currentText));
+                    }
                     else if (e.KeyCode == Keys.Escape)
-                        textCompletion.SetResult(new TextResult(false, lastText));
+                    {
+                        inputCompleted = true;
+                        textCompletion.SetResult(new TextResult(ResultMode.Cancel));
+                    }
                     break;
             }
         }
 
         internal void OnViewKeyPress(object sender, KeyPressEventArgs e)
         {
-            switch (Mode)
+            bool textChanged = false;
+
+            if (e.KeyChar == '\b') // backspace
             {
-                case InputMode.Text:
-                    if (e.KeyChar == '\b') // backspace
-                    {
-                        if (lastText.Length > 0)
-                            lastText = lastText.Remove(lastText.Length - 1);
-                    }
-                    else if (!char.IsControl(e.KeyChar))
-                    {
-                        lastText += e.KeyChar;
-                    }
-                    currentTextOptions.Jig(lastText);
-                    break;
+                if (currentText.Length > 0)
+                {
+                    currentText = currentText.Remove(currentText.Length - 1);
+                    textChanged = true;
+                }
+            }
+            else if (e.KeyChar == ' ' && Mode == InputMode.Text)
+            {
+                currentText += e.KeyChar;
+                textChanged = true;
+            }
+            else if (!char.IsControl(e.KeyChar))
+            {
+                currentText += e.KeyChar;
+                textChanged = true;
+            }
+
+            if (textChanged)
+            {
+                OnPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + currentText));
+
+                if (Mode == InputMode.Text)
+                    ((TextOptions)currentOptions).Jig(currentText);
             }
         }
 
