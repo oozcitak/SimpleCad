@@ -136,9 +136,9 @@ namespace SimpleCAD
         {
             public Action<T> Jig { get; private set; }
 
-            public JigOptions(string message) : base(message)
+            public JigOptions(string message) : this(message, (p) => { })
             {
-                Jig = (p) => { };
+                ;
             }
 
             public JigOptions(string message, Action<T> jig) : base(message)
@@ -158,10 +158,9 @@ namespace SimpleCAD
                 BasePoint = basePoint;
             }
 
-            public PointOptions(string message, Point2D basePoint) : base(message)
+            public PointOptions(string message, Point2D basePoint) : this(message, basePoint, (p) => { })
             {
-                HasBasePoint = true;
-                BasePoint = basePoint;
+                ;
             }
 
             public PointOptions(string message, Action<Point2D> jig) : base(message, jig)
@@ -170,10 +169,9 @@ namespace SimpleCAD
                 BasePoint = Point2D.Zero;
             }
 
-            public PointOptions(string message) : base(message)
+            public PointOptions(string message) : this(message, (p) => { })
             {
-                HasBasePoint = false;
-                BasePoint = Point2D.Zero;
+                ;
             }
         }
 
@@ -186,9 +184,9 @@ namespace SimpleCAD
                 BasePoint = basePoint;
             }
 
-            public AngleOptions(string message, Point2D basePoint) : base(message)
+            public AngleOptions(string message, Point2D basePoint) : this(message, basePoint, (p) => { })
             {
-                BasePoint = basePoint;
+                ;
             }
         }
 
@@ -199,7 +197,7 @@ namespace SimpleCAD
                 ;
             }
 
-            public TextOptions(string message) : base(message)
+            public TextOptions(string message) : this(message, (p) => { })
             {
                 ;
             }
