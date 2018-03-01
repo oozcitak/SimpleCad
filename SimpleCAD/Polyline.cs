@@ -8,7 +8,7 @@ namespace SimpleCAD
         private bool closed;
 
         public Point2DCollection Points { get; private set; }
-        public bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
+        public virtual bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
 
         public Polyline()
         {
@@ -22,7 +22,7 @@ namespace SimpleCAD
             Points.CollectionChanged += Points_CollectionChanged;
         }
 
-        public Polyline(Point2D[] pts)
+        public Polyline(params Point2D[] pts)
         {
             Points = new Point2DCollection(pts);
             Points.CollectionChanged += Points_CollectionChanged;
