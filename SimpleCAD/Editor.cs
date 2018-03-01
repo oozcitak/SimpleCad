@@ -261,7 +261,7 @@ namespace SimpleCAD
                         if (float.TryParse(currentText, out float angle))
                         {
                             inputCompleted = true;
-                            angleCompletion.SetResult(new AngleResult(Vector2D.FromAngle(angle * (float)Math.PI / 180)));
+                            angleCompletion.SetResult(new AngleResult(Vector2D.FromAngle(angle * MathF.PI / 180)));
                         }
                         else if (!string.IsNullOrEmpty(keyword))
                         {

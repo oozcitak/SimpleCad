@@ -41,16 +41,16 @@ namespace SimpleCAD
             {
                 // Represent curved features by at most 4 pixels
                 float sweep = EndAngle - StartAngle;
-                while (sweep < 0) sweep += 2 * (float)Math.PI;
-                while (sweep > 2 * (float)Math.PI) sweep -= 2 * (float)Math.PI;
+                while (sweep < 0) sweep += 2 * MathF.PI;
+                while (sweep > 2 * MathF.PI) sweep -= 2 * MathF.PI;
                 float curveLength = param.ModelToView(sweep * Radius);
                 int n = (int)Math.Max(4, curveLength / 4);
                 float a = StartAngle;
-                float da = sweep / (float)n;
+                float da = sweep / n;
                 PointF[] pts = new PointF[n + 1];
                 for (int i = 0; i <= n; i++)
                 {
-                    pts[i] = new PointF(X + Radius * (float)Math.Cos(a), Y + Radius * (float)Math.Sin(a));
+                    pts[i] = new PointF(X + Radius * MathF.Cos(a), Y + Radius * MathF.Sin(a));
                     a += da;
                 }
                 param.Graphics.DrawLines(pen, pts);

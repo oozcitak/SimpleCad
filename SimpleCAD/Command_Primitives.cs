@@ -38,7 +38,7 @@ namespace SimpleCAD
 
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
-                Arc consArc = new Arc(p1.Value, 0, 0, 2 * (float)Math.PI);
+                Arc consArc = new Arc(p1.Value, 0, 0, 2 * MathF.PI);
                 consArc.OutlineStyle = doc.Editor.TransientStyle;
                 doc.Transients.Add(consArc);
                 Editor.PointResult p2 = await ed.GetPoint("Radius: ", p1.Value, (p) => consArc.Radius = (p - consArc.Center).Length);
@@ -120,7 +120,7 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Editor.PointResult p2 = await ed.GetPoint("Semi major axis: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
-                EllipticArc consArc = new EllipticArc(p1.Value, (p2.Value - p1.Value).Length, (p2.Value - p1.Value).Length / 10, 0, 2 * (float)Math.PI);
+                EllipticArc consArc = new EllipticArc(p1.Value, (p2.Value - p1.Value).Length, (p2.Value - p1.Value).Length / 10, 0, 2 * MathF.PI);
                 consArc.OutlineStyle = doc.Editor.TransientStyle;
                 doc.Transients.Add(consArc);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consArc.SemiMinorAxis = (p - consArc.Center).Length);

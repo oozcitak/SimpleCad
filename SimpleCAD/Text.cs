@@ -85,7 +85,7 @@ namespace SimpleCAD
                     dy = -sz.Height / 2;
 
                 param.Graphics.TranslateTransform(dx, dy, MatrixOrder.Append);
-                param.Graphics.RotateTransform(-Rotation * 180 / (float)Math.PI, MatrixOrder.Append);
+                param.Graphics.RotateTransform(-Rotation * 180 / MathF.PI, MatrixOrder.Append);
                 param.Graphics.TranslateTransform(x, y, MatrixOrder.Append);
 
                 // Fill background

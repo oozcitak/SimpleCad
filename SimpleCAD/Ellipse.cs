@@ -47,13 +47,13 @@ namespace SimpleCAD
             poly = new Polyline();
             // Represent curved features by at most 4 pixels
             int n = (int)Math.Max(4, curveLength / 4);
-            float da = 2 * (float)Math.PI / (float)n;
+            float da = 2 * MathF.PI / n;
             float a = 0;
             Point2DCollection pts = new Point2DCollection();
             for (int i = 0; i < n; i++)
             {
-                float x = SemiMajorAxis * (float)Math.Cos(a);
-                float y = SemiMinorAxis * (float)Math.Sin(a);
+                float x = SemiMajorAxis * MathF.Cos(a);
+                float y = SemiMinorAxis * MathF.Sin(a);
                 poly.Points.Add(x, y);
                 a += da;
             }
@@ -65,9 +65,9 @@ namespace SimpleCAD
         public override void Draw(DrawParams param)
         {
             // Approximate perimeter (Ramanujan)
-            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            float p = 2 * MathF.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - MathF.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
             float newCurveLength = param.ModelToView(p);
-            if (Math.Abs(newCurveLength - curveLength) > 1e-7f)
+            if (!MathF.IsEqual(newCurveLength, curveLength))
             {
                 curveLength = newCurveLength;
                 UpdatePolyline();

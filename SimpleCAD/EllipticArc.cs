@@ -48,24 +48,24 @@ namespace SimpleCAD
         public override void Draw(DrawParams param)
         {
             // Approximate perimeter (Ramanujan)
-            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            float p = 2 * MathF.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - MathF.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
             // Represent curved features by at most 4 pixels
             float sweep = EndAngle - StartAngle;
-            while (sweep < 0) sweep += 2 * (float)Math.PI;
-            while (sweep > 2 * (float)Math.PI) sweep -= 2 * (float)Math.PI;
-            float curveLength = param.ModelToView(sweep / (2 * (float)Math.PI) * p);
+            while (sweep < 0) sweep += 2 * MathF.PI;
+            while (sweep > 2 * MathF.PI) sweep -= 2 * MathF.PI;
+            float curveLength = param.ModelToView(sweep / (2 * MathF.PI) * p);
             int n = (int)Math.Max(4, curveLength / 4);
             float a = StartAngle;
-            float da = sweep / (float)n;
+            float da = sweep / n;
             Point2DCollection pts = new Point2DCollection();
             for (int i = 0; i < n + 1; i++)
             {
-                float dx = (float)Math.Cos(a) * SemiMinorAxis;
-                float dy = (float)Math.Sin(a) * SemiMajorAxis;
-                float t = (float)Math.Atan2(dy, dx);
+                float dx = MathF.Cos(a) * SemiMinorAxis;
+                float dy = MathF.Sin(a) * SemiMajorAxis;
+                float t = MathF.Atan2(dy, dx);
 
-                float x = SemiMajorAxis * (float)Math.Cos(t);
-                float y = SemiMinorAxis * (float)Math.Sin(t);
+                float x = SemiMajorAxis * MathF.Cos(t);
+                float y = SemiMinorAxis * MathF.Sin(t);
                 pts.Add(x, y);
                 a += da;
             }
@@ -108,8 +108,8 @@ namespace SimpleCAD
             float b1 = SemiMinorAxis - pickBoxSize / 2;
             float b2 = SemiMinorAxis + pickBoxSize / 2;
             float rot = dir.Angle;
-            float xx = (pt.X - X) * (float)Math.Cos(rot) + (pt.Y - Y) * (float)Math.Sin(rot);
-            float yy = (pt.X - X) * (float)Math.Sin(rot) - (pt.Y - Y) * (float)Math.Cos(rot);
+            float xx = (pt.X - X) * MathF.Cos(rot) + (pt.Y - Y) * MathF.Sin(rot);
+            float yy = (pt.X - X) * MathF.Sin(rot) - (pt.Y - Y) * MathF.Cos(rot);
             return (xx * xx / a1 / a1 + yy * yy / b1 / b1 >= 1) && (xx * xx / a2 / a2 + yy * yy / b2 / b2 <= 1) &&
                 ptDir.IsBetween(Vector2D.FromAngle(StartAngle + rot), Vector2D.FromAngle(EndAngle + rot));
         }

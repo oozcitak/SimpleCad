@@ -8,7 +8,7 @@ namespace SimpleCAD
     {
         public float X { get; set; }
         public float Y { get; set; }
-        public float Length { get { return (float)Math.Sqrt(X * X + Y * Y); } }
+        public float Length { get { return MathF.Sqrt(X * X + Y * Y); } }
         public float Angle { get { return AngleTo(Vector2D.XAxis); } }
 
         public static Vector2D XAxis { get { return new Vector2D(1, 0); } }
@@ -69,7 +69,7 @@ namespace SimpleCAD
         {
             float dot = this.DotProduct(v);
             float det = X * v.Y - v.X * Y;
-            float ang = -(float)Math.Atan2(det, dot);
+            float ang = -MathF.Atan2(det, dot);
             return ang;
         }
 
@@ -80,14 +80,14 @@ namespace SimpleCAD
 
         private static float ClampAngle(float ang, bool low, bool high)
         {
-            if (low) { while (ang < 0) ang += 2 * (float)Math.PI; }
-            if (high) { while (ang > 2 * (float)Math.PI) ang -= 2 * (float)Math.PI; }
+            if (low) { while (ang < 0) ang += 2 * MathF.PI; }
+            if (high) { while (ang > 2 * MathF.PI) ang -= 2 * MathF.PI; }
             return ang;
         }
 
         public static Vector2D FromAngle(float angle)
         {
-            return new Vector2D((float)Math.Cos(angle), (float)Math.Sin(angle));
+            return new Vector2D(MathF.Cos(angle), MathF.Sin(angle));
         }
 
         public Vector2D GetPerpendicularVector()

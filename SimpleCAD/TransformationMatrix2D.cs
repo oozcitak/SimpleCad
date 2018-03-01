@@ -11,7 +11,7 @@ namespace SimpleCAD
         public float M22 { get; set; }
         public float DX { get; set; }
         public float DY { get; set; }
-        public float RotationAngle { get { return -(float)Math.Asin(M12); } }
+        public float RotationAngle { get { return -MathF.Asin(M12); } }
 
         public static TransformationMatrix2D Identity { get { return new TransformationMatrix2D(1, 0, 0, 1, 0, 0); } }
 
@@ -24,10 +24,10 @@ namespace SimpleCAD
 
         public static TransformationMatrix2D Transformation(float xScale, float yScale, float rotation, float dx, float dy)
         {
-            float m11 = xScale * (float)Math.Cos(rotation);
-            float m12 = -(float)Math.Sin(rotation);
-            float m21 = (float)Math.Sin(rotation);
-            float m22 = yScale * (float)Math.Cos(rotation);
+            float m11 = xScale * MathF.Cos(rotation);
+            float m12 = -MathF.Sin(rotation);
+            float m21 = MathF.Sin(rotation);
+            float m22 = yScale * MathF.Cos(rotation);
 
             return new TransformationMatrix2D(m11, m12, m21, m22, dx, dy);
         }
@@ -42,10 +42,10 @@ namespace SimpleCAD
 
         public static TransformationMatrix2D Rotation(float rotation)
         {
-            float m11 = (float)Math.Cos(-rotation);
-            float m12 = (float)Math.Sin(-rotation);
-            float m21 = -(float)Math.Sin(-rotation);
-            float m22 = (float)Math.Cos(-rotation);
+            float m11 = MathF.Cos(-rotation);
+            float m12 = MathF.Sin(-rotation);
+            float m21 = -MathF.Sin(-rotation);
+            float m22 = MathF.Cos(-rotation);
 
             return new TransformationMatrix2D(m11, m12, m21, m22, 0, 0);
         }
