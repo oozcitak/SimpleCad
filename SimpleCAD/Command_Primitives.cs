@@ -128,12 +128,14 @@ namespace SimpleCAD
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p.Angle);
                 if (a1.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
                 Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p.Angle);
+                if (a2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                Editor.AngleResult a3 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consArc.Rotation = v.Angle);
                 doc.Transients.Remove(consArc);
-                if (a2.Result != Editor.ResultMode.OK) return;
+                if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new EllipticArc(p1.Value,
                     (p2.Value - p1.Value).Length, (p3.Value - p1.Value).Length,
-                    a1.Value.Angle, a2.Value.Angle);
+                    a1.Value.Angle, a2.Value.Angle, a3.Value.Angle);
                 doc.Model.Add(newItem);
             }
         }

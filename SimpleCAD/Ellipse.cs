@@ -15,7 +15,6 @@ namespace SimpleCAD
         [Browsable(false)]
         public float Y { get { return Center.Y; } }
 
-
         private float semiMajorAxis;
         private float semiMinorAxis;
         private float rotation;
@@ -49,7 +48,6 @@ namespace SimpleCAD
             int n = (int)Math.Max(4, curveLength / 4);
             float da = 2 * MathF.PI / n;
             float a = 0;
-            Point2DCollection pts = new Point2DCollection();
             for (int i = 0; i < n; i++)
             {
                 float x = SemiMajorAxis * MathF.Cos(a);
