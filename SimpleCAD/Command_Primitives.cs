@@ -301,5 +301,30 @@ namespace SimpleCAD
                 doc.Model.Add(newItem);
             }
         }
+
+        public class DrawTriangle : Command
+        {
+            public override string RegisteredName => "Primitives.Triangle";
+            public override string Name => "Triangle";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("First point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value);
+                if (p2.Result != Editor.ResultMode.OK) return;
+                Triangle consTri = new Triangle(p1.Value, p2.Value, p2.Value);
+                consTri.OutlineStyle = doc.Editor.TransientStyle;
+                doc.Transients.Add(consTri);
+                Editor.PointResult p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.P3 = p);
+                doc.Transients.Remove(consTri);
+                if (p3.Result != Editor.ResultMode.OK) return;
+
+                Drawable newItem = new Triangle(p1.Value, p2.Value, p3.Value);
+                doc.Model.Add(newItem);
+            }
+        }
     }
 }

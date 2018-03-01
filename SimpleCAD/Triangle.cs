@@ -6,11 +6,13 @@ namespace SimpleCAD
 {
     public class Triangle : Drawable
     {
-        private Point2DCollection points;
+        private Point2D p1;
+        private Point2D p2;
+        private Point2D p3;
 
-        public Point2D P1 { get { return points[0]; } set { points[0] = value; NotifyPropertyChanged(); } }
-        public Point2D P2 { get { return points[1]; } set { points[1] = value; NotifyPropertyChanged(); } }
-        public Point2D P3 { get { return points[2]; } set { points[2] = value; NotifyPropertyChanged(); } }
+        public Point2D P1 { get { return p1; } set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D P2 { get { return p2; } set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D P3 { get { return p3; } set { p3 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return P1.X; } }
@@ -25,12 +27,14 @@ namespace SimpleCAD
         [Browsable(false)]
         public float Y3 { get { return P3.Y; } }
 
+        private Polyline poly;
+
         public Triangle(Point2D p1, Point2D p2, Point2D p3)
         {
-            points = new Point2DCollection();
-            points.Add(p1);
-            points.Add(p2);
-            points.Add(p3);
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            UpdatePolyline();
         }
 
         public Triangle(float x1, float y1, float x2, float y2, float x3, float y3)
@@ -39,27 +43,38 @@ namespace SimpleCAD
             ;
         }
 
+        private void UpdatePolyline()
+        {
+            poly = new Polyline();
+            poly.Points.Add(p1);
+            poly.Points.Add(p2);
+            poly.Points.Add(p3);
+            poly.Closed = true;
+        }
+
         public override void Draw(DrawParams param)
         {
-            PointF[] ptf = points.ToPointF();
-            using (Brush brush = FillStyle.CreateBrush(param))
-            {
-                param.Graphics.FillPolygon(brush, ptf);
-            }
-            using (Pen pen = OutlineStyle.CreatePen(param))
-            {
-                param.Graphics.DrawPolygon(pen, ptf);
-            }
+            poly.OutlineStyle = OutlineStyle;
+            poly.FillStyle = FillStyle;
+            poly.Draw(param);
         }
 
         public override Extents GetExtents()
         {
-            return points.GetExtents();
+            return poly.GetExtents();
         }
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            points.TransformBy(transformation);
+            p1.TransformBy(transformation);
+            p2.TransformBy(transformation);
+            p3.TransformBy(transformation);
+            UpdatePolyline();
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            return poly.Contains(pt, pickBoxSize);
         }
     }
 }

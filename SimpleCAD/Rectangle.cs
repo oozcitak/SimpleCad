@@ -68,7 +68,6 @@ namespace SimpleCAD
             poly.Closed = true;
             poly.TransformBy(TransformationMatrix2D.Rotation(rotation));
             poly.TransformBy(TransformationMatrix2D.Translation(X, Y));
-
         }
 
         public override void Draw(DrawParams param)
