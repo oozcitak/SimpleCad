@@ -39,7 +39,7 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Arc consArc = new Arc(p1.Value, 0, 0, 2 * MathF.PI);
-                consArc.OutlineStyle = doc.Editor.TransientStyle;
+                consArc.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consArc);
                 Editor.PointResult p2 = await ed.GetPoint("Radius: ", p1.Value, (p) => consArc.Radius = (p - consArc.Center).Length);
                 if (p2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
@@ -68,7 +68,7 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Circle consCircle = new Circle(p1.Value, 0);
-                consCircle.OutlineStyle = doc.Editor.TransientStyle;
+                consCircle.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consCircle);
                 Editor.PointResult p2 = await ed.GetPoint("Radius: ", p1.Value, (p) => consCircle.Radius = (p - consCircle.Center).Length);
                 doc.Transients.Remove(consCircle);
@@ -93,7 +93,7 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Semi major axis: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Ellipse consEllipse = new Ellipse(p1.Value, (p2.Value - p1.Value).Length, 0);
-                consEllipse.OutlineStyle = doc.Editor.TransientStyle;
+                consEllipse.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consEllipse);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consEllipse.SemiMinorAxis = (p - consEllipse.Center).Length);
                 if (p3.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consEllipse); return; }
@@ -121,7 +121,7 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Semi major axis: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 EllipticArc consArc = new EllipticArc(p1.Value, (p2.Value - p1.Value).Length, (p2.Value - p1.Value).Length / 10, 0, 2 * MathF.PI);
-                consArc.OutlineStyle = doc.Editor.TransientStyle;
+                consArc.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consArc);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consArc.SemiMinorAxis = (p - consArc.Center).Length);
                 if (p3.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
@@ -157,7 +157,7 @@ namespace SimpleCAD
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Text consText = new Text(p1.Value, " ", (p2.Value - p1.Value).Length);
                 consText.Rotation = a1.Value.Angle;
-                consText.OutlineStyle = doc.Editor.TransientStyle;
+                consText.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consText);
                 Editor.TextResult t1 = await ed.GetText("Text string: ", (p) => consText.String = p);
                 doc.Transients.Remove(consText);
@@ -206,7 +206,7 @@ namespace SimpleCAD
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value);
                 if (a1.Result != Editor.ResultMode.OK) return;
                 Parabola consPb = new Parabola(p1.Value, p2.Value, a1.Value.Angle, 0);
-                consPb.OutlineStyle = doc.Editor.TransientStyle;
+                consPb.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consPb);
                 Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p2.Value, (p) => consPb.EndAngle = p.Angle);
                 doc.Transients.Remove(consPb);
@@ -230,7 +230,7 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Point2D pt = p1.Value;
                 Polyline consPoly = new Polyline(new Point2D[] { pt, pt });
-                consPoly.OutlineStyle = doc.Editor.TransientStyle;
+                consPoly.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consPoly);
 
                 Point2DCollection points = new Point2DCollection();
@@ -289,7 +289,7 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Rectangle consRec = new Rectangle(p1.Value, 0, 0);
-                consRec.OutlineStyle = doc.Editor.TransientStyle;
+                consRec.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consRec);
                 Editor.PointResult p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
                 if (p2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consRec); return; }
@@ -316,7 +316,7 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Triangle consTri = new Triangle(p1.Value, p2.Value, p2.Value);
-                consTri.OutlineStyle = doc.Editor.TransientStyle;
+                consTri.Outline = doc.Editor.TransientStyle;
                 doc.Transients.Add(consTri);
                 Editor.PointResult p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.P3 = p);
                 doc.Transients.Remove(consTri);

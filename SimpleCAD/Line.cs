@@ -35,7 +35,7 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            using (Pen pen = OutlineStyle.CreatePen(param))
+            using (Pen pen = Outline.CreatePen(param))
             {
                 param.Graphics.DrawLine(pen, X1, Y1, X2, Y2);
             }

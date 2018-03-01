@@ -31,7 +31,7 @@ namespace SimpleCAD
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
         public Color SelectionHighlight { get; set; } = Color.FromArgb(64, 46, 116, 251);
-        public OutlineStyle TransientStyle { get; set; } = new OutlineStyle(Color.Orange, 1, DashStyle.Dash);
+        public Outline TransientStyle { get; set; } = new Outline(Color.Orange, 1, DashStyle.Dash);
 
         static Editor()
         {
@@ -102,7 +102,7 @@ namespace SimpleCAD
                 if (options.HasBasePoint)
                 {
                     consLine = new Line(options.BasePoint, options.BasePoint);
-                    consLine.OutlineStyle = TransientStyle;
+                    consLine.Outline = TransientStyle;
                     Document.Transients.Add(consLine);
                 }
                 pointCompletion = new TaskCompletionSource<PointResult>();
@@ -139,7 +139,7 @@ namespace SimpleCAD
             while (!inputCompleted)
             {
                 consLine = new Line(options.BasePoint, options.BasePoint);
-                consLine.OutlineStyle = TransientStyle;
+                consLine.Outline = TransientStyle;
                 Document.Transients.Add(consLine);
                 angleCompletion = new TaskCompletionSource<AngleResult>();
                 res = await angleCompletion.Task;

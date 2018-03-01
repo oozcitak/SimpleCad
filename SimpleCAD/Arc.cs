@@ -37,7 +37,7 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            using (Pen pen = OutlineStyle.CreatePen(param))
+            using (Pen pen = Outline.CreatePen(param))
             {
                 // Represent curved features by at most 4 pixels
                 float sweep = EndAngle - StartAngle;

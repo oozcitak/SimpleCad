@@ -5,14 +5,14 @@ using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
-    [TypeConverter(typeof(OutlineStyleConverter))]
-    public partial struct OutlineStyle
+    [TypeConverter(typeof(OutlineConverter))]
+    public partial struct Outline
     {
         public Color Color { get; set; }
         public float LineWeight { get; set; }
         public DashStyle DashStyle { get; set; }
 
-        public OutlineStyle(Color color, float lineWeight, DashStyle dashStyle)
+        public Outline(Color color, float lineWeight, DashStyle dashStyle)
             : this()
         {
             Color = color;
@@ -20,13 +20,13 @@ namespace SimpleCAD
             DashStyle = dashStyle;
         }
 
-        public OutlineStyle(Color color, float lineWeight)
+        public Outline(Color color, float lineWeight)
             : this(color, lineWeight, DashStyle.Solid)
         {
             ;
         }
 
-        public OutlineStyle(Color color)
+        public Outline(Color color)
             : this(color, 0, DashStyle.Solid)
         {
             ;

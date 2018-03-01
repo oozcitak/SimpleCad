@@ -61,7 +61,7 @@ namespace SimpleCAD
             Point2D c1 = P1 * 1 / 3 + (PC * 2 / 3).ToVector2D();
             Point2D c2 = P2 * 1 / 3 + (PC * 2 / 3).ToVector2D();
 
-            using (Pen pen = OutlineStyle.CreatePen(param))
+            using (Pen pen = Outline.CreatePen(param))
             {
                 param.Graphics.DrawBezier(pen, P1.ToPointF(), c1.ToPointF(), c2.ToPointF(), P2.ToPointF());
             }
