@@ -84,7 +84,6 @@
       <DependentUpon>OutlineStyles.tt</DependentUpon>
     </Compile>
     <Compile Include="Parabola.cs" />
-    <Compile Include="MultiLineText.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Vector2D.cs" />
     <Compile Include="TransformationMatrix2D.cs" />
