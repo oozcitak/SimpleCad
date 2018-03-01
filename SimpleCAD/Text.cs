@@ -57,7 +57,6 @@ namespace SimpleCAD
             float height = param.ModelToView(Height);
             using (Pen pen = OutlineStyle.CreatePen(param))
             using (Brush brush = new SolidBrush(pen.Color))
-            using (Brush back = new SolidBrush(FillStyle.Color))
             using (Font font = new Font(FontFamily, height, FontStyle, GraphicsUnit.Pixel))
             {
                 // Convert the text alignment point (x, y) to pixel coordinates
@@ -88,8 +87,6 @@ namespace SimpleCAD
                 param.Graphics.RotateTransform(-Rotation * 180 / MathF.PI, MatrixOrder.Append);
                 param.Graphics.TranslateTransform(x, y, MatrixOrder.Append);
 
-                // Fill background
-                param.Graphics.FillRectangle(back, 0, 0, sz.Width, sz.Height);
                 param.Graphics.DrawString(String, font, brush, 0, 0);
 
                 // Restore old transformation

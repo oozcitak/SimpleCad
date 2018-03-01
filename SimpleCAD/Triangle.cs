@@ -55,7 +55,6 @@ namespace SimpleCAD
         public override void Draw(DrawParams param)
         {
             poly.OutlineStyle = OutlineStyle;
-            poly.FillStyle = FillStyle;
             poly.Draw(param);
         }
 

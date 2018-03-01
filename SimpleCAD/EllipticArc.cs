@@ -86,7 +86,6 @@ namespace SimpleCAD
                 UpdatePolyline();
             }
             poly.OutlineStyle = OutlineStyle;
-            poly.FillStyle = FillStyle;
             poly.Draw(param);
         }
 

@@ -31,10 +31,6 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            using (Brush brush = FillStyle.CreateBrush(param))
-            {
-                param.Graphics.FillEllipse(brush, X - Radius, Y - Radius, 2f * Radius, 2f * Radius);
-            }
             using (Pen pen = OutlineStyle.CreatePen(param))
             {
                 param.Graphics.DrawEllipse(pen, X - Radius, Y - Radius, 2f * Radius, 2f * Radius);

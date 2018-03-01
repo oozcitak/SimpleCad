@@ -57,7 +57,6 @@
     <Compile Include="SelectionSet.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Events.cs" />
-    <Compile Include="FillStyleConverter.cs" />
     <Compile Include="Vector2DConverter.cs" />
     <Compile Include="Point2DConverter.cs" />
     <Compile Include="OutlineStyleConverter.cs" />
@@ -73,11 +72,6 @@
     <Compile Include="Circle.cs" />
     <Compile Include="Arc.cs" />
     <Compile Include="EllipticArc.cs" />
-    <Compile Include="FillStyles.cs">
-      <DependentUpon>FillStyles.tt</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="OutlineStyles.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -91,7 +85,6 @@
     <Compile Include="Dimension.cs" />
     <Compile Include="Ellipse.cs" />
     <Compile Include="Extents.cs" />
-    <Compile Include="FillStyle.cs" />
     <Compile Include="OutlineStyle.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Polyline.cs" />
@@ -107,10 +100,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FillStyles.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>FillStyles.cs</LastGenOutput>
-    </Content>
     <Content Include="OutlineStyles.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>OutlineStyles.cs</LastGenOutput>
