@@ -89,7 +89,7 @@ namespace SimpleCAD
             poly.Draw(param);
         }
 
-        public override Extents GetExtents()
+        public override Extents2D GetExtents()
         {
             return poly.GetExtents();
         }

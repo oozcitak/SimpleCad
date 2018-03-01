@@ -19,6 +19,7 @@ namespace SimpleCAD
 
         public event EditorPromptEventHandler Prompt;
 
+        private TaskCompletionSource<SelectionResult> selectionCompletion;
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
@@ -27,10 +28,14 @@ namespace SimpleCAD
         private InputOptions currentOptions;
         private Point2D currentMouseLocation;
         private string currentText;
-        private Line consLine;
+        private Polyline consLine;
+        private Hatch consHatch;
+        private bool selectionClickedFirstPoint;
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
+        public Color SelectionBorder { get; set; } = Color.White;
         public Color SelectionHighlight { get; set; } = Color.FromArgb(64, 46, 116, 251);
+        public Color ReverseSelectionHighlight { get; set; } = Color.FromArgb(64, 46, 251, 116);
         public Outline TransientStyle { get; set; } = new Outline(Color.Orange, 1, DashStyle.Dash);
 
         static Editor()
@@ -67,6 +72,45 @@ namespace SimpleCAD
             com.Apply(Document);
         }
 
+        public async Task<SelectionResult> GetSelection(string message)
+        {
+            return await GetSelection(new SelectionOptions(message));
+        }
+
+        public async Task<SelectionResult> GetSelection(SelectionOptions options)
+        {
+            if (Selection.Count != 0)
+            {
+                // Immediately return existing selection if any
+                selectionCompletion = new TaskCompletionSource<SelectionResult>();
+                selectionCompletion.SetResult(new SelectionResult(Selection));
+                return await selectionCompletion.Task;
+            }
+            else
+            {
+                SelectionResult res = new SelectionResult(ResultMode.Cancel);
+
+                Mode = InputMode.Selection;
+                currentOptions = options;
+                selectionClickedFirstPoint = false;
+                OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
+
+                inputCompleted = false;
+                while (!inputCompleted)
+                {
+                    selectionCompletion = new TaskCompletionSource<SelectionResult>();
+                    res = await selectionCompletion.Task;
+                    Document.Transients.Remove(consLine);
+                    Document.Transients.Remove(consHatch);
+                }
+
+                Mode = InputMode.None;
+                OnPrompt(new EditorPromptEventArgs(""));
+
+                return res;
+            }
+        }
+
         public async Task<PointResult> GetPoint(string message)
         {
             return await GetPoint(new PointOptions(message));
@@ -101,7 +145,7 @@ namespace SimpleCAD
             {
                 if (options.HasBasePoint)
                 {
-                    consLine = new Line(options.BasePoint, options.BasePoint);
+                    consLine = new Polyline(options.BasePoint, options.BasePoint);
                     consLine.Outline = TransientStyle;
                     Document.Transients.Add(consLine);
                 }
@@ -138,7 +182,7 @@ namespace SimpleCAD
             inputCompleted = false;
             while (!inputCompleted)
             {
-                consLine = new Line(options.BasePoint, options.BasePoint);
+                consLine = new Polyline(options.BasePoint, options.BasePoint);
                 consLine.Outline = TransientStyle;
                 Document.Transients.Add(consLine);
                 angleCompletion = new TaskCompletionSource<AngleResult>();
@@ -189,13 +233,41 @@ namespace SimpleCAD
             currentMouseLocation = point;
             switch (Mode)
             {
+                case InputMode.Selection:
+                    if (selectionClickedFirstPoint)
+                    {
+                        // Update the selection window
+                        Point2D p1 = consLine.Points[0];
+                        Point2D p2 = new Point2D(point.X, p1.Y);
+                        Point2D p3 = point;
+                        Point2D p4 = new Point2D(p1.X, point.Y);
+                        consLine.Points[0] = p1;
+                        consLine.Points[1] = p2;
+                        consLine.Points[2] = p3;
+                        consLine.Points[3] = p4;
+                        consHatch.Points[0] = p1;
+                        consHatch.Points[1] = p2;
+                        consHatch.Points[2] = p3;
+                        consHatch.Points[3] = p4;
+                        if (point.X > p1.X)
+                        {
+                            consHatch.Outline = new Outline(SelectionHighlight);
+                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Solid);
+                        }
+                        else
+                        {
+                            consHatch.Outline = new Outline(ReverseSelectionHighlight);
+                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
+                        }
+                    }
+                    break;
                 case InputMode.Point:
                     if (((PointOptions)currentOptions).HasBasePoint)
-                        consLine.P2 = currentMouseLocation;
+                        consLine.Points[1] = currentMouseLocation;
                     ((PointOptions)currentOptions).Jig(currentMouseLocation);
                     break;
                 case InputMode.Angle:
-                    consLine.P2 = currentMouseLocation;
+                    consLine.Points[1] = currentMouseLocation;
                     ((AngleOptions)currentOptions).Jig(currentMouseLocation - ((AngleOptions)currentOptions).BasePoint);
                     break;
             }
@@ -205,7 +277,37 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (Mode == InputMode.Point)
+                if (Mode == InputMode.Selection)
+                {
+                    if (!selectionClickedFirstPoint)
+                    {
+                        selectionClickedFirstPoint = true;
+                        // Create the selection window
+                        consHatch = new Hatch(point, point, point, point);
+                        consHatch.Outline = new Outline(SelectionHighlight);
+                        Document.Transients.Add(consHatch);
+                        consLine = new Polyline(point, point, point, point);
+                        consLine.Closed = true;
+                        consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
+                        Document.Transients.Add(consLine);
+                    }
+                    else
+                    {
+                        inputCompleted = true;
+                        SelectionSet set = new SelectionSet();
+                        Extents2D ex = consHatch.GetExtents();
+                        bool windowSelection = (consHatch.Points[2].X > consHatch.Points[0].X);
+                        foreach (Drawable item in Document.Model)
+                        {
+                            Extents2D exItem = item.GetExtents();
+                            if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
+                                set.Add(item);
+                        }
+                        Selection = set;
+                        selectionCompletion.SetResult(new SelectionResult(set));
+                    }
+                }
+                else if (Mode == InputMode.Point)
                 {
                     inputCompleted = true;
                     pointCompletion.SetResult(new PointResult(point));

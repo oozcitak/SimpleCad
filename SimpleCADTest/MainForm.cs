@@ -13,14 +13,10 @@ namespace SimpleCADTest
 {
     public partial class MainForm : Form
     {
-        Circle trPoint;
-
         public MainForm()
         {
             InitializeComponent();
-            trPoint = new Circle(0, 0, 20);
-            trPoint.Outline = new Outline(Color.Red, 3);
-            cadWindow1.Document.Model.Add(trPoint);
+
             cadWindow1.Document.SelectionChanged += CadWindow1_SelectionChanged;
             cadWindow2.Document = cadWindow1.Document;
 
@@ -46,15 +42,6 @@ namespace SimpleCADTest
         {
             Point2D pt = new Point2D(cadWindow1.View.ScreenToWorld(e.X, e.Y));
             statusCoords.Text = pt.X.ToString("F2") + ", " + pt.Y.ToString("F2");
-        }
-
-        private void cadWindow1_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                trPoint.Center = new Point2D(cadWindow1.View.ScreenToWorld(e.X, e.Y));
-                cadWindow1.Refresh();
-            }
         }
 
         private void btnDrawLine_Click(object sender, EventArgs e)
@@ -112,60 +99,9 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Primitives.Triangle");
         }
 
-        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        private void btnMove_Click(object sender, EventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case Keys.Right:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(20, 0));
-                    break;
-                case Keys.Left:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-20, 0));
-                    break;
-                case Keys.Down:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(0, -20));
-                    break;
-                case Keys.Up:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(0, 20));
-                    break;
-                case Keys.PageDown:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(-5 * (float)Math.PI / 180));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
-                    break;
-                case Keys.PageUp:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Rotation(5 * (float)Math.PI / 180));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
-                    break;
-                case Keys.Home:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Scale(0.8f, 0.8f));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
-                    break;
-                case Keys.End:
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(-trPoint.X, -trPoint.Y));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Scale(1.2f, 1.2f));
-                    TransformItems(cadWindow1.Document.Editor.Selection, TransformationMatrix2D.Translation(trPoint.X, trPoint.Y));
-                    break;
-                case Keys.Delete:
-                    Drawable[] toDelete = cadWindow1.Document.Editor.Selection.ToArray();
-                    foreach (Drawable item in toDelete)
-                    {
-                        cadWindow1.Document.Model.Remove(item);
-                    }
-                    break;
-            }
-            propertyGrid1.Refresh();
-            cadWindow1.Refresh();
-        }
-
-        private void TransformItems(IEnumerable<Drawable> items, TransformationMatrix2D trans)
-        {
-            foreach (Drawable item in items)
-            {
-                item.TransformBy(trans);
-            }
+            cadWindow1.Document.Editor.RunCommand("Transform.Move");
         }
 
         private void btnSave_Click(object sender, EventArgs e)

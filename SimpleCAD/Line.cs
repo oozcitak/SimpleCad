@@ -41,9 +41,9 @@ namespace SimpleCAD
             }
         }
 
-        public override Extents GetExtents()
+        public override Extents2D GetExtents()
         {
-            Extents extents = new Extents();
+            Extents2D extents = new Extents2D();
             extents.Add(X1, Y1);
             extents.Add(X2, Y2);
             return extents;

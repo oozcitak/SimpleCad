@@ -50,6 +50,11 @@ namespace SimpleCAD
             return new TransformationMatrix2D(m11, m12, m21, m22, 0, 0);
         }
 
+        public static TransformationMatrix2D Translation(Vector2D delta)
+        {
+            return Translation(delta.X, delta.Y);
+        }
+
         public static TransformationMatrix2D Translation(float dx, float dy)
         {
             return new TransformationMatrix2D(1, 0, 0, 1, dx, dy);

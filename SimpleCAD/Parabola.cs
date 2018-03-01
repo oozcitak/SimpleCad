@@ -67,9 +67,9 @@ namespace SimpleCAD
             }
         }
 
-        public override Extents GetExtents()
+        public override Extents2D GetExtents()
         {
-            Extents extents = new Extents();
+            Extents2D extents = new Extents2D();
 
             float t = 0;
             for (int i = 0; i < 20; i++)

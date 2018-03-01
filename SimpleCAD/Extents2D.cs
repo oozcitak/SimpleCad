@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SimpleCAD
 {
-    public class Extents
+    public class Extents2D
     {
         public bool IsEmpty { get; private set; }
         public float XMin { get; private set; }
@@ -14,7 +14,7 @@ namespace SimpleCAD
         public float Width { get { return Math.Abs(XMax - XMin); } }
         public float Height { get { return Math.Abs(YMax - YMin); } }
 
-        public Extents()
+        public Extents2D()
         {
             IsEmpty = true;
         }
@@ -53,7 +53,7 @@ namespace SimpleCAD
             Add(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height);
         }
 
-        public void Add(Extents extents)
+        public void Add(Extents2D extents)
         {
             if (!extents.IsEmpty)
             {
@@ -62,7 +62,7 @@ namespace SimpleCAD
             }
         }
 
-        public static implicit operator RectangleF(Extents extents)
+        public static implicit operator RectangleF(Extents2D extents)
         {
             if (extents.IsEmpty)
                 return RectangleF.Empty;
@@ -83,6 +83,16 @@ namespace SimpleCAD
                 return (x >= XMin && x <= XMax && y >= YMin && y <= YMax);
         }
 
-        public static Extents Empty { get { return new Extents(); } }
+        public static Extents2D Empty { get { return new Extents2D(); } }
+
+        public bool Contains(Extents2D other)
+        {
+            return (XMin <= other.XMin && XMax >= other.XMax && YMin <= other.YMin && YMax >= other.YMax);
+        }
+
+        public bool IntersectsWith(Extents2D other)
+        {
+            return (XMax >= other.XMin && XMin <= other.XMax && YMax >= other.YMin && YMin <= other.YMax);
+        }
     }
 }

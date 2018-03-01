@@ -12,6 +12,7 @@ namespace SimpleCAD
         internal enum InputMode
         {
             None,
+            Selection,
             Point,
             Angle,
             Text
@@ -36,6 +37,13 @@ namespace SimpleCAD
                 Value = value;
                 Keyword = keyword;
             }
+        }
+
+        public class SelectionResult : InputResult<SelectionSet>
+        {
+            internal SelectionResult(ResultMode result) : base(result, new SelectionSet(), "") { }
+            internal SelectionResult(SelectionSet value) : base(ResultMode.OK, value, "") { }
+            internal SelectionResult(string keyword) : base(ResultMode.Keyword, new SelectionSet(), keyword) { }
         }
 
         public class PointResult : InputResult<Point2D>
@@ -144,6 +152,14 @@ namespace SimpleCAD
             public JigOptions(string message, Action<T> jig) : base(message)
             {
                 Jig = jig;
+            }
+        }
+
+        public class SelectionOptions : InputOptions
+        {
+            public SelectionOptions(string message) : base(message)
+            {
+                ;
             }
         }
 

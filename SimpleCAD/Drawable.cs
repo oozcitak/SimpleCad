@@ -13,7 +13,7 @@ namespace SimpleCAD
         public event PropertyChangedEventHandler PropertyChanged;
 
         public abstract void Draw(DrawParams param);
-        public abstract Extents GetExtents();
+        public abstract Extents2D GetExtents();
         public virtual bool Contains(Point2D pt, float pickBoxSize) { return GetExtents().Contains(pt); }
         public abstract void TransformBy(TransformationMatrix2D transformation);
 

@@ -33,9 +33,9 @@ namespace SimpleCAD
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
         }
 
-        public Extents GetExtents()
+        public Extents2D GetExtents()
         {
-            Extents ex = new Extents();
+            Extents2D ex = new Extents2D();
             foreach (Point2D item in items)
             {
                 ex.Add(item);

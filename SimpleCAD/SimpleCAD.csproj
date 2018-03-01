@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="CADDocument.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Command_Transform.cs" />
     <Compile Include="Command_Primitives.cs" />
     <Compile Include="EditorInput.cs" />
     <Compile Include="Hatch.cs" />
@@ -85,7 +86,7 @@
     <Compile Include="Triangle.cs" />
     <Compile Include="Dimension.cs" />
     <Compile Include="Ellipse.cs" />
-    <Compile Include="Extents.cs" />
+    <Compile Include="Extents2D.cs" />
     <Compile Include="Outline.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Polyline.cs" />

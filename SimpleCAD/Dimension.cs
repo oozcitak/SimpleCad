@@ -63,7 +63,7 @@ namespace SimpleCAD
             GetSubItems().Draw(param);
         }
 
-        public override Extents GetExtents()
+        public override Extents2D GetExtents()
         {
             float offset = Math.Sign(Offset) * (0.5f * TextHeight + Math.Abs(Offset));
 
@@ -80,7 +80,7 @@ namespace SimpleCAD
             p3.TransformBy(trans);
             p4.TransformBy(trans);
 
-            Extents extents = new Extents();
+            Extents2D extents = new Extents2D();
             extents.Add(p1);
             extents.Add(p2);
             extents.Add(p3);
