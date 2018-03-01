@@ -96,11 +96,13 @@ namespace SimpleCAD
                 consEllipse.OutlineStyle = doc.Editor.TransientStyle;
                 doc.Transients.Add(consEllipse);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consEllipse.SemiMinorAxis = (p - consEllipse.Center).Length);
+                if (p3.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consEllipse); return; }
+                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consEllipse.Rotation = v.Angle);
                 doc.Transients.Remove(consEllipse);
-                if (p3.Result != Editor.ResultMode.OK) return;
+                if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Ellipse(p1.Value,
-                    (p2.Value - p1.Value).Length, (p3.Value - p1.Value).Length);
+                    (p2.Value - p1.Value).Length, (p3.Value - p1.Value).Length, a1.Value.Angle);
                 doc.Model.Add(newItem);
             }
         }

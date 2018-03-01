@@ -8,41 +8,44 @@ namespace SimpleCAD
     {
         private Point2D center;
 
-        public Point2D Center { get => center; set { center = value; NotifyPropertyChanged(); } }
+        public Point2D Center { get => center; set { center = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return Center.X; } }
         [Browsable(false)]
         public float Y { get { return Center.Y; } }
 
-        private Vector2D dir;
 
         private float semiMajorAxis;
         private float semiMinorAxis;
+        private float rotation;
 
-        public float SemiMajorAxis { get => semiMajorAxis; set { semiMajorAxis = value; NotifyPropertyChanged(); } }
-        public float SemiMinorAxis { get => semiMinorAxis; set { semiMinorAxis = value; NotifyPropertyChanged(); } }
+        public float SemiMajorAxis { get => semiMajorAxis; set { semiMajorAxis = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float SemiMinorAxis { get => semiMinorAxis; set { semiMinorAxis = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float Rotation { get => rotation; set { rotation = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
-        public Ellipse(Point2D center, float semiMajor, float semiMinor)
+        private Polyline poly;
+        float curveLength = 4;
+
+        public Ellipse(Point2D center, float semiMajor, float semiMinor, float rotation = 0)
         {
             Center = center;
             SemiMajorAxis = semiMajor;
             SemiMinorAxis = semiMinor;
-            dir = Vector2D.XAxis;
+            Rotation = rotation;
+            UpdatePolyline();
         }
 
-        public Ellipse(float x, float y, float semiMajor, float semiMinor)
-            : this(new Point2D(x, y), semiMajor, semiMinor)
+        public Ellipse(float x, float y, float semiMajor, float semiMinor, float rotation = 0)
+            : this(new Point2D(x, y), semiMajor, semiMinor, rotation)
         {
             ;
         }
 
-        public override void Draw(DrawParams param)
+        private void UpdatePolyline()
         {
-            // Approximate perimeter (Ramanujan)
-            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            poly = new Polyline();
             // Represent curved features by at most 4 pixels
-            float curveLength = param.ModelToView(p);
             int n = (int)Math.Max(4, curveLength / 4);
             float da = 2 * (float)Math.PI / (float)n;
             float a = 0;
@@ -51,28 +54,32 @@ namespace SimpleCAD
             {
                 float x = SemiMajorAxis * (float)Math.Cos(a);
                 float y = SemiMinorAxis * (float)Math.Sin(a);
-                pts.Add(x, y);
+                poly.Points.Add(x, y);
                 a += da;
             }
-            pts.TransformBy(TransformationMatrix2D.Rotation(dir.Angle));
-            pts.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
-            PointF[] ptfs = pts.ToPointF();
-            using (Brush brush = FillStyle.CreateBrush(param))
+            poly.Closed = true;
+            poly.TransformBy(TransformationMatrix2D.Rotation(Rotation));
+            poly.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
+        }
+
+        public override void Draw(DrawParams param)
+        {
+            // Approximate perimeter (Ramanujan)
+            float p = 2 * (float)Math.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - (float)Math.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
+            float newCurveLength = param.ModelToView(p);
+            if (Math.Abs(newCurveLength - curveLength) > 1e-7f)
             {
-                param.Graphics.FillPolygon(brush, ptfs);
+                curveLength = newCurveLength;
+                UpdatePolyline();
             }
-            using (Pen pen = OutlineStyle.CreatePen(param))
-            {
-                param.Graphics.DrawPolygon(pen, ptfs);
-            }
+            poly.OutlineStyle = OutlineStyle;
+            poly.FillStyle = FillStyle;
+            poly.Draw(param);
         }
 
         public override Extents GetExtents()
         {
-            Extents extents = new Extents();
-            extents.Add(X - SemiMajorAxis, Y - SemiMinorAxis);
-            extents.Add(X + SemiMajorAxis, Y + SemiMinorAxis);
-            return extents;
+            return poly.GetExtents();
         }
 
         public override void TransformBy(TransformationMatrix2D transformation)
@@ -81,7 +88,9 @@ namespace SimpleCAD
             p.TransformBy(transformation);
             Center = p;
 
+            Vector2D dir = Vector2D.FromAngle(Rotation);
             dir.TransformBy(transformation);
+            Rotation = dir.Angle;
 
             Vector2D unit = Vector2D.XAxis;
             unit.TransformBy(transformation);
@@ -91,14 +100,7 @@ namespace SimpleCAD
 
         public override bool Contains(Point2D pt, float pickBoxSize)
         {
-            float a1 = SemiMajorAxis - pickBoxSize / 2;
-            float a2 = SemiMajorAxis + pickBoxSize / 2;
-            float b1 = SemiMinorAxis - pickBoxSize / 2;
-            float b2 = SemiMinorAxis + pickBoxSize / 2;
-            float rot = dir.Angle;
-            float xx = (pt.X - X) * (float)Math.Cos(rot) + (pt.Y - Y) * (float)Math.Sin(rot);
-            float yy = (pt.X - X) * (float)Math.Sin(rot) - (pt.Y - Y) * (float)Math.Cos(rot);
-            return (xx * xx / a1 / a1 + yy * yy / b1 / b1 >= 1) && (xx * xx / a2 / a2 + yy * yy / b2 / b2 <= 1);
+            return poly.Contains(pt, pickBoxSize);
         }
     }
 }
