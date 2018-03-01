@@ -71,5 +71,18 @@ namespace SimpleCAD
         {
             Points.TransformBy(transformation);
         }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            int iend = (Closed ? Points.Count - 1 : Points.Count - 2);
+            for (int i = 0; i <= iend; i++)
+            {
+                int j = (i == Points.Count - 1 ? 0 : i + 1);
+                Line line = new Line(Points[i], Points[j]);
+                if (line.Contains(pt, pickBoxSize))
+                    return true;
+            }
+            return false;
+        }
     }
 }
