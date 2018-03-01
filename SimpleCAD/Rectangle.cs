@@ -6,61 +6,95 @@ namespace SimpleCAD
 {
     public class Rectangle : Drawable
     {
-        private Point2DCollection points;
+        private Point2D center;
+        private float width;
+        private float height;
+        private float rotation;
 
-        public Point2D P1 { get { return points[0]; } set { points[0] = value; NotifyPropertyChanged(); } }
-        public Point2D P2 { get { return points[1]; } set { points[1] = value; NotifyPropertyChanged(); } }
-
-        [Browsable(false)]
-        public float X1 { get { return P1.X; } }
-        [Browsable(false)]
-        public float Y1 { get { return P1.Y; } }
-        [Browsable(false)]
-        public float X2 { get { return P2.X; } }
-        [Browsable(false)]
-        public float Y2 { get { return P2.Y; } }
-
-        [Browsable(false)]
-        public float Width { get { return Math.Abs(X2 - X1); } }
-        [Browsable(false)]
-        public float Height { get { return Math.Abs(Y2 - Y1); } }
-
-        public Rectangle(Point2D p1, Point2D p2)
+        public Point2D Center { get { return center; } set { center = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float Width { get { return width; } set { width = Math.Abs(value); UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float Height { get { return height; } set { height = Math.Abs(value); UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D Corner
         {
-            points = new Point2DCollection();
-            points.Add(p1);
-            points.Add(p2.X, p1.Y);
-            points.Add(p2);
-            points.Add(p1.X, p2.Y);
+            get
+            {
+                return new Point2D(Center.X + Width / 2, Center.Y + Height / 2);
+            }
+            set
+            {
+                width = Math.Abs(value.X - center.X) * 2;
+                height = Math.Abs(value.Y - center.Y) * 2;
+                UpdatePolyline();
+                NotifyPropertyChanged();
+            }
+        }
+        public float Rotation { get { return rotation; } set { rotation = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+
+        [Browsable(false)]
+        public float X { get { return Center.X; } }
+        [Browsable(false)]
+        public float Y { get { return Center.Y; } }
+
+        private Polyline poly;
+
+        public Rectangle(Point2D center, float width, float height, float rotation = 0)
+        {
+            Center = center;
+            Width = width;
+            Height = height;
+            Rotation = rotation;
+            UpdatePolyline();
         }
 
-        public Rectangle(float x1, float y1, float x2, float y2)
-            : this(new Point2D(x1, y1), new Point2D(x2, y2))
+        public Rectangle(float x, float y, float width, float height, float rotation = 0)
+            : this(new Point2D(x, y), width, height, rotation)
         {
             ;
         }
 
+        public Rectangle(Point2D center, Point2D corner, float rotation = 0)
+            : this(center, (corner - center).X * 2, (corner - center).Y * 2, rotation)
+        {
+            ;
+        }
+
+        private void UpdatePolyline()
+        {
+            poly = new Polyline();
+            poly.Points.Add(-Width / 2, -Height / 2);
+            poly.Points.Add(+Width / 2, -Height / 2);
+            poly.Points.Add(+Width / 2, +Height / 2);
+            poly.Points.Add(-Width / 2, +Height / 2);
+            poly.Closed = true;
+            poly.TransformBy(TransformationMatrix2D.Rotation(rotation));
+            poly.TransformBy(TransformationMatrix2D.Translation(X, Y));
+
+        }
+
         public override void Draw(DrawParams param)
         {
-            PointF[] ptf = points.ToPointF();
-            using (Brush brush = FillStyle.CreateBrush(param))
-            {
-                param.Graphics.FillPolygon(brush, ptf);
-            }
-            using (Pen pen = OutlineStyle.CreatePen(param))
-            {
-                param.Graphics.DrawPolygon(pen, ptf);
-            }
+            poly.OutlineStyle = OutlineStyle;
+            poly.FillStyle = FillStyle;
+            poly.Draw(param);
         }
 
         public override Extents GetExtents()
         {
-            return points.GetExtents();
+            return poly.GetExtents();
         }
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            points.TransformBy(transformation);
+            Center.TransformBy(transformation);
+            Vector2D dir = Vector2D.FromAngle(Rotation);
+            dir.TransformBy(transformation);
+            Rotation = dir.Angle;
+            UpdatePolyline();
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            return poly.Contains(pt, pickBoxSize);
         }
     }
 }

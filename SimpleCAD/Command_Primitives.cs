@@ -272,5 +272,30 @@ namespace SimpleCAD
                 doc.Model.Add(newItem);
             }
         }
+
+        public class DrawRectangle : Command
+        {
+            public override string RegisteredName => "Primitives.Rectangle";
+            public override string Name => "Rectangle";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("Center point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Rectangle consRec = new Rectangle(p1.Value, 0, 0);
+                consRec.OutlineStyle = doc.Editor.TransientStyle;
+                doc.Transients.Add(consRec);
+                Editor.PointResult p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
+                if (p2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consRec); return; }
+                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consRec.Rotation = v.Angle);
+                doc.Transients.Remove(consRec);
+                if (a1.Result != Editor.ResultMode.OK) return;
+
+                Drawable newItem = new Rectangle(p1.Value, p2.Value, a1.Value.Angle);
+                doc.Model.Add(newItem);
+            }
+        }
     }
 }

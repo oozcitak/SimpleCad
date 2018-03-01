@@ -52,6 +52,7 @@
             this.btnDrawDimension = new System.Windows.Forms.ToolStripButton();
             this.btnDrawParabola = new System.Windows.Forms.ToolStripButton();
             this.btnDrawPolyline = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawRectangle = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -201,10 +202,11 @@
             this.btnDrawText,
             this.btnDrawDimension,
             this.btnDrawParabola,
-            this.btnDrawPolyline});
+            this.btnDrawPolyline,
+            this.btnDrawRectangle});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(508, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(571, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // btnSave
@@ -313,6 +315,16 @@
             this.btnDrawPolyline.Text = "Polyline";
             this.btnDrawPolyline.Click += new System.EventHandler(this.btnDrawPolyline_Click);
             // 
+            // btnDrawRectangle
+            // 
+            this.btnDrawRectangle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawRectangle.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawRectangle.Image")));
+            this.btnDrawRectangle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawRectangle.Name = "btnDrawRectangle";
+            this.btnDrawRectangle.Size = new System.Drawing.Size(63, 22);
+            this.btnDrawRectangle.Text = "Rectangle";
+            this.btnDrawRectangle.Click += new System.EventHandler(this.btnDrawRectangle_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -369,6 +381,7 @@
         private System.Windows.Forms.ToolStripButton btnDrawDimension;
         private System.Windows.Forms.ToolStripButton btnDrawParabola;
         private System.Windows.Forms.ToolStripButton btnDrawPolyline;
+        private System.Windows.Forms.ToolStripButton btnDrawRectangle;
     }
 }
 

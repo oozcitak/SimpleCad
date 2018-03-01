@@ -103,6 +103,11 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Primitives.Polyline");
         }
 
+        private void btnDrawRectangle_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("Primitives.Rectangle");
+        }
+
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
