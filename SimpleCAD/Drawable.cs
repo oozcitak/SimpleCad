@@ -18,6 +18,8 @@ namespace SimpleCAD
         public virtual bool Contains(Point2D pt, float pickBoxSize) { return GetExtents().Contains(pt); }
         public abstract void TransformBy(TransformationMatrix2D transformation);
 
+        public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
+
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

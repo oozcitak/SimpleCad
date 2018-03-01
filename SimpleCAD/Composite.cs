@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace SimpleCAD
 {
@@ -54,6 +55,13 @@ namespace SimpleCAD
             {
                 item.TransformBy(transformation);
             }
+        }
+
+        public override Drawable Clone()
+        {
+            Composite newComposite = (Composite)base.Clone();
+            newComposite.items = items.Select(d => d.Clone()).ToList();
+            return newComposite;
         }
 
         public void Add(Drawable item)

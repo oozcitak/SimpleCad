@@ -84,5 +84,12 @@ namespace SimpleCAD
             }
             return false;
         }
+
+        public override Drawable Clone()
+        {
+            Polyline newPolyline = (Polyline)base.Clone();
+            newPolyline.Points = new Point2DCollection(Points);
+            return newPolyline;
+        }
     }
 }
