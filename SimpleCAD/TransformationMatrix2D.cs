@@ -47,9 +47,9 @@ namespace SimpleCAD
 
         public static TransformationMatrix2D Scale(Point2D basePoint, float xScale, float yScale)
         {
-            return Translation(basePoint.X, basePoint.Y)
-                .Multiply(Scale(xScale, yScale))
-                .Multiply(Translation(-basePoint.X, -basePoint.Y));
+            return Translation(basePoint.X, basePoint.Y) *
+                Scale(xScale, yScale) *
+                Translation(-basePoint.X, -basePoint.Y);
         }
 
         public static TransformationMatrix2D Scale(Point2D basePoint, float uniformScale)
@@ -69,9 +69,9 @@ namespace SimpleCAD
 
         public static TransformationMatrix2D Rotation(Point2D basePoint, float rotation)
         {
-            return Translation(basePoint.X, basePoint.Y)
-                .Multiply(Rotation(rotation))
-                .Multiply(Translation(-basePoint.X, -basePoint.Y));
+            return Translation(basePoint.X, basePoint.Y) *
+                Rotation(rotation) *
+                Translation(-basePoint.X, -basePoint.Y);
         }
 
         public static TransformationMatrix2D Translation(Vector2D delta)
@@ -84,14 +84,14 @@ namespace SimpleCAD
             return new TransformationMatrix2D(1, 0, 0, 1, dx, dy);
         }
 
-        public TransformationMatrix2D Multiply(TransformationMatrix2D m)
+        public static TransformationMatrix2D operator *(TransformationMatrix2D a, TransformationMatrix2D b)
         {
-            float m11 = M11 * m.M11 + M12 * m.M21 + DX * 0;
-            float m12 = M11 * m.M12 + M22 * m.M21 + DX * 0;
-            float dx = M11 * m.DX + M22 * m.DY + DX * 1;
-            float m21 = M21 * m.M11 + M22 * m.M21 + DY * 0;
-            float m22 = M21 * m.M12 + M22 * m.M22 + DY * 0;
-            float dy = M21 * m.DX + M22 * m.DY + DY * 1;
+            float m11 = a.M11 * b.M11 + a.M12 * b.M21 + a.DX * 0;
+            float m12 = a.M11 * b.M12 + a.M12 * b.M22 + a.DX * 0;
+            float dx = a.M11 * b.DX + a.M12 * b.DY + a.DX * 1;
+            float m21 = a.M21 * b.M11 + a.M22 * b.M21 + a.DY * 0;
+            float m22 = a.M21 * b.M12 + a.M22 * b.M22 + a.DY * 0;
+            float dy = a.M21 * b.DX + a.M22 * b.DY + a.DY * 1;
             return new TransformationMatrix2D(m11, m12, m21, m22, dx, dy);
         }
 
