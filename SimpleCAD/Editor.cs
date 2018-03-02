@@ -23,6 +23,7 @@ namespace SimpleCAD
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
+        private TaskCompletionSource<DistanceResult> distanceCompletion;
         private bool inputCompleted;
 
         private InputOptions currentOptions;
@@ -196,6 +197,42 @@ namespace SimpleCAD
             return res;
         }
 
+        public async Task<DistanceResult> GetDistance(string message, Point2D basePoint, Action<Vector2D> jig)
+        {
+            return await GetDistance(new DistanceOptions(message, basePoint, jig));
+        }
+
+        public async Task<DistanceResult> GetDistance(string message, Point2D basePoint)
+        {
+            return await GetDistance(new DistanceOptions(message, basePoint));
+        }
+
+        public async Task<DistanceResult> GetDistance(DistanceOptions options)
+        {
+            DistanceResult res = new DistanceResult(ResultMode.Cancel);
+
+            Mode = InputMode.Distance;
+            currentText = "";
+            currentOptions = options;
+            OnPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                consLine = new Polyline(options.BasePoint, options.BasePoint);
+                consLine.Outline = TransientStyle;
+                Document.Transients.Add(consLine);
+                distanceCompletion = new TaskCompletionSource<DistanceResult>();
+                res = await distanceCompletion.Task;
+                Document.Transients.Remove(consLine);
+            }
+
+            Mode = InputMode.None;
+            OnPrompt(new EditorPromptEventArgs(""));
+
+            return res;
+        }
+
         public async Task<TextResult> GetText(string message, Action<string> jig)
         {
             return await GetText(new TextOptions(message, jig));
@@ -270,6 +307,10 @@ namespace SimpleCAD
                     consLine.Points[1] = currentMouseLocation;
                     ((AngleOptions)currentOptions).Jig(currentMouseLocation - ((AngleOptions)currentOptions).BasePoint);
                     break;
+                case InputMode.Distance:
+                    consLine.Points[1] = currentMouseLocation;
+                    ((DistanceOptions)currentOptions).Jig(currentMouseLocation - ((DistanceOptions)currentOptions).BasePoint);
+                    break;
             }
         }
 
@@ -317,6 +358,11 @@ namespace SimpleCAD
                     inputCompleted = true;
                     angleCompletion.SetResult(new AngleResult(point - ((AngleOptions)currentOptions).BasePoint));
                 }
+                else if (Mode == InputMode.Distance)
+                {
+                    inputCompleted = true;
+                    distanceCompletion.SetResult(new DistanceResult((point - ((DistanceOptions)currentOptions).BasePoint).Length));
+                }
             }
         }
 
@@ -360,7 +406,7 @@ namespace SimpleCAD
                             inputCompleted = true;
                             angleCompletion.SetResult(new AngleResult((Vector2D)conv.ConvertFrom(currentText)));
                         }
-                        if (float.TryParse(currentText, out float angle))
+                        else if (float.TryParse(currentText, out float angle))
                         {
                             inputCompleted = true;
                             angleCompletion.SetResult(new AngleResult(Vector2D.FromAngle(angle * MathF.PI / 180)));
@@ -379,7 +425,32 @@ namespace SimpleCAD
                     else if (e.KeyCode == Keys.Escape)
                     {
                         inputCompleted = true;
-                        pointCompletion.SetResult(new PointResult(ResultMode.Cancel));
+                        angleCompletion.SetResult(new AngleResult(ResultMode.Cancel));
+                    }
+                    break;
+                case InputMode.Distance:
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || e.KeyCode == Keys.Space)
+                    {
+                        if (float.TryParse(currentText, out float dist))
+                        {
+                            inputCompleted = true;
+                            distanceCompletion.SetResult(new DistanceResult(dist));
+                        }
+                        else if (!string.IsNullOrEmpty(keyword))
+                        {
+                            inputCompleted = true;
+                            distanceCompletion.SetResult(new DistanceResult(keyword));
+                        }
+                        else
+                        {
+                            currentText = "";
+                            OnPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                    }
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        inputCompleted = true;
+                        angleCompletion.SetResult(new AngleResult(ResultMode.Cancel));
                     }
                     break;
                 case InputMode.Text:
