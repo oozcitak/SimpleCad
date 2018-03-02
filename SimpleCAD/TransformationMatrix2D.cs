@@ -40,6 +40,23 @@ namespace SimpleCAD
             return new TransformationMatrix2D(m11, 0, 0, m22, 0, 0);
         }
 
+        public static TransformationMatrix2D Scale(float uniformScale)
+        {
+            return Scale(uniformScale, uniformScale);
+        }
+
+        public static TransformationMatrix2D Scale(Point2D basePoint, float xScale, float yScale)
+        {
+            return Translation(basePoint.X, basePoint.Y)
+                .Multiply(Scale(xScale, yScale))
+                .Multiply(Translation(-basePoint.X, -basePoint.Y));
+        }
+
+        public static TransformationMatrix2D Scale(Point2D basePoint, float uniformScale)
+        {
+            return Scale(basePoint, uniformScale, uniformScale);
+        }
+
         public static TransformationMatrix2D Rotation(float rotation)
         {
             float m11 = MathF.Cos(-rotation);
@@ -48,6 +65,13 @@ namespace SimpleCAD
             float m22 = MathF.Cos(-rotation);
 
             return new TransformationMatrix2D(m11, m12, m21, m22, 0, 0);
+        }
+
+        public static TransformationMatrix2D Rotation(Point2D basePoint, float rotation)
+        {
+            return Translation(basePoint.X, basePoint.Y)
+                .Multiply(Rotation(rotation))
+                .Multiply(Translation(-basePoint.X, -basePoint.Y));
         }
 
         public static TransformationMatrix2D Translation(Vector2D delta)
