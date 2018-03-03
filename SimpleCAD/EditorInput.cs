@@ -132,7 +132,7 @@ namespace SimpleCAD
                 }
                 else
                 {
-                    StringBuilder sb = new StringBuilder(Message);
+                    StringBuilder sb = new StringBuilder(Message.TrimEnd(' ', ':'));
                     sb.Append(" [");
                     sb.Append(string.Join(", ", Keywords));
                     sb.Append("]");

@@ -318,50 +318,50 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (Mode == InputMode.Selection)
+                switch (Mode)
                 {
-                    if (!selectionClickedFirstPoint)
-                    {
-                        selectionClickedFirstPoint = true;
-                        // Create the selection window
-                        consHatch = new Hatch(point, point, point, point);
-                        consHatch.Outline = new Outline(SelectionHighlight);
-                        Document.Transients.Add(consHatch);
-                        consLine = new Polyline(point, point, point, point);
-                        consLine.Closed = true;
-                        consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
-                        Document.Transients.Add(consLine);
-                    }
-                    else
-                    {
-                        inputCompleted = true;
-                        SelectionSet set = new SelectionSet();
-                        Extents2D ex = consHatch.GetExtents();
-                        bool windowSelection = (consHatch.Points[2].X > consHatch.Points[0].X);
-                        foreach (Drawable item in Document.Model)
+                    case InputMode.Selection:
+                        if (!selectionClickedFirstPoint)
                         {
-                            Extents2D exItem = item.GetExtents();
-                            if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
-                                set.Add(item);
+                            selectionClickedFirstPoint = true;
+                            // Create the selection window
+                            consHatch = new Hatch(point, point, point, point);
+                            consHatch.Outline = new Outline(SelectionHighlight);
+                            Document.Transients.Add(consHatch);
+                            consLine = new Polyline(point, point, point, point);
+                            consLine.Closed = true;
+                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
+                            Document.Transients.Add(consLine);
                         }
-                        Selection = set;
-                        selectionCompletion.SetResult(new SelectionResult(set));
-                    }
-                }
-                else if (Mode == InputMode.Point)
-                {
-                    inputCompleted = true;
-                    pointCompletion.SetResult(new PointResult(point));
-                }
-                else if (Mode == InputMode.Angle)
-                {
-                    inputCompleted = true;
-                    angleCompletion.SetResult(new AngleResult(point - ((AngleOptions)currentOptions).BasePoint));
-                }
-                else if (Mode == InputMode.Distance)
-                {
-                    inputCompleted = true;
-                    distanceCompletion.SetResult(new DistanceResult((point - ((DistanceOptions)currentOptions).BasePoint).Length));
+                        else
+                        {
+                            inputCompleted = true;
+                            SelectionSet set = new SelectionSet();
+                            Extents2D ex = consHatch.GetExtents();
+                            bool windowSelection = (consHatch.Points[2].X > consHatch.Points[0].X);
+                            foreach (Drawable item in Document.Model)
+                            {
+                                Extents2D exItem = item.GetExtents();
+                                if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
+                                    set.Add(item);
+                            }
+                            Selection = set;
+                            selectionCompletion.SetResult(new SelectionResult(set));
+                        }
+                        break;
+                    case InputMode.Point:
+
+                        inputCompleted = true;
+                        pointCompletion.SetResult(new PointResult(point));
+                        break;
+                    case InputMode.Angle:
+                        inputCompleted = true;
+                        angleCompletion.SetResult(new AngleResult(point - ((AngleOptions)currentOptions).BasePoint));
+                        break;
+                    case InputMode.Distance:
+                        inputCompleted = true;
+                        distanceCompletion.SetResult(new DistanceResult((point - ((DistanceOptions)currentOptions).BasePoint).Length));
+                        break;
                 }
             }
         }
