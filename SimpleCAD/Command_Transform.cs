@@ -31,7 +31,8 @@ namespace SimpleCAD
                 doc.Transients.Add(consItems);
                 Point2D lastPt = p1.Value;
                 Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
-                    (p) => {
+                    (p) =>
+                    {
                         consItems.TransformBy(TransformationMatrix2D.Translation(p - lastPt));
                         lastPt = p;
                     });
@@ -43,6 +44,58 @@ namespace SimpleCAD
                     item.TransformBy(TransformationMatrix2D.Translation(p2.Value - p1.Value));
                 }
 
+                ed.Selection.Clear();
+            }
+        }
+
+        public class TransformCopy : Command
+        {
+            public override string RegisteredName => "Transform.Copy";
+            public override string Name => "Copy";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.SelectionResult s = await ed.GetSelection("Select objects: ");
+                if (s.Result != Editor.ResultMode.OK || s.Value.Count == 0) return;
+                Editor.PointResult p1 = await ed.GetPoint("Base point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Composite consItems = new Composite();
+                foreach (Drawable item in s.Value)
+                {
+                    consItems.Add(item.Clone());
+                }
+                consItems.Outline = doc.Editor.TransientStyle;
+                consItems.CopyStyleToChildren();
+                doc.Transients.Add(consItems);
+                Point2D lastPt = p1.Value;
+                bool flag = true;
+                while (flag)
+                {
+                    Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
+                        (p) =>
+                        {
+                            consItems.TransformBy(TransformationMatrix2D.Translation(p - lastPt));
+                            lastPt = p;
+                        });
+
+                    if (p2.Result != Editor.ResultMode.OK)
+                    {
+                        flag = false;
+                    }
+                    else
+                    {
+                        foreach (Drawable item in s.Value)
+                        {
+                            Drawable newItem = item.Clone();
+                            newItem.TransformBy(TransformationMatrix2D.Translation(p2.Value - p1.Value));
+                            doc.Model.Add(newItem);
+                        }
+                    }
+                }
+
+                doc.Transients.Remove(consItems);
                 ed.Selection.Clear();
             }
         }
