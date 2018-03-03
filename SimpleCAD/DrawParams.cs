@@ -5,14 +5,23 @@ namespace SimpleCAD
 {
     public class DrawParams
     {
+        public enum DrawingMode
+        {
+            Normal,
+            Selection,
+            Jigged,
+            Transients,
+            Cursor
+        }
+
         public Graphics Graphics { get; private set; }
         public bool ScaleLineWeights { get; private set; }
         public float ZoomFactor { get; private set; }
-        internal bool SelectionMode { get; set; }
-        internal Color SelectionColor { get; set; }
+        public DrawingMode Mode { get; set; }
 
         public DrawParams(Graphics graphics, bool scaleLineWeights, float zoomFactor)
         {
+            Mode = DrawingMode.Normal;
             Graphics = graphics;
             ScaleLineWeights = scaleLineWeights;
             ZoomFactor = zoomFactor;

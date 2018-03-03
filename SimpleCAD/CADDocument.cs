@@ -15,6 +15,8 @@ namespace SimpleCAD
         [Browsable(false)]
         public Composite Model { get; private set; }
         [Browsable(false)]
+        public Composite Jigged { get; private set; }
+        [Browsable(false)]
         public Composite Transients { get; private set; }
         [Browsable(false)]
         public Editor Editor { get; private set; }
@@ -27,10 +29,11 @@ namespace SimpleCAD
         {
             Editor = new Editor(this);
             Model = new Composite();
+            Jigged = new Composite();
             Transients = new Composite();
             Editor.Selection.CollectionChanged += Selection_CollectionChanged;
             Model.CollectionChanged += Model_CollectionChanged;
-            Transients.CollectionChanged += Transients_CollectionChanged;
+            Jigged.CollectionChanged += Transients_CollectionChanged;
         }
 
         public void Open(string filename)
@@ -39,10 +42,10 @@ namespace SimpleCAD
             {
                 IFormatter formatter = new BinaryFormatter();
                 Model.CollectionChanged -= Model_CollectionChanged;
-                Transients.CollectionChanged -= Transients_CollectionChanged;
+                Jigged.CollectionChanged -= Transients_CollectionChanged;
                 //Model = (Composite)formatter.Deserialize(stream);
                 Model.CollectionChanged += Model_CollectionChanged;
-                Transients.CollectionChanged += Transients_CollectionChanged;
+                Jigged.CollectionChanged += Transients_CollectionChanged;
             }
         }
 

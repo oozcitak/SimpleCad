@@ -12,6 +12,14 @@ namespace SimpleCAD
         public float LineWeight { get; set; }
         public DashStyle DashStyle { get; set; }
 
+        internal static Outline SelectionHighlightStyle { get { return new Outline(Color.FromArgb(64, 46, 116, 251)); } }
+        internal static Outline SelectionWindowStyle { get { return new Outline(Color.FromArgb(64, 46, 116, 251)); } }
+        internal static Outline SelectionBorderStyle { get { return new Outline(Color.White, 1, DashStyle.Solid); } }
+        internal static Outline ReverseSelectionWindowStyle { get { return new Outline(Color.FromArgb(64, 46, 251, 116)); } }
+        internal static Outline ReverseSelectionBorderStyle { get { return new Outline(Color.White, 1, DashStyle.Dash); } }
+        internal static Outline JiggedStyle { get { return new Outline(Color.Orange, 1, DashStyle.Dash); } }
+        internal static Outline CursorStyle { get { return new Outline(Color.White, 1, DashStyle.Solid); } }
+
         public Outline(Color color, float lineWeight, DashStyle dashStyle)
             : this()
         {
@@ -34,13 +42,20 @@ namespace SimpleCAD
 
         public Pen CreatePen(DrawParams param)
         {
-            if (param.SelectionMode)
+            if (param.Mode == DrawParams.DrawingMode.Selection)
             {
-                Pen pen = new Pen(param.SelectionColor, param.GetScaledLineWeight(LineWeight + 6));
+                Pen pen = new Pen(SelectionHighlightStyle.Color, param.GetScaledLineWeight(LineWeight + 6));
                 pen.DashStyle = DashStyle.Solid;
                 return pen;
             }
-            else
+            else if (param.Mode == DrawParams.DrawingMode.Jigged)
+            {
+                Outline style = JiggedStyle;
+                Pen pen = new Pen(style.Color, param.GetScaledLineWeight(style.LineWeight));
+                pen.DashStyle = style.DashStyle;
+                return pen;
+            }
+            else // (param.Mode == DrawParams.DrawingMode.Normal)
             {
                 Pen pen = new Pen(Color, param.GetScaledLineWeight(LineWeight));
                 pen.DashStyle = DashStyle;

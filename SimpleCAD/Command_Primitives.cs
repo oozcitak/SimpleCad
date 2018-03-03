@@ -39,14 +39,13 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Arc consArc = new Arc(p1.Value, 0, 0, 2 * MathF.PI);
-                consArc.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consArc);
+                doc.Jigged.Add(consArc);
                 Editor.PointResult p2 = await ed.GetPoint("Radius: ", p1.Value, (p) => consArc.Radius = (p - consArc.Center).Length);
-                if (p2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                if (p2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p.Angle);
-                if (a1.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                if (a1.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
                 Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p.Angle);
-                doc.Transients.Remove(consArc);
+                doc.Jigged.Remove(consArc);
                 if (a2.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Arc(p1.Value,
@@ -68,10 +67,9 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Circle consCircle = new Circle(p1.Value, 0);
-                consCircle.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consCircle);
+                doc.Jigged.Add(consCircle);
                 Editor.PointResult p2 = await ed.GetPoint("Radius: ", p1.Value, (p) => consCircle.Radius = (p - consCircle.Center).Length);
-                doc.Transients.Remove(consCircle);
+                doc.Jigged.Remove(consCircle);
                 if (p2.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Circle(p1.Value, (p2.Value - p1.Value).Length);
@@ -93,12 +91,11 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Semi major axis: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Ellipse consEllipse = new Ellipse(p1.Value, (p2.Value - p1.Value).Length, 0);
-                consEllipse.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consEllipse);
+                doc.Jigged.Add(consEllipse);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consEllipse.SemiMinorAxis = (p - consEllipse.Center).Length);
-                if (p3.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consEllipse); return; }
+                if (p3.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consEllipse); return; }
                 Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consEllipse.Rotation = v.Angle);
-                doc.Transients.Remove(consEllipse);
+                doc.Jigged.Remove(consEllipse);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Ellipse(p1.Value,
@@ -121,16 +118,15 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Semi major axis: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 EllipticArc consArc = new EllipticArc(p1.Value, (p2.Value - p1.Value).Length, (p2.Value - p1.Value).Length / 10, 0, 2 * MathF.PI);
-                consArc.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consArc);
+                doc.Jigged.Add(consArc);
                 Editor.PointResult p3 = await ed.GetPoint("Semi minor axis: ", p1.Value, (p) => consArc.SemiMinorAxis = (p - consArc.Center).Length);
-                if (p3.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                if (p3.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p.Angle);
-                if (a1.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                if (a1.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
                 Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p.Angle);
-                if (a2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consArc); return; }
+                if (a2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
                 Editor.AngleResult a3 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consArc.Rotation = v.Angle);
-                doc.Transients.Remove(consArc);
+                doc.Jigged.Remove(consArc);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new EllipticArc(p1.Value,
@@ -157,10 +153,9 @@ namespace SimpleCAD
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Text consText = new Text(p1.Value, " ", (p2.Value - p1.Value).Length);
                 consText.Rotation = a1.Value.Angle;
-                consText.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consText);
+                doc.Jigged.Add(consText);
                 Editor.TextResult t1 = await ed.GetText("Text string: ", (p) => consText.String = p);
-                doc.Transients.Remove(consText);
+                doc.Jigged.Remove(consText);
                 if (t1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Text(p1.Value, t1.Value, (p2.Value - p1.Value).Length);
@@ -206,10 +201,9 @@ namespace SimpleCAD
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value);
                 if (a1.Result != Editor.ResultMode.OK) return;
                 Parabola consPb = new Parabola(p1.Value, p2.Value, a1.Value.Angle, 0);
-                consPb.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consPb);
+                doc.Jigged.Add(consPb);
                 Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p2.Value, (p) => consPb.EndAngle = p.Angle);
-                doc.Transients.Remove(consPb);
+                doc.Jigged.Remove(consPb);
                 if (a2.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Parabola(p1.Value, p2.Value, a1.Value.Angle, a2.Value.Angle);
@@ -230,8 +224,7 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Point2D pt = p1.Value;
                 Polyline consPoly = new Polyline(new Point2D[] { pt, pt });
-                consPoly.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consPoly);
+                doc.Jigged.Add(consPoly);
 
                 Point2DCollection points = new Point2DCollection();
                 points.Add(pt);
@@ -252,14 +245,14 @@ namespace SimpleCAD
                     }
                     else if (pNext.Result == Editor.ResultMode.Cancel)
                     {
-                        doc.Transients.Remove(consPoly);
+                        doc.Jigged.Remove(consPoly);
                         return;
                     }
                     else if (pNext.Result == Editor.ResultMode.Keyword)
                     {
                         if (points.Count < 2)
                         {
-                            doc.Transients.Remove(consPoly);
+                            doc.Jigged.Remove(consPoly);
                             return;
                         }
 
@@ -270,7 +263,7 @@ namespace SimpleCAD
                     }
                 }
 
-                doc.Transients.Remove(consPoly);
+                doc.Jigged.Remove(consPoly);
                 Polyline newItem = new Polyline(points);
                 if (closed) newItem.Closed = true;
                 doc.Model.Add(newItem);
@@ -289,12 +282,11 @@ namespace SimpleCAD
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Rectangle consRec = new Rectangle(p1.Value, 0, 0);
-                consRec.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consRec);
+                doc.Jigged.Add(consRec);
                 Editor.PointResult p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
-                if (p2.Result != Editor.ResultMode.OK) { doc.Transients.Remove(consRec); return; }
+                if (p2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
                 Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consRec.Rotation = v.Angle);
-                doc.Transients.Remove(consRec);
+                doc.Jigged.Remove(consRec);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Rectangle(p1.Value, p2.Value, a1.Value.Angle);
@@ -316,10 +308,9 @@ namespace SimpleCAD
                 Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value);
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Triangle consTri = new Triangle(p1.Value, p2.Value, p2.Value);
-                consTri.Outline = doc.Editor.TransientStyle;
-                doc.Transients.Add(consTri);
+                doc.Jigged.Add(consTri);
                 Editor.PointResult p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.P3 = p);
-                doc.Transients.Remove(consTri);
+                doc.Jigged.Remove(consTri);
                 if (p3.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new Triangle(p1.Value, p2.Value, p3.Value);

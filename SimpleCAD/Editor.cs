@@ -34,10 +34,6 @@ namespace SimpleCAD
         private bool selectionClickedFirstPoint;
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
-        public Color SelectionBorder { get; set; } = Color.White;
-        public Color SelectionHighlight { get; set; } = Color.FromArgb(64, 46, 116, 251);
-        public Color ReverseSelectionHighlight { get; set; } = Color.FromArgb(64, 46, 251, 116);
-        public Outline TransientStyle { get; set; } = new Outline(Color.Orange, 1, DashStyle.Dash);
 
         static Editor()
         {
@@ -147,12 +143,11 @@ namespace SimpleCAD
                 if (options.HasBasePoint)
                 {
                     consLine = new Polyline(options.BasePoint, options.BasePoint);
-                    consLine.Outline = TransientStyle;
-                    Document.Transients.Add(consLine);
+                    Document.Jigged.Add(consLine);
                 }
                 pointCompletion = new TaskCompletionSource<PointResult>();
                 res = await pointCompletion.Task;
-                Document.Transients.Remove(consLine);
+                Document.Jigged.Remove(consLine);
             }
 
             Mode = InputMode.None;
@@ -184,11 +179,10 @@ namespace SimpleCAD
             while (!inputCompleted)
             {
                 consLine = new Polyline(options.BasePoint, options.BasePoint);
-                consLine.Outline = TransientStyle;
-                Document.Transients.Add(consLine);
+                Document.Jigged.Add(consLine);
                 angleCompletion = new TaskCompletionSource<AngleResult>();
                 res = await angleCompletion.Task;
-                Document.Transients.Remove(consLine);
+                Document.Jigged.Remove(consLine);
             }
 
             Mode = InputMode.None;
@@ -220,11 +214,10 @@ namespace SimpleCAD
             while (!inputCompleted)
             {
                 consLine = new Polyline(options.BasePoint, options.BasePoint);
-                consLine.Outline = TransientStyle;
-                Document.Transients.Add(consLine);
+                Document.Jigged.Add(consLine);
                 distanceCompletion = new TaskCompletionSource<DistanceResult>();
                 res = await distanceCompletion.Task;
-                Document.Transients.Remove(consLine);
+                Document.Jigged.Remove(consLine);
             }
 
             Mode = InputMode.None;
@@ -288,13 +281,13 @@ namespace SimpleCAD
                         consHatch.Points[3] = p4;
                         if (point.X > p1.X)
                         {
-                            consHatch.Outline = new Outline(SelectionHighlight);
-                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Solid);
+                            consHatch.Outline = Outline.SelectionWindowStyle;
+                            consLine.Outline = Outline.SelectionBorderStyle;
                         }
                         else
                         {
-                            consHatch.Outline = new Outline(ReverseSelectionHighlight);
-                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
+                            consHatch.Outline = Outline.ReverseSelectionWindowStyle;
+                            consLine.Outline = Outline.ReverseSelectionBorderStyle;
                         }
                     }
                     break;
@@ -326,11 +319,11 @@ namespace SimpleCAD
                             selectionClickedFirstPoint = true;
                             // Create the selection window
                             consHatch = new Hatch(point, point, point, point);
-                            consHatch.Outline = new Outline(SelectionHighlight);
+                            consHatch.Outline = Outline.SelectionWindowStyle;
                             Document.Transients.Add(consHatch);
                             consLine = new Polyline(point, point, point, point);
                             consLine.Closed = true;
-                            consLine.Outline = new Outline(SelectionBorder, 1, DashStyle.Dash);
+                            consLine.Outline = Outline.SelectionBorderStyle;
                             Document.Transients.Add(consLine);
                         }
                         else
