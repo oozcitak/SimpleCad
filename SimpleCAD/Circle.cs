@@ -61,5 +61,30 @@ namespace SimpleCAD
             float dist = (pt - Center).Length;
             return dist <= Radius + pickBoxSize / 2 && dist >= Radius - pickBoxSize / 2;
         }
+
+        public override Point2D[] GetControlPoints()
+        {
+            return new Point2D[]
+            {
+                Center,
+                Center + Radius * Vector2D.XAxis
+            };
+        }
+
+        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
+        {
+            if (index == 0)
+            {
+                Point2D p = Center;
+                p.TransformBy(transformation);
+                Center = p;
+            }
+            else if (index == 1)
+            {
+                Point2D pt = Center + Vector2D.XAxis * Radius;
+                pt.TransformBy(transformation);
+                Radius = (pt - Center).Length;
+            }
+        }
     }
 }

@@ -16,6 +16,8 @@ namespace SimpleCAD
         public abstract Extents2D GetExtents();
         public virtual bool Contains(Point2D pt, float pickBoxSize) { return GetExtents().Contains(pt); }
         public abstract void TransformBy(TransformationMatrix2D transformation);
+        public virtual Point2D[] GetControlPoints() { return new Point2D[0]; }
+        public virtual void TransformControlPoint(int index, TransformationMatrix2D transformation) { }
 
         public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
 

@@ -9,6 +9,7 @@ namespace SimpleCAD
         {
             Normal,
             Selection,
+            ControlPoint,
             Jigged,
             Transients,
             Cursor

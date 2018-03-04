@@ -19,6 +19,8 @@ namespace SimpleCAD
         internal static Outline ReverseSelectionBorderStyle { get { return new Outline(Color.White, 1, DashStyle.Dash); } }
         internal static Outline JiggedStyle { get { return new Outline(Color.Orange, 1, DashStyle.Dash); } }
         internal static Outline CursorStyle { get { return new Outline(Color.White, 1, DashStyle.Solid); } }
+        internal static Outline ControlPointStyle { get { return new Outline(Color.FromArgb(46, 116, 251)); } }
+        internal static Outline HotControlPointStyle { get { return new Outline(Color.FromArgb(251, 46, 46)); } }
 
         public Outline(Color color, float lineWeight, DashStyle dashStyle)
             : this()

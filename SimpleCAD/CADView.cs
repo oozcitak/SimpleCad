@@ -17,11 +17,14 @@ namespace SimpleCAD
         private Drawable mouseDownItem;
         private Point2D currentMouseLocationWorld;
         private bool hasMouse;
+        private ControlPoint mouseDownCP;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
         [Category("Behavior"), DefaultValue(4), Description("Determines the size of the pick box around the selection cursor.")]
         public int PickBoxSize { get; set; } = 4;
+        [Category("Behavior"), DefaultValue(4), Description("Determines the size of the control points of drawable objects.")]
+        public int ControlPointSize { get; set; } = 7;
 
         [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
         public float ZoomFactor
@@ -158,18 +161,33 @@ namespace SimpleCAD
             {
                 selected.Draw(param);
             }
+            param.Mode = DrawParams.DrawingMode.ControlPoint;
+            foreach (ControlPoint pt in Document.Editor.ControlPoints)
+            {
+                DrawControlPoint(param, pt);
+            }
 
-            // Render transient objects
+            // Render jigged objects
             param.Mode = DrawParams.DrawingMode.Jigged;
             Document.Jigged.Draw(param);
 
-            // Render jigged objects
+            // Render transient objects
             param.Mode = DrawParams.DrawingMode.Transients;
             Document.Transients.Draw(param);
 
             // Render cursor
             param.Mode = DrawParams.DrawingMode.Cursor;
             DrawCursor(param);
+        }
+
+        private void DrawControlPoint(DrawParams param, ControlPoint pt)
+        {
+            using (Pen pen = pt.IsHot ? Outline.HotControlPointStyle.CreatePen(param) : Outline.ControlPointStyle.CreatePen(param))
+            {
+                pen.Width = param.GetScaledLineWeight(2);
+                float cpSize = ScreenToWorld(new Size(ControlPointSize, ControlPointSize)).Width;
+                param.Graphics.DrawRectangle(pen, pt.X - cpSize / 2, pt.Y - cpSize / 2, cpSize, cpSize);
+            }
         }
 
         private void DrawCursor(DrawParams param)
@@ -358,10 +376,11 @@ namespace SimpleCAD
             if (e.Button == MouseButtons.Left && Interactive)
             {
                 mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
+                mouseDownCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
             }
         }
 
-        void CadView_MouseUp(object sender, MouseEventArgs e)
+        async void CadView_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Middle && panning)
             {
@@ -374,12 +393,45 @@ namespace SimpleCAD
             if (e.Button == MouseButtons.Left && Interactive && mouseDownItem != null)
             {
                 Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
-                if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem))
+                if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.Selection.Contains(mouseDownItem))
                 {
                     if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
+                    {
+                        Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Parent, mouseDownItem));
                         Document.Editor.Selection.Remove(mouseDownItem);
+                    }
                     else
+                    {
+                        Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(mouseDownItem));
                         Document.Editor.Selection.Add(mouseDownItem);
+                    }
+                }
+            }
+
+            if (e.Button == MouseButtons.Left && Interactive && mouseDownCP != null)
+            {
+                ControlPoint mouseUpCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                if (mouseUpCP != null && ReferenceEquals(mouseDownCP, mouseUpCP))
+                {
+                    Drawable item = mouseDownCP.Parent;
+                    int index = mouseDownCP.Index;
+                    Point2D basePoint = mouseDownCP.P;
+                    Drawable consItem = item.Clone();
+                    Document.Jigged.Add(consItem);
+                    Point2D lastPt = basePoint;
+                    Editor.PointResult p2 = await Document.Editor.GetPoint("New point: ", lastPt,
+                        (p) =>
+                        {
+                            consItem.TransformControlPoint(index, TransformationMatrix2D.Translation(p - lastPt));
+                            lastPt = p;
+                        });
+                    if (p2.Result == Editor.ResultMode.OK)
+                    {
+                        item.TransformControlPoint(index, TransformationMatrix2D.Translation(p2.Value - basePoint));
+                        Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Parent, item));
+                        Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(item));
+                    }
+                    Document.Jigged.Remove(consItem);
                 }
             }
         }
@@ -463,6 +515,7 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.Selection.Clear();
+                Document.Editor.ControlPoints.Clear();
             }
         }
 
@@ -491,6 +544,18 @@ namespace SimpleCAD
             foreach (Drawable d in Document.Model)
             {
                 if (d.Contains(new Point2D(pt), pickBoxWorld)) return d;
+            }
+            return null;
+        }
+
+        private ControlPoint FindControlPointAtScreenCoordinates(int x, int y, int pickBox)
+        {
+            PointF pt = ScreenToWorld(x, y);
+            foreach (ControlPoint cp in Document.Editor.ControlPoints)
+            {
+                if (pt.X >= cp.X - pickBox / 2 && pt.X <= cp.X + pickBox / 2 &&
+                    pt.Y >= cp.Y - pickBox / 2 && pt.Y <= cp.Y + pickBox / 2)
+                    return cp;
             }
             return null;
         }
