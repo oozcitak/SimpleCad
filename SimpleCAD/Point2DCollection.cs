@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SimpleCAD
 {
-    public class Point2DCollection : ICollection<Point2D>, INotifyCollectionChanged
+    public class Point2DCollection : IList<Point2D>, INotifyCollectionChanged
     {
         private List<Point2D> items;
 
@@ -143,6 +143,23 @@ namespace SimpleCAD
         protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(this, e);
+        }
+
+        public int IndexOf(Point2D item)
+        {
+            return items.IndexOf(item);
+        }
+
+        public void Insert(int index, Point2D item)
+        {
+            items.Insert(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+        }
+
+        public void RemoveAt(int index)
+        {
+            items.RemoveAt(index);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, items[index]));
         }
     }
 }
