@@ -76,6 +76,19 @@ namespace SimpleCAD
             return new Vector2D(X, Y);
         }
 
+        public static Point2D Average(params Point2D[] points)
+        {
+            int n = points.Length;
+            float x = 0;
+            float y = 0;
+            foreach (Point2D pt in points)
+            {
+                x += pt.X / n;
+                y += pt.Y / n;
+            }
+            return new Point2D(x, y);
+        }
+
         public override string ToString()
         {
             return "{" + X.ToString() + ", " + Y.ToString() + "}";
