@@ -144,5 +144,16 @@ namespace SimpleCAD
 
             Rotation += transformation.RotationAngle;
         }
+
+        public override ControlPoint[] GetControlPoints(float size)
+        {
+            Vector2D upDir = Vector2D.FromAngle(Rotation).GetPerpendicularVector();
+            return new[]
+            {
+                new ControlPoint("Location", ControlPoint.ControlPointType.Point, Location, Location),
+                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + size * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Height", ControlPoint.ControlPointType.Distance, Location, Location + Height * upDir),
+            };
+        }
     }
 }
