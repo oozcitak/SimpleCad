@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Drawing;
 
 namespace SimpleCAD
@@ -82,6 +83,18 @@ namespace SimpleCAD
             Polyline newPolyline = (Polyline)base.Clone();
             newPolyline.Points = new Point2DCollection(Points);
             return newPolyline;
+        }
+
+        public override Point2D[] GetControlPoints()
+        {
+            return Points.ToArray();
+        }
+
+        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
+        {
+            Point2D pt = Points[index];
+            pt.TransformBy(transformation);
+            Points[index] = pt;
         }
     }
 }

@@ -18,12 +18,16 @@ namespace SimpleCAD
         {
             get
             {
-                return new Point2D(Center.X + Width / 2, Center.Y + Height / 2);
+                Vector2D corner = new Vector2D(Width / 2, Height / 2);
+                corner.TransformBy(TransformationMatrix2D.Rotation(Rotation));
+                return Center + corner;
             }
             set
             {
-                width = Math.Abs(value.X - center.X) * 2;
-                height = Math.Abs(value.Y - center.Y) * 2;
+                Vector2D size = (value - center);
+                size.TransformBy(TransformationMatrix2D.Rotation(-Rotation));
+                width = size.X * 2;
+                height = size.Y * 2;
                 UpdatePolyline();
                 NotifyPropertyChanged();
             }
@@ -93,6 +97,38 @@ namespace SimpleCAD
         public override bool Contains(Point2D pt, float pickBoxSize)
         {
             return poly.Contains(pt, pickBoxSize);
+        }
+
+        public override Point2D[] GetControlPoints()
+        {
+            return new Point2D[]
+            {
+                Center,
+                Corner,
+                Center + Vector2D.FromAngle(Rotation) * Width / 2
+            };
+        }
+
+        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
+        {
+            if (index == 0)
+            {
+                Point2D p = Center;
+                p.TransformBy(transformation);
+                Center = p;
+            }
+            else if (index == 1)
+            {
+                Point2D p = Corner;
+                p.TransformBy(transformation);
+                Corner = p;
+            }
+            else if (index == 2)
+            {
+                Point2D p = Center + Vector2D.FromAngle(Rotation) * Width;
+                p.TransformBy(transformation);
+                Rotation = (p - Center).Angle;
+            }
         }
     }
 }
