@@ -149,8 +149,8 @@ namespace SimpleCAD
         {
             return new[]
             {
-                new ControlPoint("StartPoint", ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
-                new ControlPoint("EndPoint", ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+                new ControlPoint("StartPoint"),
+                new ControlPoint("EndPoint"),
             };
         }
     }

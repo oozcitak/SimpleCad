@@ -90,7 +90,7 @@ namespace SimpleCAD
             ControlPoint[] cp = new ControlPoint[Points.Count];
             for (int i = 0; i < Points.Count; i++)
             {
-                cp[i] = new ControlPoint("Points", i, ControlPoint.ControlPointType.Point, Points[i], Points[i]);
+                cp[i] = new ControlPoint("Points", i);
             }
             return cp;
         }

@@ -119,7 +119,7 @@ namespace SimpleCAD
         {
             return new[]
             {
-                new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
+                new ControlPoint("Center"),
                 new ControlPoint("SemiMajorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
                 new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).GetPerpendicularVector()),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + size) * Vector2D.FromAngle(Rotation)),

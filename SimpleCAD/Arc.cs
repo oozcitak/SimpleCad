@@ -95,7 +95,7 @@ namespace SimpleCAD
         {
             return new[]
             {
-                new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
+                new ControlPoint("Center"),
                 new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
                 new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
                 new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),

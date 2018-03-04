@@ -137,8 +137,8 @@ namespace SimpleCAD
         {
             return new[]
             {
-                new ControlPoint("StartPoint", ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
-                new ControlPoint("EndPoint", ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+                new ControlPoint("StartPoint"),
+                new ControlPoint("EndPoint"),
                 new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, StartPoint, StartPoint + size * Vector2D.FromAngle(StartAngle)),
                 new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, EndPoint, EndPoint + size * Vector2D.FromAngle(EndAngle)),
             };
