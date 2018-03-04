@@ -10,17 +10,17 @@ namespace SimpleCAD
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
-        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
-        public float X1 { get { return P1.X; } }
+        public float X1 { get { return StartPoint.X; } }
         [Browsable(false)]
-        public float Y1 { get { return P1.Y; } }
+        public float Y1 { get { return StartPoint.Y; } }
         [Browsable(false)]
-        public float X2 { get { return P2.X; } }
+        public float X2 { get { return EndPoint.X; } }
         [Browsable(false)]
-        public float Y2 { get { return P2.Y; } }
+        public float Y2 { get { return EndPoint.Y; } }
 
         private float offset;
         private string str;
@@ -40,8 +40,8 @@ namespace SimpleCAD
 
         public Dimension(Point2D p1, Point2D p2, float textHeight)
         {
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
 
             Offset = 0.4f;
             TextHeight = textHeight;
@@ -67,14 +67,14 @@ namespace SimpleCAD
         {
             float offset = Math.Sign(Offset) * (0.5f * TextHeight + Math.Abs(Offset));
 
-            Vector2D dir = P2 - P1;
+            Vector2D dir = EndPoint - StartPoint;
             float angle = dir.Angle;
             float len = dir.Length;
             Point2D p1 = new Point2D(0, 0);
             Point2D p2 = new Point2D(len, 0);
             Point2D p3 = p1 + new Vector2D(0, offset);
             Point2D p4 = p2 + new Vector2D(0, offset);
-            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);
             p1.TransformBy(trans);
             p2.TransformBy(trans);
             p3.TransformBy(trans);
@@ -90,12 +90,12 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p1 = P1;
-            Point2D p2 = P2;
+            Point2D p1 = StartPoint;
+            Point2D p2 = EndPoint;
             p1.TransformBy(transformation);
             p2.TransformBy(transformation);
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
@@ -109,7 +109,7 @@ namespace SimpleCAD
 
             float tickSize = 0.5f * TextHeight;
 
-            Vector2D dir = P2 - P1;
+            Vector2D dir = EndPoint - StartPoint;
             float angle = dir.Angle;
             float len = dir.Length;
 
@@ -129,7 +129,7 @@ namespace SimpleCAD
             items.Add(tick2);
 
             // Text
-            float dist = (P1 - P2).Length * Scale;
+            float dist = (StartPoint - EndPoint).Length * Scale;
             string txt = String.Replace("<>", dist.ToString("F" + Precision.ToString()));
             Text textObj = new Text(len / 2, Offset, txt, TextHeight);
             textObj.FontFamily = FontFamily;
@@ -139,10 +139,19 @@ namespace SimpleCAD
             textObj.Outline = Outline;
             items.Add(textObj);
 
-            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, P1.X, P1.Y);
+            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);
             items.TransformBy(trans);
 
             return items;
+        }
+
+        public override ControlPoint[] GetControlPoints()
+        {
+            return new[]
+            {
+                new ControlPoint("StartPoint", ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
+                new ControlPoint("EndPoint", ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+            };
         }
     }
 }
