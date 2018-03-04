@@ -267,6 +267,61 @@ namespace SimpleCAD
             }
         }
 
+        public class DrawHatch : Command
+        {
+            public override string RegisteredName => "Primitives.Hatch";
+            public override string Name => "Hatch";
+
+            public override async Task Apply(CADDocument doc)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.PointResult p1 = await ed.GetPoint("First point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Point2D pt = p1.Value;
+                Polyline consPoly = new Polyline(new Point2D[] { pt, pt });
+                consPoly.Closed = true;
+                doc.Jigged.Add(consPoly);
+
+                Point2DCollection points = new Point2DCollection();
+                points.Add(pt);
+
+                bool done = false;
+                while (!done)
+                {
+                    Editor.PointOptions options = new Editor.PointOptions("Next point: ", pt, (p) => consPoly.Points[consPoly.Points.Count - 1] = p);
+                    options.AddKeyword("End", true);
+                    Editor.PointResult pNext = await ed.GetPoint(options);
+                    if (pNext.Result == Editor.ResultMode.OK)
+                    {
+                        pt = pNext.Value;
+                        consPoly.Points.Add(pt);
+                        points.Add(pt);
+                    }
+                    else if (pNext.Result == Editor.ResultMode.Cancel)
+                    {
+                        doc.Jigged.Remove(consPoly);
+                        return;
+                    }
+                    else if (pNext.Result == Editor.ResultMode.Keyword)
+                    {
+                        if (points.Count < 2)
+                        {
+                            doc.Jigged.Remove(consPoly);
+                            return;
+                        }
+
+                        if (pNext.Keyword == "End")
+                            done = true;
+                    }
+                }
+
+                doc.Jigged.Remove(consPoly);
+                Hatch newItem = new Hatch(points);
+                doc.Model.Add(newItem);
+            }
+        }
+
         public class DrawRectangle : Command
         {
             public override string RegisteredName => "Primitives.Rectangle";

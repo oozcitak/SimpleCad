@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             SimpleCAD.CADDocument cadDocument1 = new SimpleCAD.CADDocument();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsStandard = new System.Windows.Forms.ToolStrip();
             this.btnSave = new System.Windows.Forms.ToolStripButton();
@@ -52,10 +53,10 @@
             this.btnDrawTriangle = new System.Windows.Forms.ToolStripButton();
             this.tsTransform = new System.Windows.Forms.ToolStrip();
             this.btnMove = new System.Windows.Forms.ToolStripButton();
+            this.btnCopy = new System.Windows.Forms.ToolStripButton();
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
-            this.btnCopy = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -137,6 +138,19 @@
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Document = cadDocument1;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
+            this.cadWindow1.TabIndex = 0;
+            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
+            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -180,10 +194,11 @@
             this.btnDrawParabola,
             this.btnDrawPolyline,
             this.btnDrawRectangle,
-            this.btnDrawTriangle});
+            this.btnDrawTriangle,
+            this.btnDrawHatch});
             this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
             this.tsPrimitives.Name = "tsPrimitives";
-            this.tsPrimitives.Size = new System.Drawing.Size(552, 25);
+            this.tsPrimitives.Size = new System.Drawing.Size(626, 25);
             this.tsPrimitives.TabIndex = 0;
             // 
             // btnDrawLine
@@ -307,7 +322,7 @@
             this.btnScale});
             this.tsTransform.Location = new System.Drawing.Point(3, 50);
             this.tsTransform.Name = "tsTransform";
-            this.tsTransform.Size = new System.Drawing.Size(206, 25);
+            this.tsTransform.Size = new System.Drawing.Size(175, 25);
             this.tsTransform.TabIndex = 2;
             // 
             // btnMove
@@ -319,6 +334,16 @@
             this.btnMove.Size = new System.Drawing.Size(41, 22);
             this.btnMove.Text = "Move";
             this.btnMove.Click += new System.EventHandler(this.btnMove_Click);
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnCopy.Image = ((System.Drawing.Image)(resources.GetObject("btnCopy.Image")));
+            this.btnCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(39, 22);
+            this.btnCopy.Text = "Copy";
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
             // btnRotate
             // 
@@ -340,28 +365,15 @@
             this.btnScale.Text = "Scale";
             this.btnScale.Click += new System.EventHandler(this.btnScale_Click);
             // 
-            // cadWindow1
+            // btnDrawHatch
             // 
-            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Document = cadDocument1;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
-            this.cadWindow1.TabIndex = 0;
-            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
-            // 
-            // btnCopy
-            // 
-            this.btnCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnCopy.Image = ((System.Drawing.Image)(resources.GetObject("btnCopy.Image")));
-            this.btnCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(39, 22);
-            this.btnCopy.Text = "Copy";
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.btnDrawHatch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawHatch.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawHatch.Image")));
+            this.btnDrawHatch.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawHatch.Name = "btnDrawHatch";
+            this.btnDrawHatch.Size = new System.Drawing.Size(43, 22);
+            this.btnDrawHatch.Text = "Hatch";
+            this.btnDrawHatch.Click += new System.EventHandler(this.btnDrawHatch_Click);
             // 
             // MainForm
             // 
@@ -423,6 +435,7 @@
         private System.Windows.Forms.ToolStripButton btnRotate;
         private System.Windows.Forms.ToolStripButton btnScale;
         private System.Windows.Forms.ToolStripButton btnCopy;
+        private System.Windows.Forms.ToolStripButton btnDrawHatch;
     }
 }
 

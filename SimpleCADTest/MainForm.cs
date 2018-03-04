@@ -87,6 +87,11 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Primitives.Polyline");
         }
 
+        private void btnDrawHatch_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("Primitives.Hatch");
+        }
+
         private void btnDrawRectangle_Click(object sender, EventArgs e)
         {
             cadWindow1.Document.Editor.RunCommand("Primitives.Rectangle");
