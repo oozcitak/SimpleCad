@@ -85,16 +85,14 @@ namespace SimpleCAD
             return newPolyline;
         }
 
-        public override Point2D[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints()
         {
-            return Points.ToArray();
-        }
-
-        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
-        {
-            Point2D pt = Points[index];
-            pt.TransformBy(transformation);
-            Points[index] = pt;
+            ControlPoint[] cp = new ControlPoint[Points.Count];
+            for(int i=0;i<Points.Count;i++)
+            {
+                cp[i] = new ControlPoint("Points", i, ControlPoint.ControlPointType.Point, Points[i], Points[i]);
+            }
+            return cp;
         }
     }
 }

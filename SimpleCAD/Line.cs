@@ -9,22 +9,22 @@ namespace SimpleCAD
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
-        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
-        public float X1 { get { return P1.X; } }
+        public float X1 { get { return StartPoint.X; } }
         [Browsable(false)]
-        public float Y1 { get { return P1.Y; } }
+        public float Y1 { get { return StartPoint.Y; } }
         [Browsable(false)]
-        public float X2 { get { return P2.X; } }
+        public float X2 { get { return EndPoint.X; } }
         [Browsable(false)]
-        public float Y2 { get { return P2.Y; } }
+        public float Y2 { get { return EndPoint.Y; } }
 
         public Line(Point2D p1, Point2D p2)
         {
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
         }
 
         public Line(float x1, float y1, float x2, float y2)
@@ -51,46 +51,30 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p1 = P1;
-            Point2D p2 = P2;
+            Point2D p1 = StartPoint;
+            Point2D p2 = EndPoint;
             p1.TransformBy(transformation);
             p2.TransformBy(transformation);
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
         {
-            Vector2D w = pt - P1;
-            Vector2D vL = (P2 - P1);
+            Vector2D w = pt - StartPoint;
+            Vector2D vL = (EndPoint - StartPoint);
             float b = w.DotProduct(vL) / vL.DotProduct(vL);
             float dist = (w - b * vL).Length;
             return b >= 0 && b <= 1 && dist <= pickBoxSize / 2;
         }
 
-        public override Point2D[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints()
         {
-            return new Point2D[]
+            return new []
             {
-                P1,
-                P2
+                new ControlPoint("StartPoint", ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
+                new ControlPoint("EndPoint", ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
             };
-        }
-
-        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
-        {
-            if (index == 0)
-            {
-                Point2D p = P1;
-                p.TransformBy(transformation);
-                P1 = p;
-            }
-            else if (index == 1)
-            {
-                Point2D p = P2;
-                p.TransformBy(transformation);
-                P2 = p;
-            }
         }
     }
 }

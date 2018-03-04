@@ -99,36 +99,14 @@ namespace SimpleCAD
             return poly.Contains(pt, pickBoxSize);
         }
 
-        public override Point2D[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints()
         {
-            return new Point2D[]
+            return new[]
             {
-                Center,
-                Corner,
-                Center + Vector2D.FromAngle(Rotation) * Width / 2
+                new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
+                new ControlPoint("Corner", ControlPoint.ControlPointType.Point, Corner, Corner),
+                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Corner, Center + Vector2D.FromAngle(Rotation) * Width / 2),
             };
-        }
-
-        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
-        {
-            if (index == 0)
-            {
-                Point2D p = Center;
-                p.TransformBy(transformation);
-                Center = p;
-            }
-            else if (index == 1)
-            {
-                Point2D p = Corner;
-                p.TransformBy(transformation);
-                Corner = p;
-            }
-            else if (index == 2)
-            {
-                Point2D p = Center + Vector2D.FromAngle(Rotation) * Width;
-                p.TransformBy(transformation);
-                Rotation = (p - Center).Angle;
-            }
         }
     }
 }

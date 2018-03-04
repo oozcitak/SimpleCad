@@ -186,7 +186,7 @@ namespace SimpleCAD
             {
                 pen.Width = param.GetScaledLineWeight(2);
                 float cpSize = ScreenToWorld(new Size(ControlPointSize, ControlPointSize)).Width;
-                param.Graphics.DrawRectangle(pen, pt.X - cpSize / 2, pt.Y - cpSize / 2, cpSize, cpSize);
+                param.Graphics.DrawRectangle(pen, pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2, cpSize, cpSize);
             }
         }
 
@@ -370,10 +370,8 @@ namespace SimpleCAD
             {
                 panning = true;
                 lastMouse = e.Location;
-                control.Cursor = Cursors.NoMove2D;
             }
-
-            if (e.Button == MouseButtons.Left && Interactive)
+            else if (e.Button == MouseButtons.Left && Interactive)
             {
                 mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
                 mouseDownCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
@@ -382,56 +380,86 @@ namespace SimpleCAD
 
         async void CadView_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Middle && panning)
+            if (e.Button == MouseButtons.Middle && Interactive && panning)
             {
                 panning = false;
                 control.Invalidate();
             }
-
-            control.Cursor = Cursors.Cross;
-
-            if (e.Button == MouseButtons.Left && Interactive && mouseDownItem != null)
+            else if (e.Button == MouseButtons.Left && Interactive)
             {
-                Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
-                if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.Selection.Contains(mouseDownItem))
+                if (mouseDownItem != null)
                 {
-                    if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
+                    Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
+                    if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.Selection.Contains(mouseDownItem))
                     {
-                        Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Parent, mouseDownItem));
-                        Document.Editor.Selection.Remove(mouseDownItem);
-                    }
-                    else
-                    {
-                        Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(mouseDownItem));
-                        Document.Editor.Selection.Add(mouseDownItem);
+                        if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
+                        {
+                            Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Owner, mouseDownItem));
+                            Document.Editor.Selection.Remove(mouseDownItem);
+                        }
+                        else
+                        {
+                            Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(mouseDownItem));
+                            Document.Editor.Selection.Add(mouseDownItem);
+                        }
                     }
                 }
-            }
 
-            if (e.Button == MouseButtons.Left && Interactive && mouseDownCP != null)
-            {
-                ControlPoint mouseUpCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
-                if (mouseUpCP != null && ReferenceEquals(mouseDownCP, mouseUpCP))
+                if (mouseDownCP != null)
                 {
-                    Drawable item = mouseDownCP.Parent;
-                    int index = mouseDownCP.Index;
-                    Point2D basePoint = mouseDownCP.P;
-                    Drawable consItem = item.Clone();
-                    Document.Transients.Add(consItem);
-                    Point2D lastPt = basePoint;
-                    Editor.PointResult p2 = await Document.Editor.GetPoint("New point: ", lastPt,
-                        (p) =>
-                        {
-                            consItem.TransformControlPoint(index, TransformationMatrix2D.Translation(p - lastPt));
-                            lastPt = p;
-                        });
-                    if (p2.Result == Editor.ResultMode.OK)
+                    ControlPoint mouseUpCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                    if (mouseUpCP != null && ReferenceEquals(mouseDownCP, mouseUpCP))
                     {
-                        item.TransformControlPoint(index, TransformationMatrix2D.Translation(p2.Value - basePoint));
-                        Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Parent, item));
-                        Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(item));
+                        ControlPoint cp = mouseDownCP;
+                        Drawable consItem = cp.Owner.Clone();
+                        Document.Transients.Add(consItem);
+                        Editor.ResultMode result = Editor.ResultMode.Cancel;
+                        TransformationMatrix2D trans = TransformationMatrix2D.Identity;
+                        if (cp.Type == ControlPoint.ControlPointType.Point)
+                        {
+                            Editor.PointResult res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
+                                (p) =>
+                                {
+                                    trans = TransformationMatrix2D.Translation(p - cp.BasePoint);
+                                    consItem.TransformControlPoint(cp, trans);
+                                });
+                            trans = TransformationMatrix2D.Translation(res.Value - cp.BasePoint);
+                            result = res.Result;
+                        }
+                        else if (cp.Type == ControlPoint.ControlPointType.Angle)
+                        {
+                            float orjVal = (cp.Location - cp.BasePoint).Angle;
+                            Editor.AngleResult res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
+                                (p) =>
+                                {
+                                    trans = TransformationMatrix2D.Rotation(cp.BasePoint, p - orjVal);
+                                    consItem.TransformControlPoint(cp, trans);
+                                });
+                            trans = TransformationMatrix2D.Rotation(cp.BasePoint, res.Value - orjVal);
+                            result = res.Result;
+                        }
+                        else if (cp.Type == ControlPoint.ControlPointType.Distance)
+                        {
+                            Vector2D dir = cp.Location - cp.BasePoint;
+                            dir.Normalize();
+                            float orjVal = (cp.Location - cp.BasePoint).Length;
+                            Editor.DistanceResult res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
+                                (p) =>
+                                {
+                                    trans = TransformationMatrix2D.Translation(dir * (p - orjVal));
+                                    consItem.TransformControlPoint(cp, trans);
+                                });
+                            trans = TransformationMatrix2D.Translation(dir * (res.Value - orjVal));
+                            result = res.Result;
+                        }
+                        if (result == Editor.ResultMode.OK)
+                        {
+                            cp.Owner.TransformControlPoint(cp, trans);
+                            Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Owner, cp.Owner));
+                            Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(cp.Owner));
+                        }
+                        Document.Transients.Remove(consItem);
                     }
-                    Document.Transients.Remove(consItem);
                 }
             }
         }
@@ -553,8 +581,8 @@ namespace SimpleCAD
             PointF pt = ScreenToWorld(x, y);
             foreach (ControlPoint cp in Document.Editor.ControlPoints)
             {
-                if (pt.X >= cp.X - pickBox / 2 && pt.X <= cp.X + pickBox / 2 &&
-                    pt.Y >= cp.Y - pickBox / 2 && pt.Y <= cp.Y + pickBox / 2)
+                if (pt.X >= cp.Location.X - pickBox / 2 && pt.X <= cp.Location.X + pickBox / 2 &&
+                    pt.Y >= cp.Location.Y - pickBox / 2 && pt.Y <= cp.Location.Y + pickBox / 2)
                     return cp;
             }
             return null;

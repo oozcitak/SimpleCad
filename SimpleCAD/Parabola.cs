@@ -9,16 +9,16 @@ namespace SimpleCAD
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D P1 { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
-        public Point2D P2 { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
-        public Point2D PC
+        public Point2D ControlPoint
         {
             get
             {
-                Point2D p3 = P1 + Vector2D.FromAngle(StartAngle);
-                Point2D p4 = P2 + Vector2D.FromAngle(EndAngle);
-                Intersect(P1, p3, P2, p4, out Point2D c);
+                Point2D p3 = StartPoint + Vector2D.FromAngle(StartAngle);
+                Point2D p4 = EndPoint + Vector2D.FromAngle(EndAngle);
+                Intersect(StartPoint, p3, EndPoint, p4, out Point2D c);
                 return c;
             }
         }
@@ -30,22 +30,22 @@ namespace SimpleCAD
         public float EndAngle { get => endAngle; set { endAngle = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
-        public float X1 { get { return P1.X; } }
+        public float X1 { get { return StartPoint.X; } }
         [Browsable(false)]
-        public float Y1 { get { return P1.Y; } }
+        public float Y1 { get { return StartPoint.Y; } }
         [Browsable(false)]
-        public float X2 { get { return P2.X; } }
+        public float X2 { get { return EndPoint.X; } }
         [Browsable(false)]
-        public float Y2 { get { return P2.Y; } }
+        public float Y2 { get { return EndPoint.Y; } }
         [Browsable(false)]
-        public float XC { get { return PC.X; } }
+        public float XC { get { return ControlPoint.X; } }
         [Browsable(false)]
-        public float YC { get { return PC.Y; } }
+        public float YC { get { return ControlPoint.Y; } }
 
         public Parabola(Point2D p1, Point2D p2, float startAngle, float endAngle)
         {
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
             StartAngle = startAngle;
             EndAngle = endAngle;
         }
@@ -58,12 +58,12 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            Point2D c1 = P1 * 1 / 3 + (PC * 2 / 3).ToVector2D();
-            Point2D c2 = P2 * 1 / 3 + (PC * 2 / 3).ToVector2D();
+            Point2D c1 = StartPoint * 1 / 3 + (ControlPoint * 2 / 3).ToVector2D();
+            Point2D c2 = EndPoint * 1 / 3 + (ControlPoint * 2 / 3).ToVector2D();
 
             using (Pen pen = Outline.CreatePen(param))
             {
-                param.Graphics.DrawBezier(pen, P1.ToPointF(), c1.ToPointF(), c2.ToPointF(), P2.ToPointF());
+                param.Graphics.DrawBezier(pen, StartPoint.ToPointF(), c1.ToPointF(), c2.ToPointF(), EndPoint.ToPointF());
             }
         }
 
@@ -86,12 +86,12 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p1 = P1;
-            Point2D p2 = P2;
+            Point2D p1 = StartPoint;
+            Point2D p2 = EndPoint;
             p1.TransformBy(transformation);
             p2.TransformBy(transformation);
-            P1 = p1;
-            P2 = p2;
+            StartPoint = p1;
+            EndPoint = p2;
 
             Vector2D a1 = Vector2D.FromAngle(StartAngle);
             Vector2D a2 = Vector2D.FromAngle(EndAngle);

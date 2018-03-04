@@ -10,30 +10,30 @@ namespace SimpleCAD
         private Point2D p2;
         private Point2D p3;
 
-        public Point2D P1 { get { return p1; } set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
-        public Point2D P2 { get { return p2; } set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
-        public Point2D P3 { get { return p3; } set { p3 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D Point1 { get { return p1; } set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D Point2 { get { return p2; } set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D Point3 { get { return p3; } set { p3 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         [Browsable(false)]
-        public float X1 { get { return P1.X; } }
+        public float X1 { get { return Point1.X; } }
         [Browsable(false)]
-        public float Y1 { get { return P1.Y; } }
+        public float Y1 { get { return Point1.Y; } }
         [Browsable(false)]
-        public float X2 { get { return P2.X; } }
+        public float X2 { get { return Point2.X; } }
         [Browsable(false)]
-        public float Y2 { get { return P2.Y; } }
+        public float Y2 { get { return Point2.Y; } }
         [Browsable(false)]
-        public float X3 { get { return P3.X; } }
+        public float X3 { get { return Point3.X; } }
         [Browsable(false)]
-        public float Y3 { get { return P3.Y; } }
+        public float Y3 { get { return Point3.Y; } }
 
         private Polyline poly;
 
         public Triangle(Point2D p1, Point2D p2, Point2D p3)
         {
-            P1 = p1;
-            P2 = p2;
-            P3 = p3;
+            Point1 = p1;
+            Point2 = p2;
+            Point3 = p3;
             UpdatePolyline();
         }
 

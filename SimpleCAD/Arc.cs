@@ -91,43 +91,15 @@ namespace SimpleCAD
                 dir.IsBetween(Vector2D.FromAngle(StartAngle), Vector2D.FromAngle(EndAngle)));
         }
 
-        public override Point2D[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints()
         {
-            return new Point2D[]
+            return new[]
             {
-                Center,
-                Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2),
-                Center + Radius * Vector2D.FromAngle(StartAngle),
-                Center + Radius * Vector2D.FromAngle(EndAngle)
+                new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
+                new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
+                new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
             };
-        }
-
-        public override void TransformControlPoint(int index, TransformationMatrix2D transformation)
-        {
-            if (index == 0)
-            {
-                Point2D p = Center;
-                p.TransformBy(transformation);
-                Center = p;
-            }
-            else if (index == 1)
-            {
-                Point2D pt = Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2);
-                pt.TransformBy(transformation);
-                Radius = (pt - Center).Length;
-            }
-            else if (index == 2)
-            {
-                Point2D pt = Center + Radius * Vector2D.FromAngle(StartAngle);
-                pt.TransformBy(transformation);
-                StartAngle = (pt - Center).Angle;
-            }
-            else if (index == 3)
-            {
-                Point2D pt = Center + Radius * Vector2D.FromAngle(EndAngle);
-                pt.TransformBy(transformation);
-                EndAngle = (pt - Center).Angle;
-            }
         }
     }
 }

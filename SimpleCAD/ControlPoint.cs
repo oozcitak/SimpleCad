@@ -6,29 +6,48 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    internal class ControlPoint
+    public class ControlPoint
     {
-        public Drawable Parent { get; private set; }
-        public Point2D P { get; private set; }
-        public int Index { get; private set; }
-
-        public float X { get { return P.X; } }
-        public float Y { get { return P.Y; } }
-
-        public ControlPoint(Drawable parent, Point2D pt, int index)
+        public enum ControlPointType
         {
-            Parent = parent;
-            P = pt;
-            Index = index;
+            Point,
+            Angle,
+            Distance
+        }
+
+        internal Drawable Owner { get; set; }
+        public string PropertyName { get; private set; }
+        public int PropertyIndex { get; private set; }
+        public ControlPointType Type { get; private set; }
+        public Point2D BasePoint { get; private set; }
+        public Point2D Location { get; private set; }
+
+        public ControlPoint(string propertyName, ControlPointType type, Point2D basePoint, Point2D location)
+        {
+            Owner = null;
+            PropertyName = propertyName;
+            PropertyIndex = -1;
+            Type = type;
+            BasePoint = basePoint;
+            Location = location;
+        }
+
+        public ControlPoint(string propertyName, int propertyIndex, ControlPointType type, Point2D basePoint, Point2D location)
+        {
+            Owner = null;
+            PropertyName = propertyName;
+            PropertyIndex = propertyIndex;
+            Type = type;
+            BasePoint = basePoint;
+            Location = location;
         }
 
         public static ControlPoint[] FromDrawable(Drawable item)
         {
-            Point2D[] points = item.GetControlPoints();
-            ControlPoint[] cPoints = new ControlPoint[points.Length];
+            ControlPoint[] points = item.GetControlPoints();
             for (int i = 0; i < points.Length; i++)
-                cPoints[i] = new ControlPoint(item, points[i], i);
-            return cPoints;
+                points[i].Owner = item;
+            return points;
         }
     }
 }
