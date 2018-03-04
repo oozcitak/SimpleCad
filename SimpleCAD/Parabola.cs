@@ -12,7 +12,7 @@ namespace SimpleCAD
         public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
         public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
-        public Point2D ControlPoint
+        public Point2D IntersectionPoint
         {
             get
             {
@@ -38,9 +38,9 @@ namespace SimpleCAD
         [Browsable(false)]
         public float Y2 { get { return EndPoint.Y; } }
         [Browsable(false)]
-        public float XC { get { return ControlPoint.X; } }
+        public float XI { get { return IntersectionPoint.X; } }
         [Browsable(false)]
-        public float YC { get { return ControlPoint.Y; } }
+        public float YI { get { return IntersectionPoint.Y; } }
 
         public Parabola(Point2D p1, Point2D p2, float startAngle, float endAngle)
         {
@@ -58,8 +58,8 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            Point2D c1 = StartPoint * 1 / 3 + (ControlPoint * 2 / 3).ToVector2D();
-            Point2D c2 = EndPoint * 1 / 3 + (ControlPoint * 2 / 3).ToVector2D();
+            Point2D c1 = StartPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
+            Point2D c2 = EndPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
 
             using (Pen pen = Outline.CreatePen(param))
             {
@@ -76,8 +76,8 @@ namespace SimpleCAD
             {
                 t += 0.05f;
                 // Points on the Quadratic bezier curve
-                float x = (1 - t) * (1 - t) * X1 + 2 * (1 - t) * t * XC + t * t * X2;
-                float y = (1 - t) * (1 - t) * Y1 + 2 * (1 - t) * t * YC + t * t * Y2;
+                float x = (1 - t) * (1 - t) * X1 + 2 * (1 - t) * t * XI + t * t * X2;
+                float y = (1 - t) * (1 - t) * Y1 + 2 * (1 - t) * t * YI + t * t * Y2;
                 extents.Add(x, y);
             }
 
@@ -133,12 +133,14 @@ namespace SimpleCAD
             return a1 * b2 - a2 * b1;
         }
 
-        public override SimpleCAD.ControlPoint[] GetControlPoints(float size)
+        public override ControlPoint[] GetControlPoints(float size)
         {
             return new[]
             {
-                new ControlPoint("StartPoint", SimpleCAD.ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
-                new ControlPoint("EndPoint", SimpleCAD.ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+                new ControlPoint("StartPoint", ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
+                new ControlPoint("EndPoint", ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+                new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, StartPoint, StartPoint + size * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, EndPoint, EndPoint + size * Vector2D.FromAngle(EndAngle)),
             };
         }
     }
