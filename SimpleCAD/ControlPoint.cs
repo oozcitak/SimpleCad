@@ -11,7 +11,6 @@ namespace SimpleCAD
         public Drawable Parent { get; private set; }
         public Point2D P { get; private set; }
         public int Index { get; private set; }
-        public bool IsHot { get; set; }
 
         public float X { get { return P.X; } }
         public float Y { get { return P.Y; } }
@@ -21,7 +20,6 @@ namespace SimpleCAD
             Parent = parent;
             P = pt;
             Index = index;
-            IsHot = false;
         }
 
         public static ControlPoint[] FromDrawable(Drawable item)
