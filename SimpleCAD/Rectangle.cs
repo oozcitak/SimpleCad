@@ -105,7 +105,7 @@ namespace SimpleCAD
             {
                 new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
                 new ControlPoint("Corner", ControlPoint.ControlPointType.Point, Corner, Corner),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Corner, Center + Vector2D.FromAngle(Rotation) * Width / 2),
+                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + Vector2D.FromAngle(Rotation) * Width / 2),
             };
         }
     }
