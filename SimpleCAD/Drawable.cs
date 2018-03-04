@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -23,12 +25,34 @@ namespace SimpleCAD
             PropertyInfo prop = GetType().GetProperty(cp.PropertyName);
             Point2D point = cp.Location;
             point.TransformBy(transformation);
-            if (cp.Type == ControlPoint.ControlPointType.Point)
-                prop.SetValue(this, point, cp.PropertyIndex == -1 ? null : new object[] { cp.PropertyIndex });
-            else if (cp.Type == ControlPoint.ControlPointType.Angle)
-                prop.SetValue(this, (point - cp.BasePoint).Angle, cp.PropertyIndex == -1 ? null : new object[] { cp.PropertyIndex });
-            else if (cp.Type == ControlPoint.ControlPointType.Distance)
-                prop.SetValue(this, (point - cp.BasePoint).Length, cp.PropertyIndex == -1 ? null : new object[] { cp.PropertyIndex });
+
+            if (cp.PropertyIndex == -1)
+            {
+                if (cp.Type == ControlPoint.ControlPointType.Point)
+                    prop.SetValue(this, point);
+                else if (cp.Type == ControlPoint.ControlPointType.Angle)
+                    prop.SetValue(this, (point - cp.BasePoint).Angle);
+                else if (cp.Type == ControlPoint.ControlPointType.Distance)
+                    prop.SetValue(this, (point - cp.BasePoint).Length);
+            }
+            else
+            {
+                if (cp.Type == ControlPoint.ControlPointType.Point)
+                {
+                    IList<Point2D> items = (IList<Point2D>)prop.GetValue(this);
+                    items[cp.PropertyIndex] = point;
+                }
+                else if (cp.Type == ControlPoint.ControlPointType.Angle)
+                {
+                    IList<float> items = (IList<float>)prop.GetValue(this);
+                    items[cp.PropertyIndex] = (point - cp.BasePoint).Angle;
+                }
+                else if (cp.Type == ControlPoint.ControlPointType.Distance)
+                {
+                    IList<float> items = (IList<float>)prop.GetValue(this);
+                    items[cp.PropertyIndex] = (point - cp.BasePoint).Length;
+                }
+            }
         }
 
         public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
