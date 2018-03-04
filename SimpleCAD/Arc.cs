@@ -91,7 +91,7 @@ namespace SimpleCAD
                 dir.IsBetween(Vector2D.FromAngle(StartAngle), Vector2D.FromAngle(EndAngle)));
         }
 
-        public override ControlPoint[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints(float size)
         {
             return new[]
             {

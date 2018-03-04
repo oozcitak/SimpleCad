@@ -62,7 +62,7 @@ namespace SimpleCAD
             return dist <= Radius + pickBoxSize / 2 && dist >= Radius - pickBoxSize / 2;
         }
 
-        public override ControlPoint[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints(float size)
         {
             return new[]
             {

@@ -145,7 +145,7 @@ namespace SimpleCAD
             return items;
         }
 
-        public override ControlPoint[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints(float size)
         {
             return new[]
             {

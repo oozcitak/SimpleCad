@@ -132,5 +132,14 @@ namespace SimpleCAD
         {
             return a1 * b2 - a2 * b1;
         }
+
+        public override SimpleCAD.ControlPoint[] GetControlPoints(float size)
+        {
+            return new[]
+            {
+                new ControlPoint("StartPoint", SimpleCAD.ControlPoint.ControlPointType.Point, StartPoint, StartPoint),
+                new ControlPoint("EndPoint", SimpleCAD.ControlPoint.ControlPointType.Point, EndPoint, EndPoint),
+            };
+        }
     }
 }

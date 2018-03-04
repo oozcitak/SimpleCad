@@ -85,7 +85,7 @@ namespace SimpleCAD
             return newPolyline;
         }
 
-        public override ControlPoint[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints(float size)
         {
             ControlPoint[] cp = new ControlPoint[Points.Count];
             for(int i=0;i<Points.Count;i++)

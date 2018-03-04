@@ -100,14 +100,14 @@ namespace SimpleCAD
             return poly.Contains(pt, pickBoxSize);
         }
 
-        public override ControlPoint[] GetControlPoints()
+        public override ControlPoint[] GetControlPoints(float size)
         {
             return new[]
             {
                 new ControlPoint("Center", ControlPoint.ControlPointType.Point, Center, Center),
                 new ControlPoint("SemiMajorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
                 new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).GetPerpendicularVector()),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation) / 2),
+                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + size) * Vector2D.FromAngle(Rotation)),
             };
         }
     }

@@ -42,9 +42,9 @@ namespace SimpleCAD
             Location = location;
         }
 
-        public static ControlPoint[] FromDrawable(Drawable item)
+        internal static ControlPoint[] FromDrawable(Drawable item, float size)
         {
-            ControlPoint[] points = item.GetControlPoints();
+            ControlPoint[] points = item.GetControlPoints(size);
             for (int i = 0; i < points.Length; i++)
                 points[i].Owner = item;
             return points;
