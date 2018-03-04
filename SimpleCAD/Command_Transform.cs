@@ -119,15 +119,15 @@ namespace SimpleCAD
                 Editor.AngleResult p2 = await ed.GetAngle("Rotation angle: ", p1.Value,
                     (p) =>
                     {
-                        consItems.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p.Angle - lastAngle));
-                        lastAngle = p.Angle;
+                        consItems.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p - lastAngle));
+                        lastAngle = p;
                     });
                 doc.Transients.Remove(consItems);
                 if (p2.Result != Editor.ResultMode.OK) return;
 
                 foreach (Drawable item in s.Value)
                 {
-                    item.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p2.Value.Angle));
+                    item.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p2.Value));
                 }
 
                 ed.Selection.Clear();
@@ -154,18 +154,18 @@ namespace SimpleCAD
                 }
                 doc.Transients.Add(consItems);
                 float lastScale = 1;
-                Editor.DistanceResult p2 = await ed.GetDistance("Scale: ", p1.Value,
+                Editor.DistanceResult d1 = await ed.GetDistance("Scale: ", p1.Value,
                     (p) =>
                     {
-                        consItems.TransformBy(TransformationMatrix2D.Scale(p1.Value, p.Length / lastScale));
-                        lastScale = p.Length;
+                        consItems.TransformBy(TransformationMatrix2D.Scale(p1.Value, p / lastScale));
+                        lastScale = p;
                     });
                 doc.Transients.Remove(consItems);
-                if (p2.Result != Editor.ResultMode.OK) return;
+                if (d1.Result != Editor.ResultMode.OK) return;
 
                 foreach (Drawable item in s.Value)
                 {
-                    item.TransformBy(TransformationMatrix2D.Scale(p1.Value, p2.Value));
+                    item.TransformBy(TransformationMatrix2D.Scale(p1.Value, d1.Value));
                 }
 
                 ed.Selection.Clear();

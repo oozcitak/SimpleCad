@@ -54,11 +54,11 @@ namespace SimpleCAD
             internal PointResult(string keyword) : base(ResultMode.Keyword, Point2D.Zero, keyword) { }
         }
 
-        public class AngleResult : InputResult<Vector2D>
+        public class AngleResult : InputResult<float>
         {
-            internal AngleResult(ResultMode result) : base(result, Vector2D.XAxis, "") { }
-            internal AngleResult(Vector2D value) : base(ResultMode.OK, value, "") { }
-            internal AngleResult(string keyword) : base(ResultMode.Keyword, Vector2D.XAxis, keyword) { }
+            internal AngleResult(ResultMode result) : base(result, 0, "") { }
+            internal AngleResult(float value) : base(ResultMode.OK, value, "") { }
+            internal AngleResult(string keyword) : base(ResultMode.Keyword, 0, keyword) { }
         }
 
         public class TextResult : InputResult<string>
@@ -199,11 +199,11 @@ namespace SimpleCAD
             }
         }
 
-        public class AngleOptions : JigOptions<Vector2D>
+        public class AngleOptions : JigOptions<float>
         {
             public Point2D BasePoint { get; private set; }
 
-            public AngleOptions(string message, Point2D basePoint, Action<Vector2D> jig) : base(message, jig)
+            public AngleOptions(string message, Point2D basePoint, Action<float> jig) : base(message, jig)
             {
                 BasePoint = basePoint;
             }
@@ -214,11 +214,11 @@ namespace SimpleCAD
             }
         }
 
-        public class DistanceOptions : JigOptions<Vector2D>
+        public class DistanceOptions : JigOptions<float>
         {
             public Point2D BasePoint { get; private set; }
 
-            public DistanceOptions(string message, Point2D basePoint, Action<Vector2D> jig) : base(message, jig)
+            public DistanceOptions(string message, Point2D basePoint, Action<float> jig) : base(message, jig)
             {
                 BasePoint = basePoint;
             }

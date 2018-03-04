@@ -157,7 +157,7 @@ namespace SimpleCAD
             return res;
         }
 
-        public async Task<AngleResult> GetAngle(string message, Point2D basePoint, Action<Vector2D> jig)
+        public async Task<AngleResult> GetAngle(string message, Point2D basePoint, Action<float> jig)
         {
             return await GetAngle(new AngleOptions(message, basePoint, jig));
         }
@@ -192,7 +192,7 @@ namespace SimpleCAD
             return res;
         }
 
-        public async Task<DistanceResult> GetDistance(string message, Point2D basePoint, Action<Vector2D> jig)
+        public async Task<DistanceResult> GetDistance(string message, Point2D basePoint, Action<float> jig)
         {
             return await GetDistance(new DistanceOptions(message, basePoint, jig));
         }
@@ -299,11 +299,11 @@ namespace SimpleCAD
                     break;
                 case InputMode.Angle:
                     consLine.Points[1] = currentMouseLocation;
-                    ((AngleOptions)currentOptions).Jig(currentMouseLocation - ((AngleOptions)currentOptions).BasePoint);
+                    ((AngleOptions)currentOptions).Jig((currentMouseLocation - ((AngleOptions)currentOptions).BasePoint).Angle);
                     break;
                 case InputMode.Distance:
                     consLine.Points[1] = currentMouseLocation;
-                    ((DistanceOptions)currentOptions).Jig(currentMouseLocation - ((DistanceOptions)currentOptions).BasePoint);
+                    ((DistanceOptions)currentOptions).Jig((currentMouseLocation - ((DistanceOptions)currentOptions).BasePoint).Length);
                     break;
             }
         }
@@ -350,7 +350,7 @@ namespace SimpleCAD
                         break;
                     case InputMode.Angle:
                         inputCompleted = true;
-                        angleCompletion.SetResult(new AngleResult(point - ((AngleOptions)currentOptions).BasePoint));
+                        angleCompletion.SetResult(new AngleResult((point - ((AngleOptions)currentOptions).BasePoint).Angle)); ;
                         break;
                     case InputMode.Distance:
                         inputCompleted = true;
@@ -398,12 +398,12 @@ namespace SimpleCAD
                         if (conv.IsValid(currentText))
                         {
                             inputCompleted = true;
-                            angleCompletion.SetResult(new AngleResult((Vector2D)conv.ConvertFrom(currentText)));
+                            angleCompletion.SetResult(new AngleResult(((Vector2D)conv.ConvertFrom(currentText)).Angle));
                         }
                         else if (float.TryParse(currentText, out float angle))
                         {
                             inputCompleted = true;
-                            angleCompletion.SetResult(new AngleResult(Vector2D.FromAngle(angle * MathF.PI / 180)));
+                            angleCompletion.SetResult(new AngleResult(angle * MathF.PI / 180));
                         }
                         else if (!string.IsNullOrEmpty(keyword))
                         {

@@ -40,17 +40,15 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Arc consArc = new Arc(p1.Value, 0, 0, 2 * MathF.PI);
                 doc.Jigged.Add(consArc);
-                Editor.DistanceResult p2 = await ed.GetDistance("Radius: ", p1.Value, (p) => consArc.Radius = p.Length);
+                Editor.DistanceResult p2 = await ed.GetDistance("Radius: ", p1.Value, (p) => consArc.Radius = p);
                 if (p2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
-                Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p.Angle);
+                Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p);
                 if (a1.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
-                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p.Angle);
+                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p);
                 doc.Jigged.Remove(consArc);
                 if (a2.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Arc(p1.Value,
-                    p2.Value,
-                    a1.Value.Angle, a2.Value.Angle);
+                Drawable newItem = new Arc(p1.Value, p2.Value, a1.Value, a2.Value);
                 doc.Model.Add(newItem);
             }
         }
@@ -68,11 +66,11 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Circle consCircle = new Circle(p1.Value, 0);
                 doc.Jigged.Add(consCircle);
-                Editor.DistanceResult p2 = await ed.GetDistance("Radius: ", p1.Value, (p) => consCircle.Radius = p.Length);
+                Editor.DistanceResult d1 = await ed.GetDistance("Radius: ", p1.Value, (p) => consCircle.Radius = p);
                 doc.Jigged.Remove(consCircle);
-                if (p2.Result != Editor.ResultMode.OK) return;
+                if (d1.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Circle(p1.Value, p2.Value);
+                Drawable newItem = new Circle(p1.Value, d1.Value);
                 doc.Model.Add(newItem);
             }
         }
@@ -88,18 +86,17 @@ namespace SimpleCAD
 
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
-                Editor.DistanceResult p2 = await ed.GetDistance("Semi major axis: ", p1.Value);
-                if (p2.Result != Editor.ResultMode.OK) return;
-                Ellipse consEllipse = new Ellipse(p1.Value, p2.Value, 0);
+                Editor.DistanceResult d1 = await ed.GetDistance("Semi major axis: ", p1.Value);
+                if (d1.Result != Editor.ResultMode.OK) return;
+                Ellipse consEllipse = new Ellipse(p1.Value, d1.Value, 0);
                 doc.Jigged.Add(consEllipse);
-                Editor.DistanceResult p3 = await ed.GetDistance("Semi minor axis: ", p1.Value, (p) => consEllipse.SemiMinorAxis = p.Length);
-                if (p3.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consEllipse); return; }
-                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consEllipse.Rotation = v.Angle);
+                Editor.DistanceResult d2 = await ed.GetDistance("Semi minor axis: ", p1.Value, (p) => consEllipse.SemiMinorAxis = p);
+                if (d2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consEllipse); return; }
+                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consEllipse.Rotation = v);
                 doc.Jigged.Remove(consEllipse);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Ellipse(p1.Value,
-                    p2.Value, p3.Value, a1.Value.Angle);
+                Drawable newItem = new Ellipse(p1.Value, d1.Value, d2.Value, a1.Value);
                 doc.Model.Add(newItem);
             }
         }
@@ -115,23 +112,23 @@ namespace SimpleCAD
 
                 Editor.PointResult p1 = await ed.GetPoint("Center point: ");
                 if (p1.Result != Editor.ResultMode.OK) return;
-                Editor.DistanceResult p2 = await ed.GetDistance("Semi major axis: ", p1.Value);
-                if (p2.Result != Editor.ResultMode.OK) return;
-                EllipticArc consArc = new EllipticArc(p1.Value, p2.Value, p2.Value / 10, 0, 2 * MathF.PI);
+                Editor.DistanceResult d1 = await ed.GetDistance("Semi major axis: ", p1.Value);
+                if (d1.Result != Editor.ResultMode.OK) return;
+                EllipticArc consArc = new EllipticArc(p1.Value, d1.Value, d1.Value / 10, 0, 2 * MathF.PI);
                 doc.Jigged.Add(consArc);
-                Editor.DistanceResult p3 = await ed.GetDistance("Semi minor axis: ", p1.Value, (p) => consArc.SemiMinorAxis = p.Length);
-                if (p3.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
-                Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p.Angle);
+                Editor.DistanceResult d2 = await ed.GetDistance("Semi minor axis: ", p1.Value, (p) => consArc.SemiMinorAxis = p);
+                if (d2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
+                Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value, (p) => consArc.StartAngle = p);
                 if (a1.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
-                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p.Angle);
+                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p1.Value, (p) => consArc.EndAngle = p);
                 if (a2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consArc); return; }
-                Editor.AngleResult a3 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consArc.Rotation = v.Angle);
+                Editor.AngleResult a3 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consArc.Rotation = v);
                 doc.Jigged.Remove(consArc);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
                 Drawable newItem = new EllipticArc(p1.Value,
-                    p2.Value, p3.Value,
-                    a1.Value.Angle, a2.Value.Angle, a3.Value.Angle);
+                    d1.Value, d2.Value,
+                    a1.Value, a2.Value, a3.Value);
                 doc.Model.Add(newItem);
             }
         }
@@ -149,17 +146,17 @@ namespace SimpleCAD
                 if (p1.Result != Editor.ResultMode.OK) return;
                 Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value);
                 if (a1.Result != Editor.ResultMode.OK) return;
-                Editor.DistanceResult p2 = await ed.GetDistance("Text height: ", p1.Value);
-                if (p2.Result != Editor.ResultMode.OK) return;
-                Text consText = new Text(p1.Value, " ", p2.Value);
-                consText.Rotation = a1.Value.Angle;
+                Editor.DistanceResult d1 = await ed.GetDistance("Text height: ", p1.Value);
+                if (d1.Result != Editor.ResultMode.OK) return;
+                Text consText = new Text(p1.Value, " ", d1.Value);
+                consText.Rotation = a1.Value;
                 doc.Jigged.Add(consText);
                 Editor.TextResult t1 = await ed.GetText("Text string: ", (p) => consText.String = p);
                 doc.Jigged.Remove(consText);
                 if (t1.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Text(p1.Value, t1.Value, p2.Value);
-                ((Text)newItem).Rotation = a1.Value.Angle;
+                Text newItem = new Text(p1.Value, t1.Value, d1.Value);
+                newItem.Rotation = a1.Value;
                 doc.Model.Add(newItem);
             }
         }
@@ -200,13 +197,13 @@ namespace SimpleCAD
                 if (p2.Result != Editor.ResultMode.OK) return;
                 Editor.AngleResult a1 = await ed.GetAngle("Start angle: ", p1.Value);
                 if (a1.Result != Editor.ResultMode.OK) return;
-                Parabola consPb = new Parabola(p1.Value, p2.Value, a1.Value.Angle, 0);
+                Parabola consPb = new Parabola(p1.Value, p2.Value, a1.Value, 0);
                 doc.Jigged.Add(consPb);
-                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p2.Value, (p) => consPb.EndAngle = p.Angle);
+                Editor.AngleResult a2 = await ed.GetAngle("End angle: ", p2.Value, (p) => consPb.EndAngle = p);
                 doc.Jigged.Remove(consPb);
                 if (a2.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Parabola(p1.Value, p2.Value, a1.Value.Angle, a2.Value.Angle);
+                Drawable newItem = new Parabola(p1.Value, p2.Value, a1.Value, a2.Value);
                 doc.Model.Add(newItem);
             }
         }
@@ -285,11 +282,11 @@ namespace SimpleCAD
                 doc.Jigged.Add(consRec);
                 Editor.PointResult p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
                 if (p2.Result != Editor.ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
-                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consRec.Rotation = v.Angle);
+                Editor.AngleResult a1 = await ed.GetAngle("Rotation: ", p1.Value, (v) => consRec.Rotation = v);
                 doc.Jigged.Remove(consRec);
                 if (a1.Result != Editor.ResultMode.OK) return;
 
-                Drawable newItem = new Rectangle(p1.Value, p2.Value, a1.Value.Angle);
+                Drawable newItem = new Rectangle(p1.Value, p2.Value, a1.Value);
                 doc.Model.Add(newItem);
             }
         }
