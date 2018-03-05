@@ -36,6 +36,21 @@ namespace SimpleCAD
             Jigged.CollectionChanged += Transients_CollectionChanged;
         }
 
+        public void New()
+        {
+            Editor.Selection.CollectionChanged -= Selection_CollectionChanged;
+            Model.CollectionChanged -= Model_CollectionChanged;
+            Jigged.CollectionChanged -= Transients_CollectionChanged;
+            Model = new Composite();
+            Editor = new Editor(this);
+            Jigged = new Composite();
+            Transients = new Composite();
+            Editor.Selection.CollectionChanged += Selection_CollectionChanged;
+            Model.CollectionChanged += Model_CollectionChanged;
+            Jigged.CollectionChanged += Transients_CollectionChanged;
+            OnDocumentChanged(new EventArgs());
+        }
+
         public void Open(Stream stream)
         {
             using (BinaryReader reader = new BinaryReader(stream))

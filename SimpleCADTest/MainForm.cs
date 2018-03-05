@@ -42,6 +42,11 @@ namespace SimpleCADTest
             statusCoords.Text = pt.X.ToString("F2") + ", " + pt.Y.ToString("F2");
         }
 
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.New();
+        }
+
         private void btnOpen_Click(object sender, EventArgs e)
         {
             cadWindow1.Document.Open(SaveFileName);
