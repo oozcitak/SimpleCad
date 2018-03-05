@@ -164,5 +164,45 @@ namespace SimpleCAD
                 }
             }
         }
+
+        public class TransformMirror : Command
+        {
+            public override string RegisteredName => "Transform.Mirror";
+            public override string Name => "Mirror";
+
+            public override async Task Apply(CADDocument doc, params string[] args)
+            {
+                Editor ed = doc.Editor;
+
+                Editor.SelectionResult s = await ed.GetSelection("Select objects: ");
+                if (s.Result != Editor.ResultMode.OK || s.Value.Count == 0) return;
+                Editor.PointResult p1 = await ed.GetPoint("Base point: ");
+                if (p1.Result != Editor.ResultMode.OK) return;
+                Composite consItems = new Composite();
+                foreach (Drawable item in s.Value)
+                {
+                    consItems.Add(item.Clone());
+                }
+                doc.Transients.Add(consItems);
+                TransformationMatrix2D lastTrans = TransformationMatrix2D.Identity;
+                Editor.PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
+                    (p) =>
+                    {
+                        TransformationMatrix2D mirror = TransformationMatrix2D.Mirror(p1.Value, p - p1.Value);
+                        consItems.TransformBy(lastTrans.Inverse);
+                        consItems.TransformBy(mirror);
+                        lastTrans = mirror;
+                    });
+                doc.Transients.Remove(consItems);
+                if (p2.Result != Editor.ResultMode.OK) return;
+
+                foreach (Drawable item in s.Value)
+                {
+                    Drawable newItem = item.Clone();
+                    newItem.TransformBy(TransformationMatrix2D.Mirror(p1.Value, p2.Value - p1.Value));
+                    doc.Model.Add(newItem);
+                }
+            }
+        }
     }
 }

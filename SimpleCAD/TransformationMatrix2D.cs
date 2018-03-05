@@ -5,21 +5,47 @@ namespace SimpleCAD
 {
     public struct TransformationMatrix2D
     {
-        public float M11 { get; set; }
-        public float M12 { get; set; }
-        public float M21 { get; set; }
-        public float M22 { get; set; }
-        public float DX { get; set; }
-        public float DY { get; set; }
+        private readonly float _m11;
+        private readonly float _m12;
+        private readonly float _m21;
+        private readonly float _m22;
+        private readonly float _dx;
+        private readonly float _dy;
+
+        public float M11 { get { return _m11; } }
+        public float M12 { get { return _m12; } }
+        public float M21 { get { return _m21; } }
+        public float M22 { get { return _m22; } }
+        public float DX { get { return _dx; } }
+        public float DY { get { return _dy; } }
+
         public float RotationAngle { get { return Vector2D.XAxis.Transform(this).Angle; } }
 
         public static TransformationMatrix2D Identity { get { return new TransformationMatrix2D(1, 0, 0, 1, 0, 0); } }
 
         public TransformationMatrix2D(float m11, float m12, float m21, float m22, float dx, float dy)
         {
-            M11 = m11; M12 = m12;
-            M21 = m21; M22 = m22;
-            DX = dx; DY = dy;
+            _m11 = m11; _m12 = m12;
+            _m21 = m21; _m22 = m22;
+            _dx = dx; _dy = dy;
+        }
+
+        public TransformationMatrix2D Inverse
+        {
+            get
+            {
+                float det = M11 * M22 - M12 * M21;
+                float invdet = 1 / det;
+
+                float m11 = M22 * invdet;
+                float m12 = -M12 * invdet;
+                float dx = (M12 * DY - DX * M22) * invdet;
+                float m21 = -M21 * invdet;
+                float m22 = M11 * invdet;
+                float dy = (M21 * DX - M11 * DY) * invdet;
+
+                return new TransformationMatrix2D(m11, m12, m21, m22, dx, dy);
+            }
         }
 
         public static TransformationMatrix2D Transformation(float xScale, float yScale, float rotation, float dx, float dy)
@@ -55,6 +81,15 @@ namespace SimpleCAD
         public static TransformationMatrix2D Scale(Point2D basePoint, float uniformScale)
         {
             return Scale(basePoint, uniformScale, uniformScale);
+        }
+
+        public static TransformationMatrix2D Mirror(Point2D basePoint, Vector2D direction)
+        {
+            return Translation(basePoint.X, basePoint.Y) *
+                Rotation(direction.Angle) *
+                Scale(1, -1) *
+                Rotation(-direction.Angle) *
+                Translation(-basePoint.X, -basePoint.Y);
         }
 
         public static TransformationMatrix2D Rotation(float rotation)
