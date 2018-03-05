@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 
 namespace SimpleCAD
 {
-    public class Line : Drawable
+    public class Line : Drawable, IPersistable
     {
         private Point2D p1;
         private Point2D p2;
@@ -66,11 +67,24 @@ namespace SimpleCAD
 
         public override ControlPoint[] GetControlPoints()
         {
-            return new []
+            return new[]
             {
                 new ControlPoint("StartPoint"),
                 new ControlPoint("EndPoint"),
             };
+        }
+
+        public Line(BinaryReader reader) : base(reader)
+        {
+            StartPoint = new Point2D(reader);
+            EndPoint = new Point2D(reader);
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            StartPoint.Save(writer);
+            EndPoint.Save(writer);
         }
     }
 }

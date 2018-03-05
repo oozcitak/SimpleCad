@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 
 namespace SimpleCAD
@@ -17,6 +18,29 @@ namespace SimpleCAD
         public Composite()
         {
             ;
+        }
+
+        public Composite(BinaryReader reader) : base(reader)
+        {
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                string name = reader.ReadString();
+                Type itemType = Type.GetType(name);
+                Drawable item = (Drawable)Activator.CreateInstance(itemType, reader);
+                items.Add(item);
+            }
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            writer.Write(items.Count);
+            foreach (Drawable item in items)
+            {
+                writer.Write(item.GetType().FullName);
+                item.Save(writer);
+            }
         }
 
         public override void Draw(DrawParams param)
@@ -60,7 +84,7 @@ namespace SimpleCAD
         public override Drawable Clone()
         {
             Composite newComposite = (Composite)base.Clone();
-            foreach(Drawable d in items)
+            foreach (Drawable d in items)
             {
                 newComposite.Add(d.Clone());
             }

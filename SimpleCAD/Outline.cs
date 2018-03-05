@@ -2,11 +2,15 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace SimpleCAD
 {
+    [Serializable]
     [TypeConverter(typeof(OutlineConverter))]
-    public partial struct Outline
+    public partial struct Outline : IPersistable
     {
         public Color Color { get; set; }
         public float LineWeight { get; set; }
@@ -62,6 +66,20 @@ namespace SimpleCAD
                 pen.DashStyle = DashStyle;
                 return pen;
             }
+        }
+
+        public Outline(BinaryReader reader)
+        {
+            Color = Color.FromArgb(reader.ReadInt32());
+            LineWeight = reader.ReadSingle();
+            DashStyle = (DashStyle)reader.ReadInt32();
+        }
+
+        public void Save(BinaryWriter writer)
+        {
+            writer.Write(Color.ToArgb());
+            writer.Write(LineWeight);
+            writer.Write((int)DashStyle);
         }
     }
 }

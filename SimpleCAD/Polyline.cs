@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Drawing;
+using System.IO;
 
 namespace SimpleCAD
 {
@@ -93,6 +94,18 @@ namespace SimpleCAD
                 cp[i] = new ControlPoint("Points", i);
             }
             return cp;
+        }
+
+        public Polyline(BinaryReader reader) : base(reader)
+        {
+            Points = new Point2DCollection(reader);
+            Points.CollectionChanged += Points_CollectionChanged;
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            Points.Save(writer);
         }
     }
 }

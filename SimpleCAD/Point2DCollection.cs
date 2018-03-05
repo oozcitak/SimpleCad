@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace SimpleCAD
 {
-    public class Point2DCollection : IList<Point2D>, INotifyCollectionChanged
+    public class Point2DCollection : IList<Point2D>, INotifyCollectionChanged, IPersistable
     {
         private List<Point2D> items;
 
@@ -158,6 +159,25 @@ namespace SimpleCAD
         {
             items.RemoveAt(index);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, items[index]));
+        }
+
+        public Point2DCollection(BinaryReader reader) : this()
+        {
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                Point2D point = new Point2D(reader);
+                items.Add(point);
+            }
+        }
+
+        public void Save(BinaryWriter writer)
+        {
+            writer.Write(items.Count);
+            foreach (Point2D pt in items)
+            {
+                pt.Save(writer);
+            }
         }
     }
 }

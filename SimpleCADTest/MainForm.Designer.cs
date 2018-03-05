@@ -51,12 +51,13 @@
             this.btnDrawPolyline = new System.Windows.Forms.ToolStripButton();
             this.btnDrawRectangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawTriangle = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
             this.tsTransform = new System.Windows.Forms.ToolStrip();
             this.btnMove = new System.Windows.Forms.ToolStripButton();
             this.btnCopy = new System.Windows.Forms.ToolStripButton();
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
+            this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -164,10 +165,11 @@
             // 
             this.tsStandard.Dock = System.Windows.Forms.DockStyle.None;
             this.tsStandard.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnOpen,
             this.btnSave});
             this.tsStandard.Location = new System.Drawing.Point(3, 0);
             this.tsStandard.Name = "tsStandard";
-            this.tsStandard.Size = new System.Drawing.Size(47, 25);
+            this.tsStandard.Size = new System.Drawing.Size(118, 25);
             this.tsStandard.TabIndex = 1;
             // 
             // btnSave
@@ -198,7 +200,7 @@
             this.btnDrawHatch});
             this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
             this.tsPrimitives.Name = "tsPrimitives";
-            this.tsPrimitives.Size = new System.Drawing.Size(626, 25);
+            this.tsPrimitives.Size = new System.Drawing.Size(595, 25);
             this.tsPrimitives.TabIndex = 0;
             // 
             // btnDrawLine
@@ -312,6 +314,16 @@
             this.btnDrawTriangle.Text = "Triangle";
             this.btnDrawTriangle.Click += new System.EventHandler(this.btnDrawTriangle_Click);
             // 
+            // btnDrawHatch
+            // 
+            this.btnDrawHatch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawHatch.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawHatch.Image")));
+            this.btnDrawHatch.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawHatch.Name = "btnDrawHatch";
+            this.btnDrawHatch.Size = new System.Drawing.Size(43, 22);
+            this.btnDrawHatch.Text = "Hatch";
+            this.btnDrawHatch.Click += new System.EventHandler(this.btnDrawHatch_Click);
+            // 
             // tsTransform
             // 
             this.tsTransform.Dock = System.Windows.Forms.DockStyle.None;
@@ -365,15 +377,15 @@
             this.btnScale.Text = "Scale";
             this.btnScale.Click += new System.EventHandler(this.btnScale_Click);
             // 
-            // btnDrawHatch
+            // btnOpen
             // 
-            this.btnDrawHatch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawHatch.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawHatch.Image")));
-            this.btnDrawHatch.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawHatch.Name = "btnDrawHatch";
-            this.btnDrawHatch.Size = new System.Drawing.Size(43, 22);
-            this.btnDrawHatch.Text = "Hatch";
-            this.btnDrawHatch.Click += new System.EventHandler(this.btnDrawHatch_Click);
+            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnOpen.Image = ((System.Drawing.Image)(resources.GetObject("btnOpen.Image")));
+            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(40, 22);
+            this.btnOpen.Text = "Open";
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
             // MainForm
             // 
@@ -436,6 +448,7 @@
         private System.Windows.Forms.ToolStripButton btnScale;
         private System.Windows.Forms.ToolStripButton btnCopy;
         private System.Windows.Forms.ToolStripButton btnDrawHatch;
+        private System.Windows.Forms.ToolStripButton btnOpen;
     }
 }
 

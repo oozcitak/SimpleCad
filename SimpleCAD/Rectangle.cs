@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 
 namespace SimpleCAD
 {
@@ -102,6 +103,22 @@ namespace SimpleCAD
                 new ControlPoint("Corner"),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + Vector2D.FromAngle(Rotation) * Width / 2),
             };
+        }
+
+        public Rectangle(BinaryReader reader) : base(reader)
+        {
+            Center = new Point2D(reader);
+            Rotation = reader.ReadSingle();
+            Corner = new Point2D(reader);
+            UpdatePolyline();
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            Center.Save(writer);
+            writer.Write(Rotation);
+            Corner.Save(writer);
         }
     }
 }

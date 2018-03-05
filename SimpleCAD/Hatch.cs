@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 
 namespace SimpleCAD
 {
@@ -45,6 +46,16 @@ namespace SimpleCAD
                     param.Graphics.DrawPolygon(pen, pts);
                 }
             }
+        }
+
+        public Hatch(BinaryReader reader) : base(reader)
+        {
+            ;
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
         }
     }
 }

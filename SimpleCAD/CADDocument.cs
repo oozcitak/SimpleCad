@@ -27,8 +27,8 @@ namespace SimpleCAD
 
         public CADDocument()
         {
-            Editor = new Editor(this);
             Model = new Composite();
+            Editor = new Editor(this);
             Jigged = new Composite();
             Transients = new Composite();
             Editor.Selection.CollectionChanged += Selection_CollectionChanged;
@@ -39,22 +39,28 @@ namespace SimpleCAD
         public void Open(string filename)
         {
             using (Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (BinaryReader reader = new BinaryReader(stream))
             {
-                IFormatter formatter = new BinaryFormatter();
+                Editor.Selection.CollectionChanged -= Selection_CollectionChanged;
                 Model.CollectionChanged -= Model_CollectionChanged;
                 Jigged.CollectionChanged -= Transients_CollectionChanged;
-                //Model = (Composite)formatter.Deserialize(stream);
+                Model = new Composite(reader);
+                Editor = new Editor(this);
+                Jigged = new Composite();
+                Transients = new Composite();
+                Editor.Selection.CollectionChanged += Selection_CollectionChanged;
                 Model.CollectionChanged += Model_CollectionChanged;
                 Jigged.CollectionChanged += Transients_CollectionChanged;
+                OnDocumentChanged(new EventArgs());
             }
         }
 
         public void Save(string filename)
         {
             using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (BinaryWriter writer = new BinaryWriter(stream))
             {
-                IFormatter formatter = new BinaryFormatter();
-                //formatter.Serialize(stream, Model);
+                Model.Save(writer);
             }
         }
 
@@ -66,7 +72,7 @@ namespace SimpleCAD
                     OnDocumentChanged(new EventArgs());
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    foreach(Drawable item in e.OldItems.Cast<Drawable>())
+                    foreach (Drawable item in e.OldItems.Cast<Drawable>())
                     {
                         Editor.Selection.Remove(item);
                     }

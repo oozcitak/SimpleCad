@@ -56,6 +56,7 @@
     <Compile Include="ControlPoint.cs" />
     <Compile Include="EditorInput.cs" />
     <Compile Include="Hatch.cs" />
+    <Compile Include="IPersistable.cs" />
     <Compile Include="MathF.cs" />
     <Compile Include="SelectionSet.cs" />
     <Compile Include="Editor.cs" />

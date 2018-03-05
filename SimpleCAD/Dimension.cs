@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 
 namespace SimpleCAD
 {
@@ -148,6 +149,33 @@ namespace SimpleCAD
                 new ControlPoint("StartPoint"),
                 new ControlPoint("EndPoint"),
             };
+        }
+
+        public Dimension(BinaryReader reader) : base(reader)
+        {
+            StartPoint = new Point2D(reader);
+            EndPoint = new Point2D(reader);
+            TextHeight = reader.ReadSingle();
+            Offset = reader.ReadSingle();
+            String = reader.ReadString();
+            FontFamily = reader.ReadString();
+            FontStyle = (FontStyle)reader.ReadInt32();
+            Scale = reader.ReadSingle();
+            Precision = reader.ReadInt32();
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            StartPoint.Save(writer);
+            EndPoint.Save(writer);
+            writer.Write(TextHeight);
+            writer.Write(Offset);
+            writer.Write(String);
+            writer.Write(FontFamily);
+            writer.Write((int)FontStyle);
+            writer.Write(Scale);
+            writer.Write(Precision);
         }
     }
 }

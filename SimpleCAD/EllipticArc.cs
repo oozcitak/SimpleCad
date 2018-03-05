@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 
 namespace SimpleCAD
 {
@@ -119,6 +120,28 @@ namespace SimpleCAD
                 new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
             };
+        }
+
+        public EllipticArc(BinaryReader reader) : base(reader)
+        {
+            Center = new Point2D(reader);
+            SemiMajorAxis = reader.ReadSingle();
+            SemiMinorAxis = reader.ReadSingle();
+            Rotation = reader.ReadSingle();
+            StartAngle = reader.ReadSingle();
+            EndAngle = reader.ReadSingle();
+            UpdatePolyline();
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            Center.Save(writer);
+            writer.Write(SemiMajorAxis);
+            writer.Write(SemiMinorAxis);
+            writer.Write(Rotation);
+            writer.Write(StartAngle);
+            writer.Write(EndAngle);
         }
     }
 }

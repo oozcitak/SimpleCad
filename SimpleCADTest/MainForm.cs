@@ -42,6 +42,25 @@ namespace SimpleCADTest
             statusCoords.Text = pt.X.ToString("F2") + ", " + pt.Y.ToString("F2");
         }
 
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Open(SaveFileName);
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Save(SaveFileName);
+        }
+
+        private string SaveFileName
+        {
+            get
+            {
+                string path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                return Path.Combine(path, "save.bin");
+            }
+        }
+
         private void btnDrawLine_Click(object sender, EventArgs e)
         {
             cadWindow1.Document.Editor.RunCommand("Primitives.Line");
@@ -120,25 +139,6 @@ namespace SimpleCADTest
         private void btnScale_Click(object sender, EventArgs e)
         {
             cadWindow1.Document.Editor.RunCommand("Transform.Scale");
-        }
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            cadWindow1.Document.Save(SaveFileName);
-        }
-
-        private void ReadFile()
-        {
-            cadWindow1.Document.Open(SaveFileName);
-        }
-
-        private string SaveFileName
-        {
-            get
-            {
-                string path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-                return Path.Combine(path, "save.bin");
-            }
         }
     }
 }

@@ -2,13 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace SimpleCAD
 {
-    public abstract class Drawable : INotifyPropertyChanged
+    [Serializable]
+    public abstract class Drawable : INotifyPropertyChanged, IPersistable
     {
         public virtual Outline Outline { get; set; } = Outline.White;
         public virtual bool Visible { get; set; } = true;
@@ -56,14 +59,26 @@ namespace SimpleCAD
 
         public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
 
+        protected Drawable()
+        {
+            ;
+        }
+
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected Drawable()
+        public Drawable(BinaryReader reader)
         {
-            ;
+            Outline = new Outline(reader);
+            Visible = reader.ReadBoolean();
+        }
+
+        public virtual void Save(BinaryWriter writer)
+        {
+            Outline.Save(writer);
+            writer.Write(Visible);
         }
     }
 }
