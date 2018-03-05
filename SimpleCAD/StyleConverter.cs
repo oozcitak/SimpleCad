@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 
 namespace SimpleCAD
 {
-    public class OutlineConverter : ExpandableObjectConverter
+    public class StyleConverter : ExpandableObjectConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -14,7 +14,7 @@ namespace SimpleCAD
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType == typeof(Outline);
+            return destinationType == typeof(Style);
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
@@ -27,20 +27,20 @@ namespace SimpleCAD
                 if (parts.Length == 1)
                 {
                     Color col = Color.FromName(parts[0]);
-                    return new Outline(col);
+                    return new Style(col);
                 }
                 else if (parts.Length == 2)
                 {
                     Color col = Color.FromName(parts[0]);
                     float lw = float.Parse(parts[1]);
-                    return new Outline(col, lw);
+                    return new Style(col, lw);
                 }
                 else if (parts.Length == 3)
                 {
                     Color col = Color.FromName(parts[0]);
                     float lw = float.Parse(parts[1]);
                     DashStyle ds = (DashStyle)Enum.Parse(typeof(DashStyle), parts[2]);
-                    return new Outline(col, lw, ds);
+                    return new Style(col, lw, ds);
                 }
             }
 
@@ -49,9 +49,9 @@ namespace SimpleCAD
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is Outline)
+            if (destinationType == typeof(string) && value is Style)
             {
-                Outline os = (Outline)value;
+                Style os = (Style)value;
                 if (os.DashStyle == DashStyle.Solid && os.LineWeight == 0)
                     return os.Color.Name;
                 else if (os.DashStyle == DashStyle.Solid)

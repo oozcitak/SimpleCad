@@ -66,7 +66,7 @@ namespace SimpleCAD
             Point2D c1 = StartPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
             Point2D c2 = EndPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
 
-            using (Pen pen = Outline.CreatePen(param))
+            using (Pen pen = Style.CreatePen(param))
             {
                 param.Graphics.DrawBezier(pen, StartPoint.ToPointF(), c1.ToPointF(), c2.ToPointF(), EndPoint.ToPointF());
             }

@@ -65,7 +65,7 @@
     <Compile Include="Events.cs" />
     <Compile Include="Vector2DConverter.cs" />
     <Compile Include="Point2DConverter.cs" />
-    <Compile Include="OutlineConverter.cs" />
+    <Compile Include="StyleConverter.cs" />
     <Compile Include="Point2DCollection.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">
@@ -78,10 +78,10 @@
     <Compile Include="Circle.cs" />
     <Compile Include="Arc.cs" />
     <Compile Include="EllipticArc.cs" />
-    <Compile Include="Outlines.cs">
+    <Compile Include="Styles.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Outlines.tt</DependentUpon>
+      <DependentUpon>Styles.tt</DependentUpon>
     </Compile>
     <Compile Include="Parabola.cs" />
     <Compile Include="Point2D.cs" />
@@ -91,7 +91,7 @@
     <Compile Include="Dimension.cs" />
     <Compile Include="Ellipse.cs" />
     <Compile Include="Extents2D.cs" />
-    <Compile Include="Outline.cs" />
+    <Compile Include="Style.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Polyline.cs" />
     <Compile Include="Rectangle.cs" />
@@ -106,9 +106,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Outlines.tt">
+    <Content Include="Styles.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Outlines.cs</LastGenOutput>
+      <LastGenOutput>Styles.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

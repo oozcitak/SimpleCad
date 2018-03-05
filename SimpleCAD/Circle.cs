@@ -32,7 +32,7 @@ namespace SimpleCAD
 
         public override void Draw(DrawParams param)
         {
-            using (Pen pen = Outline.CreatePen(param))
+            using (Pen pen = Style.CreatePen(param))
             {
                 param.Graphics.DrawEllipse(pen, X - Radius, Y - Radius, 2f * Radius, 2f * Radius);
             }

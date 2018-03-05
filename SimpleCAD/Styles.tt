@@ -3,14 +3,14 @@
 <#@ output extension=".cs" #>
 namespace SimpleCAD
 {
-    public partial struct Outline
+    public partial struct Style
     {
 <#
 	foreach (System.Drawing.KnownColor col in Enum.GetValues(typeof(System.Drawing.KnownColor)))
 	{
 		string colorName = Enum.GetName(typeof(System.Drawing.KnownColor), col);
 #>
-		public static Outline <#= colorName #> { get { return new Outline(System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.<#= colorName #>)); } }
+		public static Style <#= colorName #> { get { return new Style(System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.<#= colorName #>)); } }
 <#
 	}
 

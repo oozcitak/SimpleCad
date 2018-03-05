@@ -112,17 +112,17 @@ namespace SimpleCAD
 
             // Dimension line
             Line dim = new Line(0, Offset, len, Offset);
-            dim.Outline = Outline;
+            dim.Style = Style;
             items.Add(dim);
 
             // Left tick
             Line tick1 = new Line(0, -tickSize + Offset, 0, tickSize + Offset);
-            tick1.Outline = Outline;
+            tick1.Style = Style;
             items.Add(tick1);
 
             // Right tick
             Line tick2 = new Line(len, -tickSize + Offset, len, tickSize + Offset);
-            tick2.Outline = Outline;
+            tick2.Style = Style;
             items.Add(tick2);
 
             // Text
@@ -133,7 +133,7 @@ namespace SimpleCAD
             textObj.FontStyle = FontStyle;
             textObj.HorizontalAlignment = StringAlignment.Center;
             textObj.VerticalAlignment = StringAlignment.Center;
-            textObj.Outline = Outline;
+            textObj.Style = Style;
             items.Add(textObj);
 
             TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);

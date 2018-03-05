@@ -397,13 +397,13 @@ namespace SimpleCAD
                         consHatch.Points[3] = p4;
                         if (point.X > p1.X)
                         {
-                            consHatch.Outline = Outline.SelectionWindowStyle;
-                            consLine.Outline = Outline.SelectionBorderStyle;
+                            consHatch.Style = Style.SelectionWindowStyle;
+                            consLine.Style = Style.SelectionBorderStyle;
                         }
                         else
                         {
-                            consHatch.Outline = Outline.ReverseSelectionWindowStyle;
-                            consLine.Outline = Outline.ReverseSelectionBorderStyle;
+                            consHatch.Style = Style.ReverseSelectionWindowStyle;
+                            consLine.Style = Style.ReverseSelectionBorderStyle;
                         }
                     }
                     break;
@@ -435,11 +435,11 @@ namespace SimpleCAD
                             selectionClickedFirstPoint = true;
                             // Create the selection window
                             consHatch = new Hatch(point, point, point, point);
-                            consHatch.Outline = Outline.SelectionWindowStyle;
+                            consHatch.Style = Style.SelectionWindowStyle;
                             Document.Transients.Add(consHatch);
                             consLine = new Polyline(point, point, point, point);
                             consLine.Closed = true;
-                            consLine.Outline = Outline.SelectionBorderStyle;
+                            consLine.Style = Style.SelectionBorderStyle;
                             Document.Transients.Add(consLine);
                         }
                         else

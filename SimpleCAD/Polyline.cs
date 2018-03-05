@@ -46,7 +46,7 @@ namespace SimpleCAD
             if (Points.Count > 0)
             {
                 PointF[] pts = Points.ToPointF();
-                using (Pen pen = Outline.CreatePen(param))
+                using (Pen pen = Style.CreatePen(param))
                 {
                     if (Closed)
                         param.Graphics.DrawPolygon(pen, pts);
