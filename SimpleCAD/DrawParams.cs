@@ -15,14 +15,16 @@ namespace SimpleCAD
             Cursor
         }
 
+        public CADView View { get; private set; }
         public Graphics Graphics { get; private set; }
         public bool ScaleLineWeights { get; private set; }
         public float ZoomFactor { get; private set; }
         public DrawingMode Mode { get; set; }
 
-        public DrawParams(Graphics graphics, bool scaleLineWeights, float zoomFactor)
+        public DrawParams(CADView view, Graphics graphics, bool scaleLineWeights, float zoomFactor)
         {
             Mode = DrawingMode.Normal;
+            View = view;
             Graphics = graphics;
             ScaleLineWeights = scaleLineWeights;
             ZoomFactor = zoomFactor;

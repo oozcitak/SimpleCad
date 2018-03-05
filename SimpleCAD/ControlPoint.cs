@@ -16,7 +16,6 @@ namespace SimpleCAD
             Distance
         }
 
-        internal Drawable Owner { get; set; }
         public string PropertyName { get; private set; }
         public int PropertyIndex { get; private set; }
         public ControlPointType Type { get; private set; }
@@ -44,7 +43,6 @@ namespace SimpleCAD
 
         public ControlPoint(string propertyName, int propertyIndex, ControlPointType type, Point2D basePoint, Point2D location)
         {
-            Owner = null;
             PropertyName = propertyName;
             PropertyIndex = propertyIndex;
             Type = type;
@@ -53,13 +51,12 @@ namespace SimpleCAD
             pointSet = true;
         }
 
-        internal static ControlPoint[] FromDrawable(Drawable item, float size)
+        internal static ControlPoint[] FromDrawable(Drawable item)
         {
-            ControlPoint[] points = item.GetControlPoints(size);
+            ControlPoint[] points = item.GetControlPoints();
             for (int i = 0; i < points.Length; i++)
             {
                 ControlPoint cp = points[i];
-                cp.Owner = item;
                 if (!cp.pointSet)
                 {
                     // Read the point location with reflection

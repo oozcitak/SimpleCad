@@ -76,7 +76,7 @@ namespace SimpleCAD
             return poly.Contains(pt, pickBoxSize);
         }
 
-        public override ControlPoint[] GetControlPoints(float size)
+        public override ControlPoint[] GetControlPoints()
         {
             return new[]
             {

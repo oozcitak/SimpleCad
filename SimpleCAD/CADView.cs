@@ -17,6 +17,7 @@ namespace SimpleCAD
         private Drawable mouseDownItem;
         private Point2D currentMouseLocationWorld;
         private bool hasMouse;
+        private Drawable mouseDownCPItem;
         private ControlPoint mouseDownCP;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
@@ -147,7 +148,7 @@ namespace SimpleCAD
 
         public void Render(Graphics graphics)
         {
-            DrawParams param = new DrawParams(graphics, false, ZoomFactor);
+            DrawParams param = new DrawParams(this, graphics, false, ZoomFactor);
 
             // Set an orthogonal projection matrix
             ScaleGraphics(graphics);
@@ -162,9 +163,12 @@ namespace SimpleCAD
                 selected.Draw(param);
             }
             param.Mode = DrawParams.DrawingMode.ControlPoint;
-            foreach (ControlPoint pt in Document.Editor.ControlPoints)
+            foreach (Drawable item in Document.Editor.Selection)
             {
-                DrawControlPoint(param, pt);
+                foreach (ControlPoint pt in ControlPoint.FromDrawable(item))
+                {
+                    DrawControlPoint(param, pt);
+                }
             }
 
             // Render jigged objects
@@ -185,7 +189,7 @@ namespace SimpleCAD
             using (Pen pen = Outline.ControlPointStyle.CreatePen(param))
             {
                 pen.Width = param.GetScaledLineWeight(2);
-                float cpSize = ScreenToWorld(new Size(ControlPointSize, ControlPointSize)).Width;
+                float cpSize = param.ViewToModel(ControlPointSize);
                 param.Graphics.DrawRectangle(pen, pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2, cpSize, cpSize);
             }
         }
@@ -374,7 +378,9 @@ namespace SimpleCAD
             else if (e.Button == MouseButtons.Left && Interactive)
             {
                 mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
-                mouseDownCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                Tuple<Drawable, ControlPoint> find = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                mouseDownCPItem = find.Item1;
+                mouseDownCP = find.Item2;
             }
         }
 
@@ -394,13 +400,11 @@ namespace SimpleCAD
                     {
                         if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
                         {
-                            Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Owner, mouseDownItem));
                             Document.Editor.Selection.Remove(mouseDownItem);
                         }
                         else
                         {
                             float cpSize = ScreenToWorld(new Size(ControlPointSize + 4, 0)).Width;
-                            Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(mouseDownItem, cpSize));
                             Document.Editor.Selection.Add(mouseDownItem);
                         }
                     }
@@ -408,11 +412,14 @@ namespace SimpleCAD
 
                 if (mouseDownCP != null)
                 {
-                    ControlPoint mouseUpCP = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
-                    if (mouseUpCP != null && ReferenceEquals(mouseDownCP, mouseUpCP))
+                    Tuple<Drawable, ControlPoint> find = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                    Drawable item = find.Item1;
+                    ControlPoint mouseUpCP = find.Item2;
+                    if (mouseUpCP != null && ReferenceEquals(mouseDownCPItem, item) &&
+                        mouseDownCP.PropertyName == mouseUpCP.PropertyName && mouseDownCP.PropertyIndex == mouseUpCP.PropertyIndex)
                     {
                         ControlPoint cp = mouseDownCP;
-                        Drawable consItem = cp.Owner.Clone();
+                        Drawable consItem = item.Clone();
                         Document.Transients.Add(consItem);
                         Editor.ResultMode result = Editor.ResultMode.Cancel;
                         TransformationMatrix2D trans = TransformationMatrix2D.Identity;
@@ -454,10 +461,7 @@ namespace SimpleCAD
                         }
                         if (result == Editor.ResultMode.OK)
                         {
-                            float cpSize = ScreenToWorld(new Size(ControlPointSize + 4, 0)).Width;
-                            cp.Owner.TransformControlPoint(cp, trans);
-                            Document.Editor.ControlPoints.RemoveAll(p => ReferenceEquals(p.Owner, cp.Owner));
-                            Document.Editor.ControlPoints.AddRange(ControlPoint.FromDrawable(cp.Owner, cpSize));
+                            item.TransformControlPoint(cp, trans);
                         }
                         Document.Transients.Remove(consItem);
                     }
@@ -544,7 +548,6 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.Selection.Clear();
-                Document.Editor.ControlPoints.Clear();
             }
         }
 
@@ -577,17 +580,20 @@ namespace SimpleCAD
             return null;
         }
 
-        private ControlPoint FindControlPointAtScreenCoordinates(int x, int y, int controlPointSize)
+        private Tuple<Drawable, ControlPoint> FindControlPointAtScreenCoordinates(int x, int y, int controlPointSize)
         {
             PointF pt = ScreenToWorld(x, y);
             float size = ScreenToWorld(new Size(controlPointSize, 0)).Width;
-            foreach (ControlPoint cp in Document.Editor.ControlPoints)
+            foreach (Drawable item in Document.Editor.Selection)
             {
-                if (pt.X >= cp.Location.X - size / 2 && pt.X <= cp.Location.X + size / 2 &&
-                    pt.Y >= cp.Location.Y - size / 2 && pt.Y <= cp.Location.Y + size / 2)
-                    return cp;
+                foreach (ControlPoint cp in ControlPoint.FromDrawable(item))
+                {
+                    if (pt.X >= cp.Location.X - size / 2 && pt.X <= cp.Location.X + size / 2 &&
+                        pt.Y >= cp.Location.Y - size / 2 && pt.Y <= cp.Location.Y + size / 2)
+                        return new Tuple<Drawable, ControlPoint>(item, cp);
+                }
             }
-            return null;
+            return new Tuple<Drawable, ControlPoint>(null, null);
         }
     }
 }

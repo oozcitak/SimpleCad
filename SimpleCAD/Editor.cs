@@ -34,7 +34,6 @@ namespace SimpleCAD
         private bool selectionClickedFirstPoint;
 
         public SelectionSet Selection { get; private set; } = new SelectionSet();
-        internal List<ControlPoint> ControlPoints { get; private set; } = new List<ControlPoint>();
 
         static Editor()
         {
