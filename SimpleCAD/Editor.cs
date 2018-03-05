@@ -12,7 +12,8 @@ namespace SimpleCAD
 {
     public partial class Editor
     {
-        public static Dictionary<string, Command> Commands { get; private set; }
+        private static Dictionary<string, AsyncCommand> asyncCommands = new Dictionary<string, AsyncCommand>();
+        private static Dictionary<string, SyncCommand> syncCommands = new Dictionary<string, SyncCommand>();
 
         public CADDocument Document { get; private set; }
         internal InputMode Mode { get; private set; }
@@ -38,22 +39,34 @@ namespace SimpleCAD
 
         static Editor()
         {
-            Commands = new Dictionary<string, Command>();
             // Search the assembly for commands
             Assembly assembly = Assembly.GetAssembly(typeof(CADDocument));
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.BaseType == typeof(Command))
+                if (type.BaseType == typeof(AsyncCommand))
                 {
-                    Command com = (Command)assembly.CreateInstance(type.FullName);
+                    AsyncCommand com = (AsyncCommand)assembly.CreateInstance(type.FullName);
                     if (com == null)
                     {
                         assembly = Assembly.GetExecutingAssembly();
-                        com = (Command)Assembly.GetExecutingAssembly().CreateInstance(type.FullName);
+                        com = (AsyncCommand)Assembly.GetExecutingAssembly().CreateInstance(type.FullName);
                     }
                     if (com != null)
                     {
-                        Commands.Add(com.RegisteredName, com);
+                        asyncCommands.Add(com.RegisteredName, com);
+                    }
+                }
+                else if (type.BaseType == typeof(SyncCommand))
+                {
+                    SyncCommand com = (SyncCommand)assembly.CreateInstance(type.FullName);
+                    if (com == null)
+                    {
+                        assembly = Assembly.GetExecutingAssembly();
+                        com = (SyncCommand)Assembly.GetExecutingAssembly().CreateInstance(type.FullName);
+                    }
+                    if (com != null)
+                    {
+                        syncCommands.Add(com.RegisteredName, com);
                     }
                 }
             }
@@ -64,10 +77,22 @@ namespace SimpleCAD
             Document = doc;
         }
 
-        public void RunCommand(string registeredName)
+        public void RunCommand(string registeredName, params string[] args)
         {
-            Command com = Commands[registeredName];
-            com.Apply(Document);
+            if (asyncCommands.ContainsKey(registeredName))
+            {
+                AsyncCommand com = asyncCommands[registeredName];
+                com.Apply(Document, args);
+            }
+            else if (syncCommands.ContainsKey(registeredName))
+            {
+                SyncCommand com = syncCommands[registeredName];
+                com.Apply(Document, args);
+            }
+            else
+            {
+                throw new InvalidOperationException("Unknown command name: " + registeredName);
+            }
         }
 
         public async Task<SelectionResult> GetSelection(string message)

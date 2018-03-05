@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    public partial class Command
+    public partial class Commands
     {
-        public class DrawLine : Command
+        public class DrawLine : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Line";
             public override string Name => "Line";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -28,12 +28,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawArc : Command
+        public class DrawArc : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Arc";
             public override string Name => "Arc";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -55,12 +55,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawCircle : Command
+        public class DrawCircle : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Circle";
             public override string Name => "Circle";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -78,12 +78,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawEllipse : Command
+        public class DrawEllipse : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Ellipse";
             public override string Name => "Ellipse";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -105,12 +105,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawEllipticArc : Command
+        public class DrawEllipticArc : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Elliptic_Arc";
             public override string Name => "Elliptic Arc";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -138,12 +138,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawText : Command
+        public class DrawText : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Text";
             public override string Name => "Text";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -167,12 +167,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawDimension : Command
+        public class DrawDimension : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Dimension";
             public override string Name => "Dimension";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -189,12 +189,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawParabola : Command
+        public class DrawParabola : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Parabola";
             public override string Name => "Parabola";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -216,12 +216,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawPolyline : Command
+        public class DrawPolyline : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Polyline";
             public override string Name => "Polyline";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -276,12 +276,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawHatch : Command
+        public class DrawHatch : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Hatch";
             public override string Name => "Hatch";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -332,12 +332,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawRectangle : Command
+        public class DrawRectangle : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Rectangle";
             public override string Name => "Rectangle";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();
@@ -357,12 +357,12 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawTriangle : Command
+        public class DrawTriangle : AsyncCommand
         {
             public override string RegisteredName => "Primitives.Triangle";
             public override string Name => "Triangle";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
                 ed.Selection.Clear();

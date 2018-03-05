@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    public partial class Command
+    public partial class Commands
     {
-        public class TransformMove : Command
+        public class TransformMove : AsyncCommand
         {
             public override string RegisteredName => "Transform.Move";
             public override string Name => "Move";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
 
@@ -46,12 +46,12 @@ namespace SimpleCAD
             }
         }
 
-        public class TransformCopy : Command
+        public class TransformCopy : AsyncCommand
         {
             public override string RegisteredName => "Transform.Copy";
             public override string Name => "Copy";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
 
@@ -96,12 +96,12 @@ namespace SimpleCAD
             }
         }
 
-        public class TransformRotate : Command
+        public class TransformRotate : AsyncCommand
         {
             public override string RegisteredName => "Transform.Rotate";
             public override string Name => "Rotate";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
 
@@ -134,12 +134,12 @@ namespace SimpleCAD
             }
         }
 
-        public class TransformScale : Command
+        public class TransformScale : AsyncCommand
         {
             public override string RegisteredName => "Transform.Scale";
             public override string Name => "Scale";
 
-            public override async Task Apply(CADDocument doc)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
                 Editor ed = doc.Editor;
 
