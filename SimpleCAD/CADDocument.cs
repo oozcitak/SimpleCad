@@ -36,9 +36,8 @@ namespace SimpleCAD
             Jigged.CollectionChanged += Transients_CollectionChanged;
         }
 
-        public void Open(string filename)
+        public void Open(Stream stream)
         {
-            using (Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (BinaryReader reader = new BinaryReader(stream))
             {
                 Editor.Selection.CollectionChanged -= Selection_CollectionChanged;
@@ -55,12 +54,27 @@ namespace SimpleCAD
             }
         }
 
-        public void Save(string filename)
+        public void Open(string filename)
         {
-            using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                Open(stream);
+            }
+        }
+
+        public void Save(Stream stream)
+        {
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 Model.Save(writer);
+            }
+        }
+
+        public void Save(string filename)
+        {
+            using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                Save(stream);
             }
         }
 
