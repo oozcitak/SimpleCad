@@ -6,39 +6,34 @@ namespace SimpleCAD
     [TypeConverter(typeof(Vector2DConverter))]
     public struct Vector2D
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        private readonly float _x;
+        private readonly float _y;
+
+        public float X { get { return _x; } }
+        public float Y { get { return _y; } }
         public float Length { get { return MathF.Sqrt(X * X + Y * Y); } }
-        public float Angle { get { return AngleTo(Vector2D.XAxis); } }
+        public float Angle { get { return AngleTo(XAxis); } }
 
         public static Vector2D XAxis { get { return new Vector2D(1, 0); } }
         public static Vector2D YAxis { get { return new Vector2D(0, 1); } }
 
         public Vector2D(float x, float y)
         {
-            X = x;
-            Y = y;
+            _x = x;
+            _y = y;
         }
 
-        public void TransformBy(TransformationMatrix2D transformation)
+        public Vector2D Transform(TransformationMatrix2D transformation)
         {
             float x = transformation.M11 * X + transformation.M12 * Y;
             float y = transformation.M21 * X + transformation.M22 * Y;
-            X = x;
-            Y = y;
+            return new Vector2D(x, y);
         }
 
-        public Vector2D GetNormalized()
+        public Vector2D Normal()
         {
             float len = Length;
             return new Vector2D(X / len, Y / len);
-        }
-
-        public void Normalize()
-        {
-            float len = Length;
-            X /= len;
-            Y /= len;
         }
 
         public float DotProduct(Vector2D v)
@@ -90,7 +85,7 @@ namespace SimpleCAD
             return new Vector2D(MathF.Cos(angle), MathF.Sin(angle));
         }
 
-        public Vector2D GetPerpendicularVector()
+        public Vector2D Perpendicular()
         {
             return new Vector2D(-Y, X);
         }

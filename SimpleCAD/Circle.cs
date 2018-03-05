@@ -48,10 +48,7 @@ namespace SimpleCAD
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             Center = Center.Transform(transformation);
-
-            Vector2D dir = Vector2D.XAxis * Radius;
-            dir.TransformBy(transformation);
-            Radius = dir.Length;
+            Radius = (Vector2D.XAxis * Radius).Transform(transformation).Length;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)

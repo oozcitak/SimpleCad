@@ -88,13 +88,8 @@ namespace SimpleCAD
         {
             StartPoint = StartPoint.Transform(transformation);
             EndPoint = EndPoint.Transform(transformation);
-
-            Vector2D a1 = Vector2D.FromAngle(StartAngle);
-            Vector2D a2 = Vector2D.FromAngle(EndAngle);
-            a1.TransformBy(transformation);
-            a2.TransformBy(transformation);
-            StartAngle = a1.Angle;
-            EndAngle = a2.Angle;
+            StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+            EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
         }
 
         private bool Intersect(Point2D p1, Point2D p2, Point2D p3, Point2D p4, out Point2D p)

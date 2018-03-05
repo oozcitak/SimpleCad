@@ -135,17 +135,13 @@ namespace SimpleCAD
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             Location = Location.Transform(transformation);
-
-            Vector2D dir = Vector2D.XAxis * Height;
-            dir.TransformBy(transformation);
-            Height = dir.Length;
-
-            Rotation += dir.Angle;
+            Height = (Vector2D.XAxis * Height).Transform(transformation).Length;
+            Rotation += transformation.RotationAngle;
         }
 
         public override ControlPoint[] GetControlPoints(float size)
         {
-            Vector2D upDir = Vector2D.FromAngle(Rotation).GetPerpendicularVector();
+            Vector2D upDir = Vector2D.FromAngle(Rotation).Perpendicular();
             return new[]
             {
                 new ControlPoint("Location"),

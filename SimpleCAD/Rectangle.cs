@@ -18,14 +18,11 @@ namespace SimpleCAD
         {
             get
             {
-                Vector2D corner = new Vector2D(Width / 2, Height / 2);
-                corner.TransformBy(TransformationMatrix2D.Rotation(Rotation));
-                return Center + corner;
+                return Center + new Vector2D(Width / 2, Height / 2).Transform(TransformationMatrix2D.Rotation(Rotation)); ;
             }
             set
             {
-                Vector2D size = (value - center);
-                size.TransformBy(TransformationMatrix2D.Rotation(-Rotation));
+                Vector2D size = (value - center).Transform(TransformationMatrix2D.Rotation(-Rotation));
                 width = size.X * 2;
                 height = size.Y * 2;
                 UpdatePolyline();
@@ -88,9 +85,7 @@ namespace SimpleCAD
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             Center = Center.Transform(transformation);
-            Vector2D dir = Vector2D.FromAngle(Rotation);
-            dir.TransformBy(transformation);
-            Rotation = dir.Angle;
+            Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
             UpdatePolyline();
         }
 

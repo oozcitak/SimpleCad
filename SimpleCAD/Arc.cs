@@ -68,17 +68,9 @@ namespace SimpleCAD
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             Center = Center.Transform(transformation);
-
-            Vector2D dir = Vector2D.XAxis * Radius;
-            dir.TransformBy(transformation);
-            Radius = dir.Length;
-
-            Vector2D a1 = Vector2D.FromAngle(StartAngle);
-            Vector2D a2 = Vector2D.FromAngle(EndAngle);
-            a1.TransformBy(transformation);
-            a2.TransformBy(transformation);
-            StartAngle = a1.Angle;
-            EndAngle = a2.Angle;
+            Radius = (Vector2D.XAxis * Radius).Transform(transformation).Length;
+            StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+            EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)

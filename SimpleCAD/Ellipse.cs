@@ -82,15 +82,9 @@ namespace SimpleCAD
         public override void TransformBy(TransformationMatrix2D transformation)
         {
             Center = Center.Transform(transformation);
-
-            Vector2D dir = Vector2D.FromAngle(Rotation);
-            dir.TransformBy(transformation);
-            Rotation = dir.Angle;
-
-            Vector2D unit = Vector2D.XAxis;
-            unit.TransformBy(transformation);
-            SemiMajorAxis = unit.Length * SemiMajorAxis;
-            SemiMinorAxis = unit.Length * SemiMinorAxis;
+            Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+            SemiMajorAxis = (Vector2D.XAxis * SemiMajorAxis).Transform(transformation).Length;
+            SemiMinorAxis = (Vector2D.XAxis * SemiMinorAxis).Transform(transformation).Length;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
@@ -104,7 +98,7 @@ namespace SimpleCAD
             {
                 new ControlPoint("Center"),
                 new ControlPoint("SemiMajorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).GetPerpendicularVector()),
+                new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular()),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + size) * Vector2D.FromAngle(Rotation)),
             };
         }
