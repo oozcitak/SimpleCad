@@ -43,12 +43,9 @@ namespace SimpleCAD
             items.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get { return items.Count; }
-        }
+        public int Count { get { return items.Count; } }
 
-        public bool IsReadOnly => throw new NotImplementedException();
+        public bool IsReadOnly { get { return false; } }
 
         public bool Remove(Drawable item)
         {
@@ -75,63 +72,59 @@ namespace SimpleCAD
             CollectionChanged?.Invoke(this, e);
         }
 
-        public void UnionWith(IEnumerable<Drawable> other)
+        void ISet<Drawable>.UnionWith(IEnumerable<Drawable> other)
         {
-            items.UnionWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, other));
+            throw new NotImplementedException();
         }
 
-        public void IntersectWith(IEnumerable<Drawable> other)
+        void ISet<Drawable>.IntersectWith(IEnumerable<Drawable> other)
         {
-            items.IntersectWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            throw new NotImplementedException();
         }
 
-        public void ExceptWith(IEnumerable<Drawable> other)
+        void ISet<Drawable>.ExceptWith(IEnumerable<Drawable> other)
         {
-            items.ExceptWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, other));
+            throw new NotImplementedException();
         }
 
-        public void SymmetricExceptWith(IEnumerable<Drawable> other)
+        void ISet<Drawable>.SymmetricExceptWith(IEnumerable<Drawable> other)
         {
-            items.SymmetricExceptWith(other);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            throw new NotImplementedException();
         }
 
-        public bool IsSubsetOf(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.IsSubsetOf(IEnumerable<Drawable> other)
         {
-            return items.IsSubsetOf(other);
+            throw new NotImplementedException();
         }
 
-        public bool IsSupersetOf(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.IsSupersetOf(IEnumerable<Drawable> other)
         {
-            return items.IsSupersetOf(other);
+            throw new NotImplementedException();
         }
 
-        public bool IsProperSupersetOf(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.IsProperSupersetOf(IEnumerable<Drawable> other)
         {
-            return items.IsProperSupersetOf(other);
+            throw new NotImplementedException();
         }
 
-        public bool IsProperSubsetOf(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.IsProperSubsetOf(IEnumerable<Drawable> other)
         {
-            return items.IsProperSubsetOf(other);
+            throw new NotImplementedException();
         }
 
-        public bool Overlaps(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.Overlaps(IEnumerable<Drawable> other)
         {
-            return items.Overlaps(other);
+            throw new NotImplementedException();
         }
 
-        public bool SetEquals(IEnumerable<Drawable> other)
+        bool ISet<Drawable>.SetEquals(IEnumerable<Drawable> other)
         {
-            return items.SetEquals(other);
+            throw new NotImplementedException();
         }
 
         void ICollection<Drawable>.Add(Drawable item)
         {
-            ((ISet<Drawable>)items).Add(item);
+            throw new NotImplementedException();
         }
     }
 }

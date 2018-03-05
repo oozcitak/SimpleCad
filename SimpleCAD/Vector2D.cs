@@ -13,6 +13,8 @@ namespace SimpleCAD
         public float Y { get { return _y; } }
         public float Length { get { return MathF.Sqrt(X * X + Y * Y); } }
         public float Angle { get { return AngleTo(XAxis); } }
+        public Vector2D Normal { get { float len = Length; return new Vector2D(X / len, Y / len); } }
+        public Vector2D Perpendicular { get { return new Vector2D(-Y, X); } }
 
         public static Vector2D XAxis { get { return new Vector2D(1, 0); } }
         public static Vector2D YAxis { get { return new Vector2D(0, 1); } }
@@ -28,12 +30,6 @@ namespace SimpleCAD
             float x = transformation.M11 * X + transformation.M12 * Y;
             float y = transformation.M21 * X + transformation.M22 * Y;
             return new Vector2D(x, y);
-        }
-
-        public Vector2D Normal()
-        {
-            float len = Length;
-            return new Vector2D(X / len, Y / len);
         }
 
         public float DotProduct(Vector2D v)
@@ -83,11 +79,6 @@ namespace SimpleCAD
         public static Vector2D FromAngle(float angle)
         {
             return new Vector2D(MathF.Cos(angle), MathF.Sin(angle));
-        }
-
-        public Vector2D Perpendicular()
-        {
-            return new Vector2D(-Y, X);
         }
 
         public static Vector2D operator +(Vector2D a, Vector2D b)

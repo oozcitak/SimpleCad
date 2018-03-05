@@ -441,8 +441,7 @@ namespace SimpleCAD
                         }
                         else if (cp.Type == ControlPoint.ControlPointType.Distance)
                         {
-                            Vector2D dir = cp.Location - cp.BasePoint;
-                            dir.Normal();
+                            Vector2D dir = (cp.Location - cp.BasePoint).Normal;
                             float orjVal = (cp.Location - cp.BasePoint).Length;
                             Editor.DistanceResult res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
                                 (p) =>
