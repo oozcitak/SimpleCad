@@ -8,7 +8,7 @@ namespace SimpleCAD
 {
     public partial class Commands
     {
-        public class DrawLine : AsyncCommand
+        public class DrawLine : Command
         {
             public override string RegisteredName => "Primitives.Line";
             public override string Name => "Line";
@@ -28,7 +28,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawArc : AsyncCommand
+        public class DrawArc : Command
         {
             public override string RegisteredName => "Primitives.Arc";
             public override string Name => "Arc";
@@ -55,7 +55,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawCircle : AsyncCommand
+        public class DrawCircle : Command
         {
             public override string RegisteredName => "Primitives.Circle";
             public override string Name => "Circle";
@@ -78,7 +78,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawEllipse : AsyncCommand
+        public class DrawEllipse : Command
         {
             public override string RegisteredName => "Primitives.Ellipse";
             public override string Name => "Ellipse";
@@ -105,7 +105,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawEllipticArc : AsyncCommand
+        public class DrawEllipticArc : Command
         {
             public override string RegisteredName => "Primitives.Elliptic_Arc";
             public override string Name => "Elliptic Arc";
@@ -138,7 +138,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawText : AsyncCommand
+        public class DrawText : Command
         {
             public override string RegisteredName => "Primitives.Text";
             public override string Name => "Text";
@@ -167,7 +167,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawDimension : AsyncCommand
+        public class DrawDimension : Command
         {
             public override string RegisteredName => "Primitives.Dimension";
             public override string Name => "Dimension";
@@ -189,7 +189,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawParabola : AsyncCommand
+        public class DrawParabola : Command
         {
             public override string RegisteredName => "Primitives.Parabola";
             public override string Name => "Parabola";
@@ -216,7 +216,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawPolyline : AsyncCommand
+        public class DrawPolyline : Command
         {
             public override string RegisteredName => "Primitives.Polyline";
             public override string Name => "Polyline";
@@ -276,7 +276,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawHatch : AsyncCommand
+        public class DrawHatch : Command
         {
             public override string RegisteredName => "Primitives.Hatch";
             public override string Name => "Hatch";
@@ -332,7 +332,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawRectangle : AsyncCommand
+        public class DrawRectangle : Command
         {
             public override string RegisteredName => "Primitives.Rectangle";
             public override string Name => "Rectangle";
@@ -357,7 +357,7 @@ namespace SimpleCAD
             }
         }
 
-        public class DrawTriangle : AsyncCommand
+        public class DrawTriangle : Command
         {
             public override string RegisteredName => "Primitives.Triangle";
             public override string Name => "Triangle";

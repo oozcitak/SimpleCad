@@ -21,6 +21,9 @@ namespace SimpleCAD
         [Browsable(false)]
         public Editor Editor { get; private set; }
 
+        public string FileName { get; private set; }
+        public bool IsModified { get; private set; } = false;
+
         public event DocumentChangedEventHandler DocumentChanged;
         public event TransientsChangedEventHandler TransientsChanged;
         public event SelectionChangedEventHandler SelectionChanged;
@@ -49,6 +52,8 @@ namespace SimpleCAD
             Model.CollectionChanged += Model_CollectionChanged;
             Jigged.CollectionChanged += Transients_CollectionChanged;
             OnDocumentChanged(new EventArgs());
+            IsModified = false;
+            FileName = "";
         }
 
         public void Open(Stream stream)
@@ -66,6 +71,8 @@ namespace SimpleCAD
                 Model.CollectionChanged += Model_CollectionChanged;
                 Jigged.CollectionChanged += Transients_CollectionChanged;
                 OnDocumentChanged(new EventArgs());
+                FileName = "";
+                IsModified = false;
             }
         }
 
@@ -74,6 +81,8 @@ namespace SimpleCAD
             using (Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 Open(stream);
+                FileName = filename;
+                IsModified = false;
             }
         }
 
@@ -82,6 +91,8 @@ namespace SimpleCAD
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 Model.Save(writer);
+                FileName = "";
+                IsModified = false;
             }
         }
 
@@ -90,6 +101,8 @@ namespace SimpleCAD
             using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 Save(stream);
+                FileName = filename;
+                IsModified = false;
             }
         }
 
@@ -125,6 +138,7 @@ namespace SimpleCAD
 
         protected void OnDocumentChanged(EventArgs e)
         {
+            IsModified = true;
             DocumentChanged?.Invoke(this, e);
         }
 

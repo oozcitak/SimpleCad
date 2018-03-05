@@ -10,57 +10,62 @@ namespace SimpleCAD
 {
     public partial class Commands
     {
-        public class DocumentNew : SyncCommand
+        public class DocumentNew : Command
         {
             public override string RegisteredName => "Document.New";
             public override string Name => "New";
 
-            public override void Apply(CADDocument doc, params string[] args)
+            public override Task Apply(CADDocument doc, params string[] args)
             {
                 doc.New();
+                return Task.FromResult(default(object));
             }
         }
 
-        public class DocumentOpen : SyncCommand
+        public class DocumentOpen : Command
         {
             public override string RegisteredName => "Document.Open";
             public override string Name => "Open";
 
-            public override void Apply(CADDocument doc, params string[] args)
+            public override async Task Apply(CADDocument doc, params string[] args)
             {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Filter = "SimpleCAD file (*.scf)|*.scf|All files (*.*)|*.*";
-                ofd.DefaultExt = "scf";
-                if (args.Length > 0)
+                Editor ed = doc.Editor;
+                ed.Selection.Clear();
+
+                Editor.FilenameResult res = await ed.GetOpenFilename("Open file");
+                if (res.Result == Editor.ResultMode.OK)
                 {
-                    ofd.FileName = Path.GetFileName(args[0]);
-                    ofd.InitialDirectory = Path.GetDirectoryName(args[0]);
-                }
-                if (ofd.ShowDialog() == DialogResult.OK)
-                {
-                    doc.Open(ofd.FileName);
+                    doc.Open(res.Value);
                 }
             }
         }
 
-        public class DocumentSave : SyncCommand
+        public class DocumentSave : Command
         {
             public override string RegisteredName => "Document.Save";
             public override string Name => "Save";
 
-            public override void Apply(CADDocument doc, params string[] args)
+            public override Task Apply(CADDocument doc, params string[] args)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "SimpleCAD file (*.scf)|*.scf|All files (*.*)|*.*";
-                sfd.DefaultExt = "scf";
-                if (args.Length > 0)
+                doc.Save(doc.FileName);
+                return Task.FromResult(default(object));
+            }
+        }
+
+        public class DocumentSaveAs : Command
+        {
+            public override string RegisteredName => "Document.SaveAs";
+            public override string Name => "Save As";
+
+            public override async Task Apply(CADDocument doc, params string[] args)
+            {
+                Editor ed = doc.Editor;
+                ed.Selection.Clear();
+
+                Editor.FilenameResult res = await ed.GetSaveFilename("Save file");
+                if (res.Result == Editor.ResultMode.OK)
                 {
-                    sfd.FileName = Path.GetFileName(args[0]);
-                    sfd.InitialDirectory = Path.GetDirectoryName(args[0]);
-                }
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    doc.Save(sfd.FileName);
+                    doc.Save(res.Value);
                 }
             }
         }

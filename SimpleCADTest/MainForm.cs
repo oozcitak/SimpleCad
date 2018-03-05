@@ -54,7 +54,10 @@ namespace SimpleCADTest
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Document.Save", SaveFileName);
+            if (string.IsNullOrEmpty(cadWindow1.Document.FileName))
+                cadWindow1.Document.Editor.RunCommand("Document.SaveAs", SaveFileName);
+            else
+                cadWindow1.Document.Editor.RunCommand("Document.Save");
         }
 
         private string SaveFileName
