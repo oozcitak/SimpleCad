@@ -33,6 +33,7 @@ namespace SimpleCAD
         private Hatch consHatch;
         private bool selectionClickedFirstPoint;
 
+        public SelectionSet PickedSelection { get; private set; } = new SelectionSet();
         public SelectionSet Selection { get; private set; } = new SelectionSet();
 
         static Editor()
@@ -76,9 +77,11 @@ namespace SimpleCAD
 
         public async Task<SelectionResult> GetSelection(SelectionOptions options)
         {
-            if (Selection.Count != 0)
+            if (PickedSelection.Count != 0)
             {
-                // Immediately return existing selection if any
+                // Immediately return existing picked-selection if any
+                Selection = PickedSelection;
+                PickedSelection = new SelectionSet();
                 selectionCompletion = new TaskCompletionSource<SelectionResult>();
                 selectionCompletion.SetResult(new SelectionResult(Selection));
                 return await selectionCompletion.Task;
