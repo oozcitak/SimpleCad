@@ -38,7 +38,7 @@ namespace SimpleCADTest
 
         private void cadWindow1_MouseMove(object sender, MouseEventArgs e)
         {
-            Point2D pt = new Point2D(cadWindow1.View.ScreenToWorld(e.X, e.Y));
+            Point2D pt = cadWindow1.View.CursorLocation;
             statusCoords.Text = pt.X.ToString("F2") + ", " + pt.Y.ToString("F2");
         }
 
