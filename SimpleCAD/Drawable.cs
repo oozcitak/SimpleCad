@@ -23,8 +23,7 @@ namespace SimpleCAD
         public virtual void TransformControlPoint(ControlPoint cp, TransformationMatrix2D transformation)
         {
             PropertyInfo prop = GetType().GetProperty(cp.PropertyName);
-            Point2D point = cp.Location;
-            point.TransformBy(transformation);
+            Point2D point = cp.Location.Transform(transformation);
 
             if (cp.PropertyIndex == -1)
             {

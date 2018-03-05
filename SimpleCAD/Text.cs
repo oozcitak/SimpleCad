@@ -119,10 +119,10 @@ namespace SimpleCAD
             p3 = p3 + offset;
             p4 = p4 + offset;
             TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, Location.X, Location.Y);
-            p1.TransformBy(trans);
-            p2.TransformBy(trans);
-            p3.TransformBy(trans);
-            p4.TransformBy(trans);
+            p1 = p1.Transform(trans);
+            p2 = p2.Transform(trans);
+            p3 = p3.Transform(trans);
+            p4 = p4.Transform(trans);
 
             Extents2D extents = new Extents2D();
             extents.Add(p1);
@@ -134,9 +134,7 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p = Location;
-            p.TransformBy(transformation);
-            Location = p;
+            Location = Location.Transform(transformation);
 
             Vector2D dir = Vector2D.XAxis * Height;
             dir.TransformBy(transformation);

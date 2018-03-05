@@ -65,9 +65,9 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            p1.TransformBy(transformation);
-            p2.TransformBy(transformation);
-            p3.TransformBy(transformation);
+            p1 = p1.Transform(transformation);
+            p2 = p2.Transform(transformation);
+            p3 = p3.Transform(transformation);
             UpdatePolyline();
         }
 

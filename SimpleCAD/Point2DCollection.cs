@@ -133,9 +133,7 @@ namespace SimpleCAD
         {
             for (int i = 0; i < items.Count; i++)
             {
-                Point2D pt = items[i];
-                pt.TransformBy(transformation);
-                items[i] = pt;
+                items[i] = items[i].Transform(transformation);
             }
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }

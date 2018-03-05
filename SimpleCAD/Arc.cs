@@ -67,9 +67,7 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p = Center;
-            p.TransformBy(transformation);
-            Center = p;
+            Center = Center.Transform(transformation);
 
             Vector2D dir = Vector2D.XAxis * Radius;
             dir.TransformBy(transformation);

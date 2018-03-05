@@ -75,10 +75,10 @@ namespace SimpleCAD
             Point2D p3 = p1 + new Vector2D(0, offset);
             Point2D p4 = p2 + new Vector2D(0, offset);
             TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);
-            p1.TransformBy(trans);
-            p2.TransformBy(trans);
-            p3.TransformBy(trans);
-            p4.TransformBy(trans);
+            p1 = p1.Transform(trans);
+            p2 = p2.Transform(trans);
+            p3 = p3.Transform(trans);
+            p4 = p4.Transform(trans);
 
             Extents2D extents = new Extents2D();
             extents.Add(p1);
@@ -90,12 +90,8 @@ namespace SimpleCAD
 
         public override void TransformBy(TransformationMatrix2D transformation)
         {
-            Point2D p1 = StartPoint;
-            Point2D p2 = EndPoint;
-            p1.TransformBy(transformation);
-            p2.TransformBy(transformation);
-            StartPoint = p1;
-            EndPoint = p2;
+            StartPoint = StartPoint.Transform(transformation);
+            EndPoint = EndPoint.Transform(transformation);
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)

@@ -6,29 +6,31 @@ namespace SimpleCAD
     [TypeConverter(typeof(Point2DConverter))]
     public struct Point2D
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        private readonly float _x;
+        private readonly float _y;
+
+        public float X { get { return _x; } }
+        public float Y { get { return _y; } }
 
         public static Point2D Zero { get { return new Point2D(0, 0); } }
 
         public Point2D(float x, float y)
         {
-            X = x;
-            Y = y;
+            _x = x;
+            _y = y;
         }
 
         public Point2D(System.Drawing.PointF pt)
         {
-            X = pt.X;
-            Y = pt.Y;
+            _x = pt.X;
+            _y = pt.Y;
         }
 
-        public void TransformBy(TransformationMatrix2D transformation)
+        public Point2D Transform(TransformationMatrix2D transformation)
         {
             float x = transformation.M11 * X + transformation.M12 * Y + transformation.DX;
             float y = transformation.M21 * X + transformation.M22 * Y + transformation.DY;
-            X = x;
-            Y = y;
+            return new Point2D(x, y);
         }
 
         public static float Distance(Point2D p1, Point2D p2)
