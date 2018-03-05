@@ -34,8 +34,8 @@ namespace SimpleCAD
         private Hatch consHatch;
         private bool selectionClickedFirstPoint;
 
+        internal SelectionSet CurrentSelection { get; private set; } = new SelectionSet();
         public SelectionSet PickedSelection { get; private set; } = new SelectionSet();
-        public SelectionSet Selection { get; private set; } = new SelectionSet();
 
         static Editor()
         {
@@ -69,7 +69,9 @@ namespace SimpleCAD
             if (commands.ContainsKey(registeredName))
             {
                 Command com = commands[registeredName];
-                com.Apply(Document, args);
+                Command clearSelection = new Commands.SelectionClear();
+                Task runTask = com.Apply(Document, args);
+                runTask.ContinueWith(a => clearSelection.Apply(Document, args));
             }
             else
             {
@@ -166,8 +168,8 @@ namespace SimpleCAD
             {
                 ;
             }
-            if(!string.IsNullOrEmpty(filename)) sfd.FileName = filename;
-            if(!string.IsNullOrEmpty(path)) sfd.InitialDirectory = path;
+            if (!string.IsNullOrEmpty(filename)) sfd.FileName = filename;
+            if (!string.IsNullOrEmpty(path)) sfd.InitialDirectory = path;
 
             TaskCompletionSource<FilenameResult> completion = new TaskCompletionSource<FilenameResult>();
             if (sfd.ShowDialog() == DialogResult.OK)
@@ -191,10 +193,10 @@ namespace SimpleCAD
             if (PickedSelection.Count != 0)
             {
                 // Immediately return existing picked-selection if any
-                Selection = PickedSelection;
+                SelectionSet picked = PickedSelection;
                 PickedSelection = new SelectionSet();
                 selectionCompletion = new TaskCompletionSource<SelectionResult>();
-                selectionCompletion.SetResult(new SelectionResult(Selection));
+                selectionCompletion.SetResult(new SelectionResult(picked));
                 return await selectionCompletion.Task;
             }
             else
@@ -452,7 +454,7 @@ namespace SimpleCAD
                                 if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
                                     set.Add(item);
                             }
-                            Selection = set;
+                            CurrentSelection = set;
                             selectionCompletion.SetResult(new SelectionResult(set));
                         }
                         break;

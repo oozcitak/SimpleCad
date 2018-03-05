@@ -28,7 +28,7 @@ namespace SimpleCADTest
 
         private void CadWindow1_SelectionChanged(object sender, EventArgs e)
         {
-            propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.Selection.ToArray();
+            propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.PickedSelection.ToArray();
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="CADDocument.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Command_Selection.cs" />
     <Compile Include="Command_Document.cs" />
     <Compile Include="Command_Transform.cs" />
     <Compile Include="Command_Primitives.cs" />

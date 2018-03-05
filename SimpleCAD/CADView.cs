@@ -154,20 +154,23 @@ namespace SimpleCAD
             ScaleGraphics(graphics);
 
             // Render drawing objects
+            param.Mode = DrawParams.DrawingMode.Normal;
             Document.Model.Draw(param);
 
             // Render selected objects
             param.Mode = DrawParams.DrawingMode.Selection;
-            foreach (Drawable selected in Document.Editor.Selection)
-            {
-                selected.Draw(param);
-            }
-            foreach (Drawable selected in Document.Editor.PickedSelection)
+            foreach (Drawable selected in Document.Editor.CurrentSelection)
             {
                 selected.Draw(param);
             }
 
+
             // Render pick-selected objects
+            param.Mode = DrawParams.DrawingMode.Selection;
+            foreach (Drawable selected in Document.Editor.PickedSelection)
+            {
+                selected.Draw(param);
+            }
             param.Mode = DrawParams.DrawingMode.ControlPoint;
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
@@ -402,7 +405,7 @@ namespace SimpleCAD
                 if (mouseDownItem != null)
                 {
                     Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
-                    if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.Selection.Contains(mouseDownItem))
+                    if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.PickedSelection.Contains(mouseDownItem))
                     {
                         if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
                         {
@@ -554,7 +557,6 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.PickedSelection.Clear();
-                Document.Editor.Selection.Clear();
             }
         }
 

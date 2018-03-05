@@ -41,8 +41,6 @@ namespace SimpleCAD
                 {
                     item.TransformBy(TransformationMatrix2D.Translation(p2.Value - p1.Value));
                 }
-
-                ed.Selection.Clear();
             }
         }
 
@@ -92,7 +90,6 @@ namespace SimpleCAD
                 }
 
                 doc.Transients.Remove(consItems);
-                ed.Selection.Clear();
             }
         }
 
@@ -129,8 +126,6 @@ namespace SimpleCAD
                 {
                     item.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p2.Value));
                 }
-
-                ed.Selection.Clear();
             }
         }
 
@@ -167,8 +162,6 @@ namespace SimpleCAD
                 {
                     item.TransformBy(TransformationMatrix2D.Scale(p1.Value, d1.Value));
                 }
-
-                ed.Selection.Clear();
             }
         }
     }
