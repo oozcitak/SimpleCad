@@ -12,6 +12,20 @@ namespace SimpleCAD
         public Point2DCollection Points { get; private set; }
         public virtual bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
 
+        public float Length
+        {
+            get
+            {
+                float len = 0;
+                for (int i = 0; i < (Closed ? Points.Count : Points.Count - 1); i++)
+                {
+                    int j = (i == Points.Count - 1 ? 0 : i + 1);
+                    len += (Points[j] - Points[i]).Length;
+                }
+                return len;
+            }
+        }
+
         public Polyline()
         {
             Points = new Point2DCollection();

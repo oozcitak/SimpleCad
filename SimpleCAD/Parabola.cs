@@ -10,8 +10,8 @@ namespace SimpleCAD
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
-        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+        public Point2D StartPoint { get => p1; set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public Point2D EndPoint { get => p2; set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         public Point2D IntersectionPoint
         {
@@ -27,8 +27,8 @@ namespace SimpleCAD
         private float startAngle;
         private float endAngle;
 
-        public float StartAngle { get => startAngle; set { startAngle = value; NotifyPropertyChanged(); } }
-        public float EndAngle { get => endAngle; set { endAngle = value; NotifyPropertyChanged(); } }
+        public float StartAngle { get => startAngle; set { startAngle = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float EndAngle { get => endAngle; set { endAngle = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return StartPoint.X; } }
@@ -43,6 +43,8 @@ namespace SimpleCAD
         [Browsable(false)]
         public float YI { get { return IntersectionPoint.Y; } }
 
+        private Polyline poly;
+        private float curveLength = 4;
         private float cpSize = 0;
 
         public Parabola(Point2D p1, Point2D p2, float startAngle, float endAngle)
@@ -51,6 +53,7 @@ namespace SimpleCAD
             EndPoint = p2;
             StartAngle = startAngle;
             EndAngle = endAngle;
+            UpdatePolyline();
         }
 
         public Parabola(float x1, float y1, float x2, float y2, float startAngle, float endAngle)
@@ -63,30 +66,38 @@ namespace SimpleCAD
         {
             cpSize = param.ViewToModel(param.View.ControlPointSize);
 
-            Point2D c1 = StartPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
-            Point2D c2 = EndPoint * 1 / 3 + (IntersectionPoint * 2 / 3).ToVector2D();
-
-            using (Pen pen = Style.CreatePen(param))
+            float p = poly.Length;
+            float newCurveLength = param.ModelToView(p);
+            if (!MathF.IsEqual(newCurveLength, curveLength))
             {
-                param.Graphics.DrawBezier(pen, StartPoint.ToPointF(), c1.ToPointF(), c2.ToPointF(), EndPoint.ToPointF());
+                curveLength = newCurveLength;
+                UpdatePolyline();
             }
+            poly.Style = Style;
+            poly.Draw(param);
+        }
+
+        private void UpdatePolyline()
+        {
+            poly = new Polyline();
+            // Represent curved features by at most 4 pixels
+            int n = (int)Math.Max(4, curveLength / 4);
+            float da = 2 * MathF.PI / n;
+            float t = 0;
+            float dt = 1f / n;
+            for (int i = 0; i <= n; i++)
+            {
+                float x = (1 - t) * (1 - t) * X1 + 2 * (1 - t) * t * XI + t * t * X2;
+                float y = (1 - t) * (1 - t) * Y1 + 2 * (1 - t) * t * YI + t * t * Y2;
+                poly.Points.Add(x, y);
+                t += dt;
+            }
+            poly.Closed = false;
         }
 
         public override Extents2D GetExtents()
         {
-            Extents2D extents = new Extents2D();
-
-            float t = 0;
-            for (int i = 0; i < 20; i++)
-            {
-                t += 0.05f;
-                // Points on the Quadratic bezier curve
-                float x = (1 - t) * (1 - t) * X1 + 2 * (1 - t) * t * XI + t * t * X2;
-                float y = (1 - t) * (1 - t) * Y1 + 2 * (1 - t) * t * YI + t * t * Y2;
-                extents.Add(x, y);
-            }
-
-            return extents;
+            return poly.GetExtents();
         }
 
         public override void TransformBy(TransformationMatrix2D transformation)
@@ -95,6 +106,11 @@ namespace SimpleCAD
             EndPoint = EndPoint.Transform(transformation);
             StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
             EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
+        }
+
+        public override bool Contains(Point2D pt, float pickBoxSize)
+        {
+            return poly.Contains(pt, pickBoxSize);
         }
 
         private bool Intersect(Point2D p1, Point2D p2, Point2D p3, Point2D p4, out Point2D p)
@@ -146,6 +162,7 @@ namespace SimpleCAD
             EndPoint = new Point2D(reader);
             StartAngle = reader.ReadSingle();
             EndAngle = reader.ReadSingle();
+            UpdatePolyline();
         }
 
         public override void Save(BinaryWriter writer)
