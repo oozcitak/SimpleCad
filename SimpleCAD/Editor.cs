@@ -378,7 +378,6 @@ namespace SimpleCAD
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
             currentMouseLocation = e.Location;
-            string format = "0." + new string('0', Document.Settings.Get<int>("DisplayPrecision"));
             string cursorMessage = "";
             switch (Mode)
             {
@@ -408,33 +407,33 @@ namespace SimpleCAD
                             consHatch.Style = new Style(Document.Settings.Get<Color>("ReverseSelectionWindowColor"));
                             consLine.Style = new Style(Document.Settings.Get<Color>("SelectionWindowBorderColor"), 0, DashStyle.Dash);
                         }
-                        cursorMessage = p1.ToString(format) + " - " + currentMouseLocation.ToString(format);
+                        cursorMessage = p1.ToString(Document.Settings.NumberFormat) + " - " + currentMouseLocation.ToString(Document.Settings.NumberFormat);
                         OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     }
                     else
                     {
-                        cursorMessage = currentMouseLocation.ToString(format);
+                        cursorMessage = currentMouseLocation.ToString(Document.Settings.NumberFormat);
                         OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     }
                     break;
                 case InputMode.Point:
                     if (((PointOptions)currentOptions).HasBasePoint)
                         consLine.Points[1] = currentMouseLocation;
-                    cursorMessage = currentMouseLocation.ToString(format);
+                    cursorMessage = currentMouseLocation.ToString(Document.Settings.NumberFormat);
                     OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     ((PointOptions)currentOptions).Jig(currentMouseLocation);
                     break;
                 case InputMode.Angle:
                     consLine.Points[1] = currentMouseLocation;
                     float angle = (currentMouseLocation - ((AngleOptions)currentOptions).BasePoint).Angle;
-                    cursorMessage = angle.ToString(format);
+                    cursorMessage = angle.ToString("F", Document.Settings.NumberFormat);
                     OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     ((AngleOptions)currentOptions).Jig(angle);
                     break;
                 case InputMode.Distance:
                     consLine.Points[1] = currentMouseLocation;
                     float dist = (currentMouseLocation - ((DistanceOptions)currentOptions).BasePoint).Length;
-                    cursorMessage = dist.ToString(format);
+                    cursorMessage = dist.ToString("F", Document.Settings.NumberFormat);
                     OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     ((DistanceOptions)currentOptions).Jig(dist);
                     break;

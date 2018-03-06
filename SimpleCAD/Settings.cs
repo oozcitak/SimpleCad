@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace SimpleCAD
                 {
                     Value = reader.ReadInt32();
                 }
-                else if(valueType=="color")
+                else if (valueType == "color")
                 {
                     Value = Color.FromArgb(reader.ReadInt32());
                 }
@@ -75,6 +76,8 @@ namespace SimpleCAD
             return (T)Get(name);
         }
 
+        public NumberFormatInfo NumberFormat { get; private set; }
+
         public Settings()
         {
             Set("DisplayPrecision", 2);
@@ -93,6 +96,8 @@ namespace SimpleCAD
             Set("SelectionHighlightColor", Color.FromArgb(64, 46, 116, 251));
             Set("JigColor", Color.Orange);
             Set("ControlPointColor", Color.FromArgb(46, 116, 251));
+
+            UpdateSettings();
         }
 
         public Settings(BinaryReader reader)
@@ -103,6 +108,8 @@ namespace SimpleCAD
                 Setting s = new Setting(reader);
                 items.Add(s.Name, s);
             }
+
+            UpdateSettings();
         }
 
         public void Save(BinaryWriter writer)
@@ -112,6 +119,14 @@ namespace SimpleCAD
             {
                 s.Save(writer);
             }
+        }
+
+        private void UpdateSettings()
+        {
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.NumberDecimalDigits = Get<int>("DisplayPrecision");
+            nfi.NumberDecimalSeparator = ".";
+            NumberFormat = nfi;
         }
     }
 }

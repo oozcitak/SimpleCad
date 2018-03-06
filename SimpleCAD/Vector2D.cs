@@ -107,14 +107,16 @@ namespace SimpleCAD
             return new Vector2D(p.X / f, p.Y / f);
         }
 
-        public override string ToString()
+        public string ToString(IFormatProvider provider)
         {
-            return "{" + X.ToString() + ", " + Y.ToString() + "}";
+            return ToString("({0:F}, {1:F})", provider);
         }
 
-        public string ToString(string format)
+        public string ToString(string format = "({0:F}, {1:F})", IFormatProvider provider = null)
         {
-            return "(" + X.ToString(format) + ", " + Y.ToString(format) + ")";
+            return (provider == null) ?
+                string.Format(format, X, Y) :
+                string.Format(provider, format, X, Y);
         }
 
         public Vector2D(BinaryReader reader)

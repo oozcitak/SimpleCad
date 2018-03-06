@@ -92,14 +92,16 @@ namespace SimpleCAD
             return new Point2D(x, y);
         }
 
-        public override string ToString()
+        public string ToString(IFormatProvider provider)
         {
-            return "(" + X.ToString() + ", " + Y.ToString() + ")";
+            return ToString("({0:F}, {1:F})", provider);
         }
 
-        public string ToString(string format)
+        public string ToString(string format = "({0:F}, {1:F})", IFormatProvider provider = null)
         {
-            return "(" + X.ToString(format) + ", " + Y.ToString(format) + ")";
+            return (provider == null) ?
+                string.Format(format, X, Y) :
+                string.Format(provider, format, X, Y);
         }
 
         public Point2D(BinaryReader reader)
