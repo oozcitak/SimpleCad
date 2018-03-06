@@ -60,6 +60,7 @@
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
+            this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -169,10 +170,11 @@
             this.tsStandard.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnNew,
             this.btnOpen,
-            this.btnSave});
+            this.btnSave,
+            this.btnSaveAs});
             this.tsStandard.Location = new System.Drawing.Point(3, 0);
             this.tsStandard.Name = "tsStandard";
-            this.tsStandard.Size = new System.Drawing.Size(122, 25);
+            this.tsStandard.Size = new System.Drawing.Size(204, 25);
             this.tsStandard.TabIndex = 1;
             // 
             // btnNew
@@ -358,7 +360,7 @@
             this.btnMirror});
             this.tsTransform.Location = new System.Drawing.Point(3, 50);
             this.tsTransform.Name = "tsTransform";
-            this.tsTransform.Size = new System.Drawing.Size(250, 25);
+            this.tsTransform.Size = new System.Drawing.Size(219, 25);
             this.tsTransform.TabIndex = 2;
             // 
             // btnMove
@@ -410,6 +412,16 @@
             this.btnMirror.Size = new System.Drawing.Size(44, 22);
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSaveAs.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveAs.Image")));
+            this.btnSaveAs.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(51, 22);
+            this.btnSaveAs.Text = "Save As";
+            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
             // 
             // MainForm
             // 
@@ -475,6 +487,7 @@
         private System.Windows.Forms.ToolStripButton btnOpen;
         private System.Windows.Forms.ToolStripButton btnNew;
         private System.Windows.Forms.ToolStripButton btnMirror;
+        private System.Windows.Forms.ToolStripButton btnSaveAs;
     }
 }
 
