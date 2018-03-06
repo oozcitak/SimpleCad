@@ -1,49 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
-    public class Settings
+    public class Settings : IPersistable
     {
-        private Dictionary<string, Setting> settings = new Dictionary<string, Setting>();
+        private Dictionary<string, Setting> items = new Dictionary<string, Setting>();
 
-        private class Setting<T> : Setting
+        private class Setting : IPersistable
         {
-            public string Name { get; private set; }
-            public T Value { get; set; }
+            public string Name { get; protected set; }
+            public object Value { get; set; }
 
-            public Setting(string name, T value)
+            public Setting(string name, object value)
             {
                 Name = name;
                 Value = value;
             }
-        }
 
-        private abstract class Setting
-        {
-
-        }
-
-        public void Set<T>(string name, T value)
-        {
-            if (settings.TryGetValue(name, out Setting s))
+            public Setting(BinaryReader reader)
             {
-                ((Setting<T>)s).Value = value;
+                Name = reader.ReadString();
+                string valueType = reader.ReadString();
+                if (valueType == "int")
+                {
+                    Value = reader.ReadInt32();
+                }
+                else if(valueType=="color")
+                {
+                    Value = Color.FromArgb(reader.ReadInt32());
+                }
+            }
+
+            public void Save(BinaryWriter writer)
+            {
+                writer.Write(Name);
+                if (Value is int)
+                {
+                    writer.Write("int");
+                    writer.Write((int)Value);
+                }
+                else if (Value is Color)
+                {
+                    writer.Write("color");
+                    writer.Write(((Color)Value).ToArgb());
+                }
+            }
+        }
+
+        public void Set(string name, object value)
+        {
+            if (items.TryGetValue(name, out Setting s))
+            {
+                s.Value = value;
             }
             else
             {
-                settings.Add(name, new Setting<T>(name, value));
+                items.Add(name, new Setting(name, value));
             }
+        }
+
+        public object Get(string name)
+        {
+            return items[name].Value;
         }
 
         public T Get<T>(string name)
         {
-            Setting s = settings[name];
-            return ((Setting<T>)s).Value;
+            return (T)Get(name);
         }
 
         public Settings()
@@ -64,6 +93,25 @@ namespace SimpleCAD
             Set("SelectionHighlightColor", Color.FromArgb(64, 46, 116, 251));
             Set("JigColor", Color.Orange);
             Set("ControlPointColor", Color.FromArgb(46, 116, 251));
+        }
+
+        public Settings(BinaryReader reader)
+        {
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                Setting s = new Setting(reader);
+                items.Add(s.Name, s);
+            }
+        }
+
+        public void Save(BinaryWriter writer)
+        {
+            writer.Write(items.Count);
+            foreach (Setting s in items.Values)
+            {
+                s.Save(writer);
+            }
         }
     }
 }

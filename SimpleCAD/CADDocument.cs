@@ -68,8 +68,8 @@ namespace SimpleCAD
                 Model.CollectionChanged -= Model_CollectionChanged;
                 Jigged.CollectionChanged -= Transients_CollectionChanged;
                 Model = new Composite(reader);
+                Settings = new Settings(reader);
                 Editor = new Editor(this);
-                /// Settings = new Settings(reader);
                 Jigged = new Composite();
                 Transients = new Composite();
                 Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
@@ -96,7 +96,7 @@ namespace SimpleCAD
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 Model.Save(writer);
-                // Settings.Save(writer);
+                Settings.Save(writer);
                 FileName = "";
                 IsModified = false;
             }
