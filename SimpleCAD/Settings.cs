@@ -10,7 +10,7 @@ namespace SimpleCAD
     {
         private Dictionary<string, Setting> settings = new Dictionary<string, Setting>();
 
-        public class Setting<T> : Setting
+        private class Setting<T> : Setting
         {
             public string Name { get; private set; }
             public T Value { get; set; }
@@ -22,7 +22,7 @@ namespace SimpleCAD
             }
         }
 
-        public abstract class Setting
+        private abstract class Setting
         {
 
         }
