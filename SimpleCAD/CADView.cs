@@ -431,21 +431,51 @@ namespace SimpleCAD
 
         void CadView_MouseDown(object sender, MouseEventArgs e)
         {
+            CadView_CursorDown(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        void CadView_MouseUp(object sender, MouseEventArgs e)
+        {
+            CadView_CursorUp(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        void CadView_MouseMove(object sender, MouseEventArgs e)
+        {
+            CadView_CursorMove(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        private void CadView_MouseClick(object sender, MouseEventArgs e)
+        {
+            CadView_CursorClick(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        private void CadView_MouseWheel(object sender, MouseEventArgs e)
+        {
+            CadView_CursorWheel(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        private void CadView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            CadView_CursorDoubleClick(sender, new CursorEventArgs(e.Button, e.Clicks, ScreenToWorld(e.X, e.Y), e.Delta));
+        }
+
+        void CadView_CursorDown(object sender, CursorEventArgs e)
+        {
             if (e.Button == MouseButtons.Middle && Interactive)
             {
                 panning = true;
-                lastMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
+                lastMouseLocationWorld = e.Location;
             }
             else if (e.Button == MouseButtons.Left && Interactive)
             {
-                mouseDownItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
-                Tuple<Drawable, ControlPoint> find = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(PickBoxSize, 0)).X);
+                Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(ControlPointSize, 0)).X);
                 mouseDownCPItem = find.Item1;
                 mouseDownCP = find.Item2;
             }
         }
 
-        async void CadView_MouseUp(object sender, MouseEventArgs e)
+        async void CadView_CursorUp(object sender, CursorEventArgs e)
         {
             if (e.Button == MouseButtons.Middle && Interactive && panning)
             {
@@ -456,7 +486,7 @@ namespace SimpleCAD
             {
                 if (mouseDownItem != null)
                 {
-                    Drawable mouseUpItem = FindItemAtScreenCoordinates(e.X, e.Y, PickBoxSize);
+                    Drawable mouseUpItem = FindItem(e.Location, ScreenToWorld(new Vector2D(PickBoxSize, 0)).X);
                     if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.PickedSelection.Contains(mouseDownItem))
                     {
                         if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
@@ -473,7 +503,7 @@ namespace SimpleCAD
 
                 if (mouseDownCP != null)
                 {
-                    Tuple<Drawable, ControlPoint> find = FindControlPointAtScreenCoordinates(e.X, e.Y, ControlPointSize + 4);
+                    Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(ControlPointSize, 0)).X);
                     Drawable item = find.Item1;
                     ControlPoint mouseUpCP = find.Item2;
                     if (mouseUpCP != null && ReferenceEquals(mouseDownCPItem, item) &&
@@ -530,34 +560,35 @@ namespace SimpleCAD
             }
         }
 
-        void CadView_MouseMove(object sender, MouseEventArgs e)
+        void CadView_CursorMove(object sender, CursorEventArgs e)
         {
-            currentMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
+            currentMouseLocationWorld = e.Location;
             control.Invalidate();
 
             if (e.Button == MouseButtons.Middle && panning)
             {
                 // Relative mouse movement
+                Point2D scrPt = WorldToScreen(e.Location);
                 Pan(currentMouseLocationWorld - lastMouseLocationWorld);
-                lastMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
+                lastMouseLocationWorld = ScreenToWorld(scrPt);
                 control.Invalidate();
             }
 
             if (Document.Editor.Mode != Editor.InputMode.None)
             {
-                Document.Editor.OnViewMouseMove(this, e, ScreenToWorld(new Point2D(e.Location)));
+                Document.Editor.OnViewMouseMove(this, e);
             }
         }
 
-        private void CadView_MouseClick(object sender, MouseEventArgs e)
+        private void CadView_CursorClick(object sender, CursorEventArgs e)
         {
             if (Document.Editor.Mode != Editor.InputMode.None)
             {
-                Document.Editor.OnViewMouseClick(this, e, ScreenToWorld(new Point2D(e.Location)));
+                Document.Editor.OnViewMouseClick(this, e);
             }
         }
 
-        void CadView_MouseWheel(object sender, MouseEventArgs e)
+        void CadView_CursorWheel(object sender, CursorEventArgs e)
         {
             if (Interactive)
             {
@@ -573,7 +604,7 @@ namespace SimpleCAD
             }
         }
 
-        void CadView_MouseDoubleClick(object sender, MouseEventArgs e)
+        void CadView_CursorDoubleClick(object sender, CursorEventArgs e)
         {
             if (e.Button == MouseButtons.Middle && Interactive)
             {
@@ -624,9 +655,8 @@ namespace SimpleCAD
             Render(e.Graphics);
         }
 
-        public Drawable FindItemAtScreenCoordinates(int x, int y, int pickBox)
+        private Drawable FindItem(Point2D pt, float pickBox)
         {
-            Point2D pt = ScreenToWorld(x, y);
             float pickBoxWorld = ScreenToWorld(new Vector2D(pickBox, 0)).X;
             foreach (Drawable d in Document.Model)
             {
@@ -635,16 +665,14 @@ namespace SimpleCAD
             return null;
         }
 
-        private Tuple<Drawable, ControlPoint> FindControlPointAtScreenCoordinates(int x, int y, int controlPointSize)
+        private Tuple<Drawable, ControlPoint> FindControlPoint(Point2D pt, float controlPointSize)
         {
-            Point2D pt = ScreenToWorld(x, y);
-            float size = ScreenToWorld(new Vector2D(controlPointSize, 0)).X;
             foreach (Drawable item in Document.Editor.PickedSelection)
             {
                 foreach (ControlPoint cp in ControlPoint.FromDrawable(item))
                 {
-                    if (pt.X >= cp.Location.X - size / 2 && pt.X <= cp.Location.X + size / 2 &&
-                        pt.Y >= cp.Location.Y - size / 2 && pt.Y <= cp.Location.Y + size / 2)
+                    if (pt.X >= cp.Location.X - controlPointSize / 2 && pt.X <= cp.Location.X + controlPointSize / 2 &&
+                        pt.Y >= cp.Location.Y - controlPointSize / 2 && pt.Y <= cp.Location.Y + controlPointSize / 2)
                         return new Tuple<Drawable, ControlPoint>(item, cp);
                 }
             }

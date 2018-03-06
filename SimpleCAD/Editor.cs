@@ -375,9 +375,9 @@ namespace SimpleCAD
             return res;
         }
 
-        internal void OnViewMouseMove(object sender, MouseEventArgs e, Point2D point)
+        internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
-            currentMouseLocation = point;
+            currentMouseLocation = e.Location;
             string format = "0." + new string('0', Document.Settings.Get<int>("DisplayPrecision"));
             string cursorMessage = "";
             switch (Mode)
@@ -387,9 +387,9 @@ namespace SimpleCAD
                     {
                         // Update the selection window
                         Point2D p1 = consLine.Points[0];
-                        Point2D p2 = new Point2D(point.X, p1.Y);
-                        Point2D p3 = point;
-                        Point2D p4 = new Point2D(p1.X, point.Y);
+                        Point2D p2 = new Point2D(e.X, p1.Y);
+                        Point2D p3 = e.Location;
+                        Point2D p4 = new Point2D(p1.X, e.Y);
                         consLine.Points[0] = p1;
                         consLine.Points[1] = p2;
                         consLine.Points[2] = p3;
@@ -398,7 +398,7 @@ namespace SimpleCAD
                         consHatch.Points[1] = p2;
                         consHatch.Points[2] = p3;
                         consHatch.Points[3] = p4;
-                        if (point.X > p1.X)
+                        if (e.X > p1.X)
                         {
                             consHatch.Style = Style.SelectionWindowStyle;
                             consLine.Style = Style.SelectionBorderStyle;
@@ -441,7 +441,7 @@ namespace SimpleCAD
             }
         }
 
-        internal void OnViewMouseClick(object sender, MouseEventArgs e, Point2D point)
+        internal void OnViewMouseClick(object sender, CursorEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -452,10 +452,10 @@ namespace SimpleCAD
                         {
                             selectionClickedFirstPoint = true;
                             // Create the selection window
-                            consHatch = new Hatch(point, point, point, point);
+                            consHatch = new Hatch(e.Location, e.Location, e.Location, e.Location);
                             consHatch.Style = Style.SelectionWindowStyle;
                             Document.Transients.Add(consHatch);
-                            consLine = new Polyline(point, point, point, point);
+                            consLine = new Polyline(e.Location, e.Location, e.Location, e.Location);
                             consLine.Closed = true;
                             consLine.Style = Style.SelectionBorderStyle;
                             Document.Transients.Add(consLine);
@@ -480,17 +480,17 @@ namespace SimpleCAD
                     case InputMode.Point:
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
-                        pointCompletion.SetResult(new PointResult(point));
+                        pointCompletion.SetResult(new PointResult(e.Location));
                         break;
                     case InputMode.Angle:
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
-                        angleCompletion.SetResult(new AngleResult((point - ((AngleOptions)currentOptions).BasePoint).Angle)); ;
+                        angleCompletion.SetResult(new AngleResult((e.Location - ((AngleOptions)currentOptions).BasePoint).Angle)); ;
                         break;
                     case InputMode.Distance:
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
-                        distanceCompletion.SetResult(new DistanceResult((point - ((DistanceOptions)currentOptions).BasePoint).Length));
+                        distanceCompletion.SetResult(new DistanceResult((e.Location - ((DistanceOptions)currentOptions).BasePoint).Length));
                         break;
                 }
             }
@@ -506,6 +506,14 @@ namespace SimpleCAD
             string keyword = currentOptions.MatchKeyword(currentText);
             switch (Mode)
             {
+                case InputMode.Selection:
+                    if (e.KeyCode == Keys.Escape)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        selectionCompletion.SetResult(new SelectionResult(ResultMode.Cancel));
+                    }
+                    break;
                 case InputMode.Point:
                     if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || e.KeyCode == Keys.Space)
                     {
@@ -549,7 +557,7 @@ namespace SimpleCAD
                         {
                             inputCompleted = true;
                             OnCursorPrompt(new CursorPromptEventArgs());
-                            angleCompletion.SetResult(new AngleResult(angle * MathF.PI / 180));
+                            angleCompletion.SetResult(new AngleResult(angle));
                         }
                         else if (!string.IsNullOrEmpty(keyword))
                         {
