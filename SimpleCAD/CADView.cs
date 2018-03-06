@@ -159,53 +159,56 @@ namespace SimpleCAD
             ScaleGraphics(graphics);
 
             // Render drawing objects
-            param.Mode = DrawParams.DrawingMode.Normal;
             Document.Model.Draw(param);
 
             // Render selected objects
-            param.Mode = DrawParams.DrawingMode.Selection;
+            DrawSelection(param);
+
+            // Render jigged objects
+            DrawJigged(param);
+
+            // Render transient objects
+            Document.Transients.Draw(param);
+
+            // Render cursor
+            DrawCursor(param);
+        }
+
+        private void DrawSelection(DrawParams param)
+        {
+            param.StyleOverride = new Style(Document.Settings.Get<Color>("SelectionHighlightColor"), 5, DashStyle.Solid);
+            // Current selection
             foreach (Drawable selected in Document.Editor.CurrentSelection)
             {
                 selected.Draw(param);
             }
-
-
-            // Render pick-selected objects
-            param.Mode = DrawParams.DrawingMode.Selection;
+            // Picked objects
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
                 selected.Draw(param);
             }
-            param.Mode = DrawParams.DrawingMode.ControlPoint;
-            foreach (Drawable selected in Document.Editor.PickedSelection)
-            {
-                foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
-                {
-                    DrawControlPoint(param, pt);
-                }
-            }
-
-            // Render jigged objects
-            param.Mode = DrawParams.DrawingMode.Jigged;
-            Document.Jigged.Draw(param);
-
-            // Render transient objects
-            param.Mode = DrawParams.DrawingMode.Transients;
-            Document.Transients.Draw(param);
-
-            // Render cursor
-            param.Mode = DrawParams.DrawingMode.Cursor;
-            DrawCursor(param);
-        }
-
-        private void DrawControlPoint(DrawParams param, ControlPoint pt)
-        {
-            using (Pen pen = Style.ControlPointStyle.CreatePen(param))
+            param.StyleOverride = null;
+            // Control points
+            using (Pen pen = new Pen(Document.Settings.Get<Color>("ControlPointColor")))
             {
                 pen.Width = param.GetScaledLineWeight(2);
                 float cpSize = param.ViewToModel(ControlPointSize);
-                param.Graphics.DrawRectangle(pen, pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2, cpSize, cpSize);
+
+                foreach (Drawable selected in Document.Editor.PickedSelection)
+                {
+                    foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
+                    {
+                        param.Graphics.DrawRectangle(pen, pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2, cpSize, cpSize);
+                    }
+                }
             }
+        }
+
+        private void DrawJigged(DrawParams param)
+        {
+            param.StyleOverride = new Style(Document.Settings.Get<Color>("JigColor"), 0, DashStyle.Dash);
+            Document.Jigged.Draw(param);
+            param.StyleOverride = null;
         }
 
         private void DrawCursor(DrawParams param)
@@ -213,7 +216,7 @@ namespace SimpleCAD
             if (hasMouse)
             {
                 RectangleF ex = GetViewPort();
-                using (Pen pen = Style.CursorStyle.CreatePen(param))
+                using (Pen pen = new Pen(Document.Settings.Get<Color>("CursorColor")))
                 {
                     // Draw cursor
                     param.Graphics.DrawLine(pen, ex.Left, CursorLocation.Y, ex.Right, CursorLocation.Y);
@@ -224,9 +227,9 @@ namespace SimpleCAD
                 if (!string.IsNullOrEmpty(cursorMessage))
                 {
                     using (Font font = new Font(control.Font.FontFamily, 8))
-                    using (Brush back = new SolidBrush(Style.CursorPromptBackStyle.Color))
-                    using (Pen fore = Style.CursorPromptForeStyle.CreatePen(param))
-                    using (Brush fontBrush = new SolidBrush(Style.CursorPromptForeStyle.Color))
+                    using (Brush back = new SolidBrush(Document.Settings.Get<Color>("CursorPromptBackColor")))
+                    using (Pen fore = new Pen(Document.Settings.Get<Color>("CursorPromptForeColor")))
+                    using (Brush fontBrush = new SolidBrush(Document.Settings.Get<Color>("CursorPromptForeColor")))
                     {
                         float margin = 4;
                         float offset = 2;

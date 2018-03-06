@@ -1,6 +1,6 @@
 ﻿namespace SimpleCAD
 {
-    public partial struct Style
+    public partial class Style
     {
 		public static Style ActiveBorder { get { return new Style(System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.ActiveBorder)); } }
 		public static Style ActiveCaption { get { return new Style(System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.ActiveCaption)); } }

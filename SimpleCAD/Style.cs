@@ -10,25 +10,13 @@ namespace SimpleCAD
 {
     [Serializable]
     [TypeConverter(typeof(StyleConverter))]
-    public partial struct Style : IPersistable
+    public partial class Style : IPersistable
     {
         public Color Color { get; set; }
         public float LineWeight { get; set; }
         public DashStyle DashStyle { get; set; }
 
-        internal static Style SelectionHighlightStyle { get { return new Style(Color.FromArgb(64, 46, 116, 251)); } }
-        internal static Style SelectionWindowStyle { get { return new Style(Color.FromArgb(64, 46, 116, 251)); } }
-        internal static Style SelectionBorderStyle { get { return new Style(Color.White, 1, DashStyle.Solid); } }
-        internal static Style ReverseSelectionWindowStyle { get { return new Style(Color.FromArgb(64, 46, 251, 116)); } }
-        internal static Style ReverseSelectionBorderStyle { get { return new Style(Color.White, 1, DashStyle.Dash); } }
-        internal static Style JiggedStyle { get { return new Style(Color.Orange, 1, DashStyle.Dash); } }
-        internal static Style CursorStyle { get { return new Style(Color.White, 1, DashStyle.Solid); } }
-        internal static Style CursorPromptBackStyle { get { return new Style(Color.FromArgb(84, 58, 84)); } }
-        internal static Style CursorPromptForeStyle { get { return new Style(Color.FromArgb(128, Color.White)); } }
-        internal static Style ControlPointStyle { get { return new Style(Color.FromArgb(46, 116, 251)); } }
-
         public Style(Color color, float lineWeight, DashStyle dashStyle)
-            : this()
         {
             Color = color;
             LineWeight = lineWeight;
@@ -49,20 +37,13 @@ namespace SimpleCAD
 
         public Pen CreatePen(DrawParams param)
         {
-            if (param.Mode == DrawParams.DrawingMode.Selection)
+            if (param.StyleOverride != null)
             {
-                Pen pen = new Pen(SelectionHighlightStyle.Color, param.GetScaledLineWeight(LineWeight + 6));
-                pen.DashStyle = DashStyle.Solid;
+                Pen pen = new Pen(param.StyleOverride.Color, param.GetScaledLineWeight(param.StyleOverride.LineWeight));
+                pen.DashStyle = param.StyleOverride.DashStyle;
                 return pen;
             }
-            else if (param.Mode == DrawParams.DrawingMode.Jigged)
-            {
-                Style style = JiggedStyle;
-                Pen pen = new Pen(style.Color, param.GetScaledLineWeight(style.LineWeight));
-                pen.DashStyle = style.DashStyle;
-                return pen;
-            }
-            else // (param.Mode == DrawParams.DrawingMode.Normal)
+            else
             {
                 Pen pen = new Pen(Color, param.GetScaledLineWeight(LineWeight));
                 pen.DashStyle = DashStyle;

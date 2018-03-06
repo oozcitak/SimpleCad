@@ -400,13 +400,13 @@ namespace SimpleCAD
                         consHatch.Points[3] = p4;
                         if (e.X > p1.X)
                         {
-                            consHatch.Style = Style.SelectionWindowStyle;
-                            consLine.Style = Style.SelectionBorderStyle;
+                            consHatch.Style = new Style(Document.Settings.Get<Color>("SelectionWindowColor"));
+                            consLine.Style = new Style(Document.Settings.Get<Color>("SelectionWindowBorderColor"));
                         }
                         else
                         {
-                            consHatch.Style = Style.ReverseSelectionWindowStyle;
-                            consLine.Style = Style.ReverseSelectionBorderStyle;
+                            consHatch.Style = new Style(Document.Settings.Get<Color>("ReverseSelectionWindowColor"));
+                            consLine.Style = new Style(Document.Settings.Get<Color>("SelectionWindowBorderColor"), 0, DashStyle.Dash);
                         }
                         cursorMessage = p1.ToString(format) + " - " + currentMouseLocation.ToString(format);
                         OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
@@ -453,11 +453,9 @@ namespace SimpleCAD
                             selectionClickedFirstPoint = true;
                             // Create the selection window
                             consHatch = new Hatch(e.Location, e.Location, e.Location, e.Location);
-                            consHatch.Style = Style.SelectionWindowStyle;
                             Document.Transients.Add(consHatch);
                             consLine = new Polyline(e.Location, e.Location, e.Location, e.Location);
                             consLine.Closed = true;
-                            consLine.Style = Style.SelectionBorderStyle;
                             Document.Transients.Add(consLine);
                         }
                         else

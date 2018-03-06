@@ -3,7 +3,7 @@
 <#@ output extension=".cs" #>
 namespace SimpleCAD
 {
-    public partial struct Style
+    public partial class Style
     {
 <#
 	foreach (System.Drawing.KnownColor col in Enum.GetValues(typeof(System.Drawing.KnownColor)))
