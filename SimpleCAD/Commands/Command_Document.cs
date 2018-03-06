@@ -37,10 +37,21 @@ namespace SimpleCAD.Commands
         public override string RegisteredName => "Document.Save";
         public override string Name => "Save";
 
-        public override Task Apply(CADDocument doc, params string[] args)
+        public override async Task Apply(CADDocument doc, params string[] args)
         {
-            doc.Save(doc.FileName);
-            return Task.FromResult(default(object));
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            string filename = doc.FileName;
+            if (string.IsNullOrEmpty(filename))
+            {
+                Editor.FilenameResult res = await ed.GetSaveFilename("Save file");
+                if (res.Result == Editor.ResultMode.OK)
+                    filename = res.Value;
+                else
+                    return;
+            }
+            doc.Save(filename);
         }
     }
 

@@ -42,14 +42,36 @@ namespace SimpleCADTest
             statusCoords.Text = cadWindow1.View.CursorLocation.ToString(cadWindow1.Document.Settings.NumberFormat);
         }
 
+        private bool EnsureDocumentSaved()
+        {
+            if (!cadWindow1.Document.IsModified)
+                return true;
+
+            DialogResult res = MessageBox.Show(
+                "Do you want to save the changes to the document?",
+                "SimpleCAD Test", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+            if (res == DialogResult.Cancel)
+                return false;
+            else if (res == DialogResult.No)
+                return true;
+            else
+            {
+                cadWindow1.Document.Editor.RunCommand("Document.Save");
+                return !cadWindow1.Document.IsModified;
+            }
+        }
+
         private void btnNew_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Document.New");
+            if (EnsureDocumentSaved())
+                cadWindow1.Document.Editor.RunCommand("Document.New");
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Document.Open", SaveFileName);
+            if (EnsureDocumentSaved())
+                cadWindow1.Document.Editor.RunCommand("Document.Open", SaveFileName);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -157,6 +179,12 @@ namespace SimpleCADTest
         private void btnMirror_Click(object sender, EventArgs e)
         {
             cadWindow1.Document.Editor.RunCommand("Transform.Mirror");
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!EnsureDocumentSaved())
+                e.Cancel = true;
         }
     }
 }
