@@ -5,7 +5,7 @@ using System.IO;
 namespace SimpleCAD
 {
     [TypeConverter(typeof(Point2DConverter))]
-    public struct Point2D: IPersistable
+    public struct Point2D : IPersistable
     {
         private readonly float _x;
         private readonly float _y;
@@ -94,7 +94,12 @@ namespace SimpleCAD
 
         public override string ToString()
         {
-            return "{" + X.ToString() + ", " + Y.ToString() + "}";
+            return "(" + X.ToString() + ", " + Y.ToString() + ")";
+        }
+
+        public string ToString(string format)
+        {
+            return "(" + X.ToString(format) + ", " + Y.ToString(format) + ")";
         }
 
         public Point2D(BinaryReader reader)

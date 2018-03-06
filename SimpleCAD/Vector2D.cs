@@ -112,6 +112,11 @@ namespace SimpleCAD
             return "{" + X.ToString() + ", " + Y.ToString() + "}";
         }
 
+        public string ToString(string format)
+        {
+            return "(" + X.ToString(format) + ", " + Y.ToString(format) + ")";
+        }
+
         public Vector2D(BinaryReader reader)
         {
             _x = reader.ReadSingle();
