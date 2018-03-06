@@ -19,6 +19,7 @@ namespace SimpleCAD
         private bool hasMouse;
         private Drawable mouseDownCPItem;
         private ControlPoint mouseDownCP;
+        private string cursorMessage;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
@@ -98,6 +99,7 @@ namespace SimpleCAD
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
             Document.SelectionChanged += Document_SelectionChanged;
+            Document.Editor.CursorPrompt += Editor_CursorPrompt;
         }
 
         public void Attach(Control ctrl)
@@ -210,11 +212,52 @@ namespace SimpleCAD
         {
             if (hasMouse)
             {
+                RectangleF ex = GetViewPort();
                 using (Pen pen = Style.CursorStyle.CreatePen(param))
                 {
-                    RectangleF ex = GetViewPort();
-                    param.Graphics.DrawLine(pen, ex.Left, currentMouseLocationWorld.Y, ex.Right, currentMouseLocationWorld.Y);
-                    param.Graphics.DrawLine(pen, currentMouseLocationWorld.X, ex.Top, currentMouseLocationWorld.X, ex.Bottom);
+                    // Draw cursor
+                    param.Graphics.DrawLine(pen, ex.Left, CursorLocation.Y, ex.Right, CursorLocation.Y);
+                    param.Graphics.DrawLine(pen, CursorLocation.X, ex.Top, CursorLocation.X, ex.Bottom);
+                }
+
+                // Draw cursor prompt
+                if (!string.IsNullOrEmpty(cursorMessage))
+                {
+                    using (Font font = new Font(control.Font.FontFamily, 8))
+                    using (Brush back = new SolidBrush(Style.CursorPromptBackStyle.Color))
+                    using (Pen fore = Style.CursorPromptForeStyle.CreatePen(param))
+                    using (Brush fontBrush = new SolidBrush(Style.CursorPromptForeStyle.Color))
+                    {
+                        int margin = 4;
+                        int offset = 2;
+                        Point cursorPt = WorldToScreen(CursorLocation.X, CursorLocation.Y);
+                        PointF lowerRight = WorldToScreen(ex.Right, ex.Bottom);
+                        SizeF sz = param.Graphics.MeasureString(cursorMessage, font);
+                        // position cursor prompt to lower-right of cursor by default
+                        int x = cursorPt.X + margin + offset;
+                        int y = cursorPt.Y + margin + offset;
+                        // check if the prompt text fits into the window horizontally
+                        if (x + sz.Width + offset > lowerRight.X)
+                        {
+                            x = cursorPt.X - margin - offset - (int)sz.Width;
+                        }
+                        // check if the prompt text fits into the window vertically
+                        if (y + sz.Height + offset > lowerRight.Y)
+                        {
+                            y = cursorPt.Y - margin - offset - (int)sz.Height;
+                        }
+                        // Reset transform to draw in device units
+                        Matrix trans = param.Graphics.Transform;
+                        param.Graphics.ResetTransform();
+
+                        // Draw cursor prompt
+                        param.Graphics.FillRectangle(back, x - offset, y - offset, 2 * offset + sz.Width, 2 * offset + sz.Height);
+                        param.Graphics.DrawRectangle(fore, x - offset, y - offset, 2 * offset + sz.Width, 2 * offset + sz.Height);
+                        param.Graphics.DrawString(cursorMessage, font, fontBrush, x, y);
+
+                        // Restore transform
+                        param.Graphics.Transform = trans;
+                    }
                 }
             }
         }
@@ -371,6 +414,12 @@ namespace SimpleCAD
 
         private void Document_TransientsChanged(object sender, EventArgs e)
         {
+            control.Invalidate();
+        }
+
+        private void Editor_CursorPrompt(object sender, CursorPromptEventArgs e)
+        {
+            cursorMessage = e.Status;
             control.Invalidate();
         }
 

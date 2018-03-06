@@ -23,6 +23,8 @@ namespace SimpleCAD
         internal static Style ReverseSelectionBorderStyle { get { return new Style(Color.White, 1, DashStyle.Dash); } }
         internal static Style JiggedStyle { get { return new Style(Color.Orange, 1, DashStyle.Dash); } }
         internal static Style CursorStyle { get { return new Style(Color.White, 1, DashStyle.Solid); } }
+        internal static Style CursorPromptBackStyle { get { return new Style(Color.FromArgb(84, 58, 84)); } }
+        internal static Style CursorPromptForeStyle { get { return new Style(Color.FromArgb(128, Color.White)); } }
         internal static Style ControlPointStyle { get { return new Style(Color.FromArgb(46, 116, 251)); } }
 
         public Style(Color color, float lineWeight, DashStyle dashStyle)
