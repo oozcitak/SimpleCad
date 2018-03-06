@@ -20,6 +20,8 @@ namespace SimpleCAD
         public Composite Transients { get; private set; }
         [Browsable(false)]
         public Editor Editor { get; private set; }
+        [Browsable(false)]
+        public Settings Settings { get; private set; }
 
         public string FileName { get; private set; }
         public bool IsModified { get; private set; } = false;
@@ -32,6 +34,7 @@ namespace SimpleCAD
         {
             Model = new Composite();
             Editor = new Editor(this);
+            Settings = new Settings();
             Jigged = new Composite();
             Transients = new Composite();
             Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
@@ -46,6 +49,7 @@ namespace SimpleCAD
             Jigged.CollectionChanged -= Transients_CollectionChanged;
             Model = new Composite();
             Editor = new Editor(this);
+            Settings = new Settings();
             Jigged = new Composite();
             Transients = new Composite();
             Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
@@ -65,6 +69,7 @@ namespace SimpleCAD
                 Jigged.CollectionChanged -= Transients_CollectionChanged;
                 Model = new Composite(reader);
                 Editor = new Editor(this);
+                /// Settings = new Settings(reader);
                 Jigged = new Composite();
                 Transients = new Composite();
                 Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
@@ -91,6 +96,7 @@ namespace SimpleCAD
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 Model.Save(writer);
+                // Settings.Save(writer);
                 FileName = "";
                 IsModified = false;
             }

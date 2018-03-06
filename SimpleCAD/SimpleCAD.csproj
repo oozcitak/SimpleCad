@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADDocument.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Command_Selection.cs" />
     <Compile Include="Command_Document.cs" />
