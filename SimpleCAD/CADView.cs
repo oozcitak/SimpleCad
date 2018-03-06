@@ -1,8 +1,10 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Drawing.Drawing2D;
+﻿using SimpleCAD.Drawables;
+using SimpleCAD.Geometry;
+using System;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace SimpleCAD
 {
@@ -343,11 +345,18 @@ namespace SimpleCAD
         /// <param name="y2">X coordinate of the top right corner of the viewport in model coordinates.</param>
         public void ZoomToWindow(float x1, float y1, float x2, float y2)
         {
-            float h = Math.Abs(y1 - y2);
-            float w = Math.Abs(x1 - x2);
-            CameraPosition = new Point2D((x1 + x2) / 2, (y1 + y2) / 2);
+            ZoomToWindow(new Extents2D(x1, y1, x2, y2));
+        }
+
+        /// <summary>
+        /// Sets the viewport to the given model coordinates.
+        /// </summary>
+        /// <param name="limits">The new limits of the viewport in model coordinates.</param>
+        public void ZoomToWindow(Extents2D limits)
+        {
+            CameraPosition = limits.Center;
             if ((Height != 0) && (Width != 0))
-                ZoomFactor = Math.Max(h / Height, w / Width);
+                ZoomFactor = Math.Max(limits.Height / Height, limits.Width / Width);
             else
                 ZoomFactor = 1;
         }
@@ -357,11 +366,10 @@ namespace SimpleCAD
         /// </summary>
         public void ZoomToExtents()
         {
-            RectangleF limits = Document.Model.GetExtents();
+            Extents2D limits = Document.Model.GetExtents();
+            if (limits.IsEmpty) limits = new Extents2D(-250, -250, 250, 250);
 
-            if (limits.IsEmpty) limits = new RectangleF(-250, -250, 500, 500);
-
-            ZoomToWindow(limits.X, limits.Y, limits.X + limits.Width, limits.Y + limits.Height);
+            ZoomToWindow(limits);
             ZoomOut();
         }
 

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SimpleCAD.Geometry;
+using System;
 using System.Windows.Forms;
 
 namespace SimpleCAD
@@ -50,6 +47,7 @@ namespace SimpleCAD
         public CursorEventArgs(MouseButtons button, int clicks, float x, float y, int delta)
             : this(button, clicks, new Point2D(x, y), delta)
         {
+            ;
         }
     }
 

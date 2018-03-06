@@ -51,23 +51,23 @@
   <ItemGroup>
     <Compile Include="CADDocument.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Command.cs" />
-    <Compile Include="Command_Selection.cs" />
-    <Compile Include="Command_Document.cs" />
-    <Compile Include="Command_Transform.cs" />
-    <Compile Include="Command_Primitives.cs" />
-    <Compile Include="ControlPoint.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\Command_Selection.cs" />
+    <Compile Include="Commands\Command_Document.cs" />
+    <Compile Include="Commands\Command_Transform.cs" />
+    <Compile Include="Commands\Command_Primitives.cs" />
+    <Compile Include="Drawables\ControlPoint.cs" />
     <Compile Include="EditorInput.cs" />
-    <Compile Include="Hatch.cs" />
+    <Compile Include="Drawables\Hatch.cs" />
     <Compile Include="IPersistable.cs" />
     <Compile Include="MathF.cs" />
     <Compile Include="SelectionSet.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Events.cs" />
-    <Compile Include="Vector2DConverter.cs" />
-    <Compile Include="Point2DConverter.cs" />
-    <Compile Include="StyleConverter.cs" />
-    <Compile Include="Point2DCollection.cs" />
+    <Compile Include="Geometry\Vector2DConverter.cs" />
+    <Compile Include="Geometry\Point2DConverter.cs" />
+    <Compile Include="Drawables\StyleConverter.cs" />
+    <Compile Include="Geometry\Point2DCollection.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">
       <SubType>UserControl</SubType>
@@ -75,30 +75,30 @@
     <Compile Include="CADWindow.Designer.cs">
       <DependentUpon>CADWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Composite.cs" />
-    <Compile Include="Circle.cs" />
-    <Compile Include="Arc.cs" />
-    <Compile Include="EllipticArc.cs" />
-    <Compile Include="Styles.cs">
+    <Compile Include="Drawables\Composite.cs" />
+    <Compile Include="Drawables\Circle.cs" />
+    <Compile Include="Drawables\Arc.cs" />
+    <Compile Include="Drawables\EllipticArc.cs" />
+    <Compile Include="Drawables\Styles.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Styles.tt</DependentUpon>
     </Compile>
-    <Compile Include="Parabola.cs" />
-    <Compile Include="Point2D.cs" />
-    <Compile Include="Vector2D.cs" />
-    <Compile Include="TransformationMatrix2D.cs" />
-    <Compile Include="Triangle.cs" />
-    <Compile Include="Dimension.cs" />
-    <Compile Include="Ellipse.cs" />
-    <Compile Include="Extents2D.cs" />
-    <Compile Include="Style.cs" />
-    <Compile Include="Text.cs" />
-    <Compile Include="Polyline.cs" />
-    <Compile Include="Rectangle.cs" />
-    <Compile Include="Drawable.cs" />
-    <Compile Include="DrawParams.cs" />
-    <Compile Include="Line.cs" />
+    <Compile Include="Drawables\Parabola.cs" />
+    <Compile Include="Geometry\Point2D.cs" />
+    <Compile Include="Geometry\Vector2D.cs" />
+    <Compile Include="Geometry\TransformationMatrix2D.cs" />
+    <Compile Include="Drawables\Triangle.cs" />
+    <Compile Include="Drawables\Dimension.cs" />
+    <Compile Include="Drawables\Ellipse.cs" />
+    <Compile Include="Geometry\Extents2D.cs" />
+    <Compile Include="Drawables\Style.cs" />
+    <Compile Include="Drawables\Text.cs" />
+    <Compile Include="Drawables\Polyline.cs" />
+    <Compile Include="Drawables\Rectangle.cs" />
+    <Compile Include="Drawables\Drawable.cs" />
+    <Compile Include="Drawables\DrawParams.cs" />
+    <Compile Include="Drawables\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -107,7 +107,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Styles.tt">
+    <Content Include="Drawables\Styles.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Styles.cs</LastGenOutput>
     </Content>

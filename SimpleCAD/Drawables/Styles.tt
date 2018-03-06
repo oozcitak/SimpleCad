@@ -1,0 +1,19 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Drawing" #>
+<#@ output extension=".cs" #>
+namespace SimpleCAD.Drawables
+{
+    public partial class Style
+    {
+<#
+	foreach (System.Drawing.KnownColor col in Enum.GetValues(typeof(System.Drawing.KnownColor)))
+	{
+		string colorName = Enum.GetName(typeof(System.Drawing.KnownColor), col);
+#>
+		public static Style <#= colorName #> { get { return new Style(System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.<#= colorName #>)); } }
+<#
+	}
+
+#>
+	}
+}
