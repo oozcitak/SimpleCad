@@ -9,11 +9,11 @@ namespace SimpleCAD
     public class CADView
     {
         private Control control;
-        private PointF mCameraPosition;
+        private Point2D mCameraPosition;
         private float mZoomFactor;
 
         private bool panning;
-        private Point lastMouse;
+        private Point2D lastMouseLocationWorld;
         private Drawable mouseDownItem;
         private Point2D currentMouseLocationWorld;
         private bool hasMouse;
@@ -48,7 +48,7 @@ namespace SimpleCAD
         }
 
         [Category("Appearance"), DefaultValue(typeof(PointF), "0,0"), Description("Determines the location of the camera.")]
-        public PointF CameraPosition
+        public Point2D CameraPosition
         {
             get
             {
@@ -69,7 +69,7 @@ namespace SimpleCAD
                 {
                     y = 0;
                 }
-                mCameraPosition = new PointF(x, y);
+                mCameraPosition = new Point2D(x, y);
             }
         }
 
@@ -92,7 +92,7 @@ namespace SimpleCAD
             Height = 1;
 
             mZoomFactor = 5.0f / 3.0f;
-            mCameraPosition = new PointF(0, 0);
+            mCameraPosition = new Point2D(0, 0);
 
             panning = false;
 
@@ -110,7 +110,7 @@ namespace SimpleCAD
             Height = ctrl.ClientRectangle.Height;
 
             mZoomFactor = 5.0f / 3.0f;
-            mCameraPosition = new PointF(0, 0);
+            mCameraPosition = new Point2D(0, 0);
 
             control.Resize += CadView_Resize;
             control.MouseDown += CadView_MouseDown;
@@ -134,7 +134,7 @@ namespace SimpleCAD
                 Height = 1;
 
                 mZoomFactor = 5.0f / 3.0f;
-                mCameraPosition = new PointF(0, 0);
+                mCameraPosition = new Point2D(0, 0);
 
                 control.Resize -= CadView_Resize;
                 control.MouseDown -= CadView_MouseDown;
@@ -228,14 +228,14 @@ namespace SimpleCAD
                     using (Pen fore = Style.CursorPromptForeStyle.CreatePen(param))
                     using (Brush fontBrush = new SolidBrush(Style.CursorPromptForeStyle.Color))
                     {
-                        int margin = 4;
-                        int offset = 2;
-                        Point cursorPt = WorldToScreen(CursorLocation.X, CursorLocation.Y);
-                        PointF lowerRight = WorldToScreen(ex.Right, ex.Bottom);
+                        float margin = 4;
+                        float offset = 2;
+                        Point2D cursorPt = WorldToScreen(CursorLocation.X, CursorLocation.Y);
+                        Point2D lowerRight = WorldToScreen(ex.Right, ex.Bottom);
                         SizeF sz = param.Graphics.MeasureString(cursorMessage, font);
                         // position cursor prompt to lower-right of cursor by default
-                        int x = cursorPt.X + margin + offset;
-                        int y = cursorPt.Y + margin + offset;
+                        float x = cursorPt.X + margin + offset;
+                        float y = cursorPt.Y + margin + offset;
                         // check if the prompt text fits into the window horizontally
                         if (x + sz.Width + offset > lowerRight.X)
                         {
@@ -268,27 +268,27 @@ namespace SimpleCAD
         /// <param name="x">X coordinate in world coordinates.</param>
         /// <param name="y">Y coordinate in world coordinates.</param>
         /// <returns>A Point in screen coordinates.</returns>
-        public Point WorldToScreen(float x, float y)
+        public Point2D WorldToScreen(float x, float y)
         {
-            return new Point((int)((x - CameraPosition.X) / ZoomFactor) + Width / 2,
-                -(int)((y - CameraPosition.Y) / ZoomFactor) + Height / 2);
+            return new Point2D(((x - CameraPosition.X) / ZoomFactor) + Width / 2,
+                -((y - CameraPosition.Y) / ZoomFactor) + Height / 2);
         }
         /// <summary>
         /// Converts the given point from world coordinates to screen coordinates.
         /// </summary>
         /// <param name="pt">Location in world coordinates.</param>
         /// <returns>A Point in screen coordinates.</returns>
-        public Point WorldToScreen(PointF pt) { return WorldToScreen(pt.X, pt.Y); }
+        public Point2D WorldToScreen(Point2D pt) { return WorldToScreen(pt.X, pt.Y); }
         /// <summary>
         /// Converts the given vector from world coordinates to screen coordinates.
         /// </summary>
         /// <param name="sz">Size in world coordinates.</param>
         /// <returns>A Size in screen coordinates.</returns>
-        public Size WorldToScreen(SizeF sz)
+        public Vector2D WorldToScreen(Vector2D sz)
         {
-            Point pt1 = WorldToScreen(0.0f, 0.0f);
-            Point pt2 = WorldToScreen(sz.Width, sz.Height);
-            return new Size(pt2.X - pt1.X, pt2.Y - pt1.Y);
+            Point2D pt1 = WorldToScreen(0.0f, 0.0f);
+            Point2D pt2 = WorldToScreen(sz.X, sz.Y);
+            return (pt2 - pt1);
         }
 
         /// <summary>
@@ -297,9 +297,9 @@ namespace SimpleCAD
         /// <param name="x">X coordinate in screen coordinates.</param>
         /// <param name="y">Y coordinate in screen coordinates.</param>
         /// <returns>A PointF in world coordinates.</returns>
-        public PointF ScreenToWorld(int x, int y)
+        public Point2D ScreenToWorld(float x, float y)
         {
-            return new PointF((x - Width / 2) * ZoomFactor + CameraPosition.X,
+            return new Point2D((x - Width / 2) * ZoomFactor + CameraPosition.X,
                 -(y - Height / 2) * ZoomFactor + CameraPosition.Y);
         }
         /// <summary>
@@ -307,17 +307,17 @@ namespace SimpleCAD
         /// </summary>
         /// <param name="pt">Location in screen coordinates.</param>
         /// <returns>A PointF in world coordinates.</returns>
-        public PointF ScreenToWorld(Point pt) { return ScreenToWorld(pt.X, pt.Y); }
+        public Point2D ScreenToWorld(Point2D pt) { return ScreenToWorld(pt.X, pt.Y); }
         /// <summary>
         /// Converts the given vector from screen coordinates to world coordinates.
         /// </summary>
         /// <param name="sz">Size in screen coordinates.</param>
         /// <returns>A SizeF in world coordinates.</returns>
-        public SizeF ScreenToWorld(Size sz)
+        public Vector2D ScreenToWorld(Vector2D sz)
         {
-            PointF pt1 = ScreenToWorld(0, 0);
-            PointF pt2 = ScreenToWorld(sz.Width, sz.Height);
-            return new SizeF(pt2.X - pt1.X, pt2.Y - pt1.Y);
+            Point2D pt1 = ScreenToWorld(0, 0);
+            Point2D pt2 = ScreenToWorld(sz.X, sz.Y);
+            return (pt2 - pt1);
         }
 
         /// <summary>
@@ -325,8 +325,8 @@ namespace SimpleCAD
         /// </summary>
         public RectangleF GetViewPort()
         {
-            PointF bl = ScreenToWorld(0, 0);
-            PointF tr = ScreenToWorld(Width, Height);
+            Point2D bl = ScreenToWorld(0, 0);
+            Point2D tr = ScreenToWorld(Width, Height);
             return new RectangleF(bl.X, bl.Y, tr.X - bl.X, tr.Y - bl.Y);
         }
 
@@ -341,7 +341,7 @@ namespace SimpleCAD
         {
             float h = Math.Abs(y1 - y2);
             float w = Math.Abs(x1 - x2);
-            CameraPosition = new PointF((x1 + x2) / 2, (y1 + y2) / 2);
+            CameraPosition = new Point2D((x1 + x2) / 2, (y1 + y2) / 2);
             if ((Height != 0) && (Width != 0))
                 ZoomFactor = Math.Max(h / Height, w / Width);
             else
@@ -376,7 +376,7 @@ namespace SimpleCAD
             Zoom(1.1f);
         }
 
-        public void Pan(SizeF distance)
+        public void Pan(Vector2D distance)
         {
             CameraPosition -= distance;
         }
@@ -434,7 +434,7 @@ namespace SimpleCAD
             if (e.Button == MouseButtons.Middle && Interactive)
             {
                 panning = true;
-                lastMouse = e.Location;
+                lastMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
             }
             else if (e.Button == MouseButtons.Left && Interactive)
             {
@@ -465,7 +465,7 @@ namespace SimpleCAD
                         }
                         else
                         {
-                            float cpSize = ScreenToWorld(new Size(ControlPointSize + 4, 0)).Width;
+                            float cpSize = ScreenToWorld(new Vector2D(ControlPointSize + 4, 0)).X;
                             Document.Editor.PickedSelection.Add(mouseDownItem);
                         }
                     }
@@ -532,23 +532,20 @@ namespace SimpleCAD
 
         void CadView_MouseMove(object sender, MouseEventArgs e)
         {
-            currentMouseLocationWorld = new Point2D(ScreenToWorld(e.Location));
+            currentMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
             control.Invalidate();
 
             if (e.Button == MouseButtons.Middle && panning)
             {
                 // Relative mouse movement
-                PointF cloc = ScreenToWorld(e.Location);
-                PointF ploc = ScreenToWorld(lastMouse);
-                SizeF delta = new SizeF(cloc.X - ploc.X, cloc.Y - ploc.Y);
-                Pan(delta);
-                lastMouse = e.Location;
+                Pan(currentMouseLocationWorld - lastMouseLocationWorld);
+                lastMouseLocationWorld = ScreenToWorld(new Point2D(e.Location));
                 control.Invalidate();
             }
 
             if (Document.Editor.Mode != Editor.InputMode.None)
             {
-                Document.Editor.OnViewMouseMove(this, e, new Point2D(ScreenToWorld(e.Location)));
+                Document.Editor.OnViewMouseMove(this, e, ScreenToWorld(new Point2D(e.Location)));
             }
         }
 
@@ -556,7 +553,7 @@ namespace SimpleCAD
         {
             if (Document.Editor.Mode != Editor.InputMode.None)
             {
-                Document.Editor.OnViewMouseClick(this, e, new Point2D(ScreenToWorld(e.Location)));
+                Document.Editor.OnViewMouseClick(this, e, ScreenToWorld(new Point2D(e.Location)));
             }
         }
 
@@ -564,9 +561,6 @@ namespace SimpleCAD
         {
             if (Interactive)
             {
-                Point pt = e.Location;
-                PointF ptw = ScreenToWorld(pt);
-
                 if (e.Delta > 0)
                 {
                     ZoomIn();
@@ -632,19 +626,19 @@ namespace SimpleCAD
 
         public Drawable FindItemAtScreenCoordinates(int x, int y, int pickBox)
         {
-            PointF pt = ScreenToWorld(x, y);
-            float pickBoxWorld = ScreenToWorld(new Size(pickBox, 0)).Width;
+            Point2D pt = ScreenToWorld(x, y);
+            float pickBoxWorld = ScreenToWorld(new Vector2D(pickBox, 0)).X;
             foreach (Drawable d in Document.Model)
             {
-                if (d.Contains(new Point2D(pt), pickBoxWorld)) return d;
+                if (d.Contains(pt, pickBoxWorld)) return d;
             }
             return null;
         }
 
         private Tuple<Drawable, ControlPoint> FindControlPointAtScreenCoordinates(int x, int y, int controlPointSize)
         {
-            PointF pt = ScreenToWorld(x, y);
-            float size = ScreenToWorld(new Size(controlPointSize, 0)).Width;
+            Point2D pt = ScreenToWorld(x, y);
+            float size = ScreenToWorld(new Vector2D(controlPointSize, 0)).X;
             foreach (Drawable item in Document.Editor.PickedSelection)
             {
                 foreach (ControlPoint cp in ControlPoint.FromDrawable(item))
