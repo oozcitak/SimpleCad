@@ -487,7 +487,7 @@ namespace SimpleCAD
                     case InputMode.Distance:
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
-                        distanceCompletion.SetResult(new DistanceResult((e.Location - ((DistanceOptions)currentOptions).BasePoint).Length));
+                        distanceCompletion.SetResult(new DistanceResult((e.Location - ((DistanceOptions)currentOptions).BasePoint).Length, e.Location));
                         break;
                 }
             }
@@ -582,7 +582,7 @@ namespace SimpleCAD
                         {
                             inputCompleted = true;
                             OnCursorPrompt(new CursorPromptEventArgs());
-                            distanceCompletion.SetResult(new DistanceResult(dist));
+                            distanceCompletion.SetResult(new DistanceResult(dist, currentMouseLocation));
                         }
                         else if (!string.IsNullOrEmpty(keyword))
                         {

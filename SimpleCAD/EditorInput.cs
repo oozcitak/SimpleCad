@@ -80,8 +80,10 @@ namespace SimpleCAD
 
         public class DistanceResult : InputResult<float>
         {
+            public Point2D Point { get; internal set; }
+
             internal DistanceResult(ResultMode result) : base(result, 0, "") { }
-            internal DistanceResult(float value) : base(ResultMode.OK, value, "") { }
+            internal DistanceResult(float value, Point2D point) : base(ResultMode.OK, value, "") { Point = point; }
             internal DistanceResult(string keyword) : base(ResultMode.Keyword, 0, keyword) { }
         }
 
@@ -187,7 +189,7 @@ namespace SimpleCAD
                 Extension = ext;
             }
 
-            public FilenameOptions(string message, string filename, string filter) 
+            public FilenameOptions(string message, string filename, string filter)
                 : this(message, filename, filter, "scf")
             {
                 ;
