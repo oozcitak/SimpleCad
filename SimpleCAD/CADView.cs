@@ -526,11 +526,11 @@ namespace SimpleCAD
                         ControlPoint cp = mouseDownCP;
                         Drawable consItem = item.Clone();
                         Document.Transients.Add(consItem);
-                        Editor.ResultMode result = Editor.ResultMode.Cancel;
+                        ResultMode result = ResultMode.Cancel;
                         TransformationMatrix2D trans = TransformationMatrix2D.Identity;
                         if (cp.Type == ControlPoint.ControlPointType.Point)
                         {
-                            Editor.PointResult res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
+                            PointResult res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = TransformationMatrix2D.Translation(p - cp.BasePoint);
@@ -542,7 +542,7 @@ namespace SimpleCAD
                         else if (cp.Type == ControlPoint.ControlPointType.Angle)
                         {
                             float orjVal = (cp.Location - cp.BasePoint).Angle;
-                            Editor.AngleResult res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
+                            AngleResult res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = TransformationMatrix2D.Rotation(cp.BasePoint, p - orjVal);
@@ -555,7 +555,7 @@ namespace SimpleCAD
                         {
                             Vector2D dir = (cp.Location - cp.BasePoint).Normal;
                             float orjVal = (cp.Location - cp.BasePoint).Length;
-                            Editor.DistanceResult res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
+                            DistanceResult res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = TransformationMatrix2D.Translation(dir * (p - orjVal));
@@ -564,7 +564,7 @@ namespace SimpleCAD
                             trans = TransformationMatrix2D.Translation(dir * (res.Value - orjVal));
                             result = res.Result;
                         }
-                        if (result == Editor.ResultMode.OK)
+                        if (result == ResultMode.OK)
                         {
                             item.TransformControlPoint(cp, trans);
                         }
@@ -588,7 +588,7 @@ namespace SimpleCAD
                 control.Invalidate();
             }
 
-            if (Document.Editor.Mode != Editor.InputMode.None)
+            if (Document.Editor.Mode != InputMode.None)
             {
                 Document.Editor.OnViewMouseMove(this, e);
             }
@@ -596,7 +596,7 @@ namespace SimpleCAD
 
         private void CadView_CursorClick(object sender, CursorEventArgs e)
         {
-            if (Document.Editor.Mode != Editor.InputMode.None)
+            if (Document.Editor.Mode != InputMode.None)
             {
                 Document.Editor.OnViewMouseClick(this, e);
             }
@@ -641,7 +641,7 @@ namespace SimpleCAD
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Document.Editor.Mode != Editor.InputMode.None)
+            if (Document.Editor.Mode != InputMode.None)
             {
                 Document.Editor.OnViewKeyDown(this, e);
             }
@@ -653,7 +653,7 @@ namespace SimpleCAD
 
         private void CadView_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (Document.Editor.Mode != Editor.InputMode.None)
+            if (Document.Editor.Mode != InputMode.None)
             {
                 Document.Editor.OnViewKeyPress(this, e);
             }
