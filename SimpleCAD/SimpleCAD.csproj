@@ -63,7 +63,7 @@
     <Compile Include="MathF.cs" />
     <Compile Include="SelectionSet.cs" />
     <Compile Include="Editor.cs" />
-    <Compile Include="Events.cs" />
+    <Compile Include="EventArgs.cs" />
     <Compile Include="Geometry\Vector2DConverter.cs" />
     <Compile Include="Geometry\Point2DConverter.cs" />
     <Compile Include="Drawables\StyleConverter.cs" />

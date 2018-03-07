@@ -4,13 +4,6 @@ using System.Windows.Forms;
 
 namespace SimpleCAD
 {
-    public delegate void DocumentChangedEventHandler(object sender, EventArgs e);
-    public delegate void TransientsChangedEventHandler(object sender, EventArgs e);
-    public delegate void SelectionChangedEventHandler(object sender, EventArgs e);
-    public delegate void EditorPromptEventHandler(object sender, EditorPromptEventArgs e);
-    internal delegate void CursorPromptEventHandler(object sender, CursorPromptEventArgs e);
-    public delegate void CursorEventHandler(object sender, CursorEventArgs e);
-
     public class EditorPromptEventArgs : EventArgs
     {
         public string Status { get; private set; }

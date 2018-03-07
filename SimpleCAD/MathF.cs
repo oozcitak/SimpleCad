@@ -2,7 +2,7 @@
 
 namespace SimpleCAD
 {
-    public static class MathF
+    internal static class MathF
     {
         public const float Epsilon = 1e-7f;
         public const float PI = 3.14159265358979323846264338327950288419716939937510582f;
