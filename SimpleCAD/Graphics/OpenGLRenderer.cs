@@ -37,6 +37,11 @@ namespace SimpleCAD.Graphics
             ;
         }
 
+        public override void ClearFrame(Color color)
+        {
+            gdi.Clear(System.Drawing.Color.FromArgb((int)color.Argb));
+        }
+
         public override void DrawLine(Style style, Point2D p1, Point2D p2)
         {
             using (var pen = CreatePen(style))

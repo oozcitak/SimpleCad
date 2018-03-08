@@ -32,6 +32,9 @@ namespace SimpleCAD.Graphics
         public override void InitFrame(System.Drawing.Graphics graphics)
         {
             gdi = graphics;
+
+            gdi.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            gdi.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
         }
 
         public override void EndFrame()
@@ -47,6 +50,11 @@ namespace SimpleCAD.Graphics
         public override void Dispose()
         {
             ;
+        }
+
+        public override void ClearFrame(Color color)
+        {
+            gdi.Clear(System.Drawing.Color.FromArgb((int)color.Argb));
         }
 
         public override void DrawLine(Style style, Point2D p1, Point2D p2)

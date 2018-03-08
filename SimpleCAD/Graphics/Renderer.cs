@@ -54,6 +54,7 @@ namespace SimpleCAD
         public abstract void Resize(int width, int height);
         public abstract void Dispose();
 
+        public abstract void ClearFrame(Color color);
         public abstract void DrawLine(Style style, Point2D p1, Point2D p2);
         public abstract void DrawRectangle(Style style, Point2D p1, Point2D p2);
         public abstract void DrawCircle(Style style, Point2D center, float radius);
