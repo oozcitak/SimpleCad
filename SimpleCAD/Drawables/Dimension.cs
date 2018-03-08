@@ -59,9 +59,9 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            GetSubItems().Draw(param);
+            renderer.Draw(GetSubItems());
         }
 
         public override Extents2D GetExtents()
@@ -131,8 +131,8 @@ namespace SimpleCAD.Drawables
             Text textObj = new Text(len / 2, Offset, txt, TextHeight);
             textObj.FontFamily = FontFamily;
             textObj.FontStyle = FontStyle;
-            textObj.HorizontalAlignment = StringAlignment.Center;
-            textObj.VerticalAlignment = StringAlignment.Center;
+            textObj.HorizontalAlignment = TextHorizontalAlignment.Center;
+            textObj.VerticalAlignment = TextVerticalAlignment.Middle;
             textObj.Style = Style;
             items.Add(textObj);
 

@@ -34,12 +34,9 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            using (Pen pen = Style.CreatePen(param))
-            {
-                param.Graphics.DrawLine(pen, X1, Y1, X2, Y2);
-            }
+            renderer.DrawLine(Style, StartPoint, EndPoint);
         }
 
         public override Extents2D GetExtents()

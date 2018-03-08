@@ -72,10 +72,10 @@ namespace SimpleCAD.Drawables
             poly.TransformBy(TransformationMatrix2D.Translation(X, Y));
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
             poly.Style = Style;
-            poly.Draw(param);
+            renderer.Draw(poly);
         }
 
         public override Extents2D GetExtents()

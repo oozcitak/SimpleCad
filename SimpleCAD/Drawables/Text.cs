@@ -1,7 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 
 namespace SimpleCAD.Drawables
@@ -22,8 +21,8 @@ namespace SimpleCAD.Drawables
         private FontStyle fontStyle;
         private float textHeight;
         private float rotation;
-        private StringAlignment horizontalAlignment;
-        private StringAlignment verticalAlignment;
+        private TextHorizontalAlignment horizontalAlignment;
+        private TextVerticalAlignment verticalAlignment;
 
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
         public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
@@ -31,8 +30,8 @@ namespace SimpleCAD.Drawables
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
         public float Rotation { get => rotation; set { rotation = value; NotifyPropertyChanged(); } }
-        public StringAlignment HorizontalAlignment { get => horizontalAlignment; set { horizontalAlignment = value; NotifyPropertyChanged(); } }
-        public StringAlignment VerticalAlignment { get => verticalAlignment; set { verticalAlignment = value; NotifyPropertyChanged(); } }
+        public TextHorizontalAlignment HorizontalAlignment { get => horizontalAlignment; set { horizontalAlignment = value; NotifyPropertyChanged(); } }
+        public TextVerticalAlignment VerticalAlignment { get => verticalAlignment; set { verticalAlignment = value; NotifyPropertyChanged(); } }
 
         private float cpSize = 0;
 
@@ -43,8 +42,8 @@ namespace SimpleCAD.Drawables
             Width = height;
             String = text;
             Rotation = 0;
-            HorizontalAlignment = StringAlignment.Near;
-            VerticalAlignment = StringAlignment.Near;
+            HorizontalAlignment = TextHorizontalAlignment.Left;
+            VerticalAlignment = TextVerticalAlignment.Bottom;
             FontFamily = "Arial";
             FontStyle = FontStyle.Regular;
         }
@@ -55,48 +54,10 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            cpSize = param.ViewToModel(param.View.ControlPointSize);
-
-            float height = param.ModelToView(TextHeight);
-            using (Pen pen = Style.CreatePen(param))
-            using (Brush brush = new SolidBrush(pen.Color))
-            using (Font font = new Font(FontFamily, height, FontStyle, GraphicsUnit.Pixel))
-            {
-                // Convert the text alignment point (x, y) to pixel coordinates
-                PointF[] pt = new PointF[] { new PointF(X, Y) };
-                param.Graphics.TransformPoints(CoordinateSpace.Device, CoordinateSpace.World, pt);
-                float x = pt[0].X;
-                float y = pt[0].Y;
-
-                // Revert transformation to identity while drawing text
-                Matrix oldMatrix = param.Graphics.Transform;
-                param.Graphics.ResetTransform();
-
-                // Calculate alignment in pixel coordinates
-                float dx = 0;
-                float dy = 0;
-                SizeF sz = param.Graphics.MeasureString(String, font);
-                Width = param.ViewToModel(sz.Width);
-                if (HorizontalAlignment == StringAlignment.Far)
-                    dx = -sz.Width;
-                else if (HorizontalAlignment == StringAlignment.Center)
-                    dx = -sz.Width / 2;
-                if (VerticalAlignment == StringAlignment.Near)
-                    dy = -sz.Height;
-                else if (VerticalAlignment == StringAlignment.Center)
-                    dy = -sz.Height / 2;
-
-                param.Graphics.TranslateTransform(dx, dy, MatrixOrder.Append);
-                param.Graphics.RotateTransform(-Rotation * 180 / MathF.PI, MatrixOrder.Append);
-                param.Graphics.TranslateTransform(x, y, MatrixOrder.Append);
-
-                param.Graphics.DrawString(String, font, brush, 0, 0);
-
-                // Restore old transformation
-                param.Graphics.Transform = oldMatrix;
-            }
+            Width = renderer.MeasureString(String, FontFamily, TextHeight).X;
+            renderer.DrawString(Style, Location, String, FontFamily, TextHeight, FontStyle.Regular, Rotation, HorizontalAlignment, VerticalAlignment);
         }
 
         public override Extents2D GetExtents()
@@ -110,13 +71,13 @@ namespace SimpleCAD.Drawables
             Point2D p4 = new Point2D(thWidth, thHeight);
             float dx = 0;
             float dy = 0;
-            if (HorizontalAlignment == StringAlignment.Far)
+            if (HorizontalAlignment == TextHorizontalAlignment.Right)
                 dx = -thWidth;
-            else if (HorizontalAlignment == StringAlignment.Center)
+            else if (HorizontalAlignment == TextHorizontalAlignment.Center)
                 dx = -thWidth / 2;
-            if (VerticalAlignment == StringAlignment.Far)
+            if (VerticalAlignment == TextVerticalAlignment.Top)
                 dy = -thHeight;
-            else if (VerticalAlignment == StringAlignment.Center)
+            else if (VerticalAlignment == TextVerticalAlignment.Middle)
                 dy = -thHeight / 2;
             Vector2D offset = new Vector2D(dx, dy);
             p1 = p1 + offset;
@@ -163,8 +124,8 @@ namespace SimpleCAD.Drawables
             FontFamily = reader.ReadString();
             FontStyle = (FontStyle)reader.ReadInt32();
             Rotation = reader.ReadSingle();
-            HorizontalAlignment = (StringAlignment)reader.ReadInt32();
-            VerticalAlignment = (StringAlignment)reader.ReadInt32();
+            HorizontalAlignment = (TextHorizontalAlignment)reader.ReadInt32();
+            VerticalAlignment = (TextVerticalAlignment)reader.ReadInt32();
         }
 
         public override void Save(BinaryWriter writer)

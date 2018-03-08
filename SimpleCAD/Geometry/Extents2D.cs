@@ -7,13 +7,15 @@ namespace SimpleCAD.Geometry
     public class Extents2D
     {
         public bool IsEmpty { get; private set; }
-        public float XMin { get; private set; }
-        public float YMin { get; private set; }
-        public float XMax { get; private set; }
-        public float YMax { get; private set; }
-        public float Width { get { return Math.Abs(XMax - XMin); } }
-        public float Height { get { return Math.Abs(YMax - YMin); } }
-        public Point2D Center { get { return IsEmpty ? Point2D.Zero : new Point2D((XMin + XMax) / 2, (YMin + YMax) / 2); } }
+        public float Xmin { get; private set; }
+        public float Ymin { get; private set; }
+        public float Xmax { get; private set; }
+        public float Ymax { get; private set; }
+        public float Width { get { return Math.Abs(Xmax - Xmin); } }
+        public float Height { get { return Math.Abs(Ymax - Ymin); } }
+        public Point2D Center { get { return IsEmpty ? Point2D.Zero : new Point2D((Xmin + Xmax) / 2, (Ymin + Ymax) / 2); } }
+        public Point2D Ptmin { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmin, Ymin); } }
+        public Point2D Ptmax { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmax, Ymax); } }
 
         public static Extents2D Empty { get { return new Extents2D(); } }
 
@@ -36,10 +38,10 @@ namespace SimpleCAD.Geometry
 
         public void Add(float x, float y)
         {
-            if (IsEmpty || x < XMin) XMin = x;
-            if (IsEmpty || y < YMin) YMin = y;
-            if (IsEmpty || x > XMax) XMax = x;
-            if (IsEmpty || y > YMax) YMax = y;
+            if (IsEmpty || x < Xmin) Xmin = x;
+            if (IsEmpty || y < Ymin) Ymin = y;
+            if (IsEmpty || x > Xmax) Xmax = x;
+            if (IsEmpty || y > Ymax) Ymax = y;
 
             IsEmpty = false;
         }
@@ -67,8 +69,8 @@ namespace SimpleCAD.Geometry
         {
             if (!extents.IsEmpty)
             {
-                Add(extents.XMin, extents.YMin);
-                Add(extents.XMax, extents.YMax);
+                Add(extents.Xmin, extents.Ymin);
+                Add(extents.Xmax, extents.Ymax);
             }
         }
 
@@ -77,7 +79,7 @@ namespace SimpleCAD.Geometry
             if (extents.IsEmpty)
                 return RectangleF.Empty;
             else
-                return new RectangleF(extents.XMin, extents.YMin, extents.XMax - extents.XMin, extents.YMax - extents.YMin);
+                return new RectangleF(extents.Xmin, extents.Ymin, extents.Xmax - extents.Xmin, extents.Ymax - extents.Ymin);
         }
 
         public bool Contains(Point2D pt)
@@ -90,17 +92,17 @@ namespace SimpleCAD.Geometry
             if (IsEmpty)
                 return false;
             else
-                return (x >= XMin && x <= XMax && y >= YMin && y <= YMax);
+                return (x >= Xmin && x <= Xmax && y >= Ymin && y <= Ymax);
         }
 
         public bool Contains(Extents2D other)
         {
-            return (XMin <= other.XMin && XMax >= other.XMax && YMin <= other.YMin && YMax >= other.YMax);
+            return (Xmin <= other.Xmin && Xmax >= other.Xmax && Ymin <= other.Ymin && Ymax >= other.Ymax);
         }
 
         public bool IntersectsWith(Extents2D other)
         {
-            return (XMax >= other.XMin && XMin <= other.XMax && YMax >= other.YMin && YMin <= other.YMax);
+            return (Xmax >= other.Xmin && Xmin <= other.Xmax && Ymax >= other.Ymin && Ymin <= other.Ymax);
         }
     }
 }

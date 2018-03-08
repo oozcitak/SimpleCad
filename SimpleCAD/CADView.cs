@@ -100,6 +100,8 @@ namespace SimpleCAD
 
             panning = false;
 
+            SetRenderer(typeof(GDIRenderer));
+
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
             Document.SelectionChanged += Document_SelectionChanged;
@@ -229,40 +231,42 @@ namespace SimpleCAD
                 Style cursorStyle = new Style(Document.Settings.Get<Color>("CursorColor"));
 
                 // Draw cursor
-                renderer.DrawLine(cursorStyle, new Point2D(ex.XMin, CursorLocation.Y), new Point2D(ex.XMax, CursorLocation.Y));
-                renderer.DrawLine(cursorStyle, new Point2D(CursorLocation.X, ex.YMin), new Point2D(CursorLocation.X, ex.YMax));
+                renderer.DrawLine(cursorStyle, new Point2D(ex.Xmin, CursorLocation.Y), new Point2D(ex.Xmax, CursorLocation.Y));
+                renderer.DrawLine(cursorStyle, new Point2D(CursorLocation.X, ex.Ymin), new Point2D(CursorLocation.X, ex.Ymax));
 
                 // Draw cursor prompt
                 if (!string.IsNullOrEmpty(cursorMessage))
                 {
                     string fontFamily = control.Font.FontFamily.Name;
-                    float textHeight = ScreenToWorld(new Vector2D(8, 0)).X;
-                    float margin = ScreenToWorld(new Vector2D(4, 0)).X;
-                    float offset = ScreenToWorld(new Vector2D(2, 0)).X;
+                    float textHeight = Math.Abs(ScreenToWorld(new Vector2D(0, 12)).Y);
+                    float margin = Math.Abs(ScreenToWorld(new Vector2D(4, 0)).X);
+                    float offset = Math.Abs(ScreenToWorld(new Vector2D(2, 0)).X);
 
                     // position cursor prompt to lower-right of cursor by default
                     float x = CursorLocation.X + margin + offset;
-                    float y = CursorLocation.Y + margin + offset;
+                    float y = CursorLocation.Y - margin - offset;
                     Vector2D sz = renderer.MeasureString(cursorMessage, fontFamily, textHeight);
-                    Point2D lowerRight = new Point2D(ex.XMax, ex.YMax);
+                    Point2D lowerRight = new Point2D(ex.Xmax, ex.Ymin);
                     // check if the prompt text fits into the window horizontally
                     if (x + sz.X + offset > lowerRight.X)
                     {
                         x = CursorLocation.X - margin - offset - sz.X;
                     }
                     // check if the prompt text fits into the window vertically
-                    if (y + sz.Y + offset > lowerRight.Y)
+                    if (y - sz.Y - offset < lowerRight.Y)
                     {
-                        y = CursorLocation.Y - margin - offset - sz.Y;
+                        y = CursorLocation.Y + margin + offset + sz.Y;
                     }
 
                     // Draw cursor prompt
                     Style fore = new Style(Document.Settings.Get<Color>("CursorPromptForeColor"));
                     Style back = new Style(Document.Settings.Get<Color>("CursorPromptBackColor"));
                     back.Fill = true;
-                    renderer.DrawRectangle(back, new Point2D(x - offset, y - offset), new Point2D(x + 2 * offset + sz.X, y + 2 * offset + sz.Y));
-                    renderer.DrawRectangle(fore, new Point2D(x - offset, y - offset), new Point2D(x + 2 * offset + sz.X, y + 2 * offset + sz.Y));
-                    renderer.DrawString(fore, new Point2D(x, y), cursorMessage, fontFamily, textHeight);
+                    renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
+                    back.Fill = false;
+                    renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
+                    renderer.DrawString(fore, new Point2D(x, y), cursorMessage, fontFamily, textHeight,
+                        hAlign: TextHorizontalAlignment.Left, vAlign: TextVerticalAlignment.Top);
                 }
             }
         }
@@ -330,7 +334,10 @@ namespace SimpleCAD
         /// </summary>
         public Extents2D GetViewPort()
         {
-            return new Extents2D(0, 0, Width, Height);
+            Extents2D ex = new Extents2D();
+            ex.Add((ScreenToWorld(new Point2D(0, 0))));
+            ex.Add((ScreenToWorld(new Point2D(Width, Height))));
+            return ex;
         }
 
         /// <summary>

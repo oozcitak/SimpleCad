@@ -37,26 +37,9 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            using (Pen pen = Style.CreatePen(param))
-            {
-                // Represent curved features by at most 4 pixels
-                float sweep = EndAngle - StartAngle;
-                while (sweep < 0) sweep += 2 * MathF.PI;
-                while (sweep > 2 * MathF.PI) sweep -= 2 * MathF.PI;
-                float curveLength = param.ModelToView(sweep * Radius);
-                int n = (int)Math.Max(4, curveLength / 4);
-                float a = StartAngle;
-                float da = sweep / n;
-                PointF[] pts = new PointF[n + 1];
-                for (int i = 0; i <= n; i++)
-                {
-                    pts[i] = new PointF(X + Radius * MathF.Cos(a), Y + Radius * MathF.Sin(a));
-                    a += da;
-                }
-                param.Graphics.DrawLines(pen, pts);
-            }
+            renderer.DrawArc(Style, Center, Radius, StartAngle, EndAngle);
         }
 
         public override Extents2D GetExtents()

@@ -54,19 +54,9 @@ namespace SimpleCAD.Drawables
             NotifyPropertyChanged("Points");
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            if (Points.Count > 0)
-            {
-                PointF[] pts = Points.ToPointF();
-                using (Pen pen = Style.CreatePen(param))
-                {
-                    if (Closed)
-                        param.Graphics.DrawPolygon(pen, pts);
-                    else
-                        param.Graphics.DrawLines(pen, pts);
-                }
-            }
+            renderer.DrawPolyline(Style, Points, Closed);
         }
 
         public override Extents2D GetExtents()

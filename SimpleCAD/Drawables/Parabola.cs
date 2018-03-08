@@ -62,19 +62,10 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            cpSize = param.ViewToModel(param.View.ControlPointSize);
-
-            float p = poly.Length;
-            float newCurveLength = param.ModelToView(p);
-            if (!MathF.IsEqual(newCurveLength, curveLength))
-            {
-                curveLength = newCurveLength;
-                UpdatePolyline();
-            }
             poly.Style = Style;
-            poly.Draw(param);
+            renderer.Draw(poly);
         }
 
         private void UpdatePolyline()

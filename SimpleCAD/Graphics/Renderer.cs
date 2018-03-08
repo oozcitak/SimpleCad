@@ -1,8 +1,33 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 
 namespace SimpleCAD
 {
+    [Flags]
+    public enum FontStyle
+    {
+        Regular = 0,
+        Bold = 1,
+        Italic = 2,
+        Underline = 4,
+        Strikeout = 8
+    }
+
+    public enum TextHorizontalAlignment
+    {
+        Left,
+        Center,
+        Right
+    }
+
+    public enum TextVerticalAlignment
+    {
+        Top,
+        Middle,
+        Bottom
+    }
+
     public abstract class Renderer
     {
         public CADView View { get; private set; }
@@ -27,12 +52,16 @@ namespace SimpleCAD
         public abstract void DrawRectangle(Style style, Point2D p1, Point2D p2);
         public abstract void DrawCircle(Style style, Point2D center, float radius);
         public abstract void DrawArc(Style style, Point2D center, float radius, float startAngle, float endAngle);
-        public abstract void DrawEllipse(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis);
-        public abstract void DrawEllipticArc(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float startAngle, float endAngle);
+        public abstract void DrawEllipse(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float rotation);
+        public abstract void DrawEllipticArc(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float startAngle, float endAngle, float rotation);
         public abstract void DrawPolyline(Style style, Point2DCollection points, bool closed);
         public abstract void DrawPolygon(Style style, Point2DCollection points);
         public abstract Vector2D MeasureString(string text, string fontFamily, float textHeight);
-        public abstract void DrawString(Style style, Point2D pt, string text, string fontFamily, float textHeight);
+        public abstract void DrawString(Style style, Point2D pt, string text,
+            string fontFamily, float textHeight, FontStyle fontStyle = FontStyle.Regular,
+            float rotation = 0, 
+            TextHorizontalAlignment hAlign = TextHorizontalAlignment.Left, 
+            TextVerticalAlignment vAlign = TextVerticalAlignment.Bottom);
         public abstract void Draw(Drawable item);
     }
 }

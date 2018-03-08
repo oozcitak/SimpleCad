@@ -207,7 +207,7 @@ namespace SimpleCAD.Graphics
             _b = (byte)(color & 255);
         }
 
-        public Color(byte r, byte g, byte b) : this(0, r, g, b)
+        public Color(byte r, byte g, byte b) : this(255, r, g, b)
         {
             ;
         }
@@ -221,7 +221,7 @@ namespace SimpleCAD.Graphics
             _b = b;
         }
 
-        public Color(byte alpha, Color color) : this(0, color.R, color.G, color.B)
+        public Color(byte alpha, Color color) : this(alpha, color.R, color.G, color.B)
         {
             ;
         }

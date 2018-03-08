@@ -41,13 +41,13 @@ namespace SimpleCAD.Drawables
             }
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
             foreach (Drawable item in items)
             {
                 if (item.Visible)
                 {
-                    item.Draw(param);
+                    renderer.Draw(item);
                 }
             }
         }

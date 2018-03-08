@@ -62,20 +62,19 @@ namespace SimpleCAD.Drawables
             poly.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            cpSize = param.ViewToModel(param.View.ControlPointSize);
-
             // Approximate perimeter (Ramanujan)
             float p = 2 * MathF.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - MathF.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
-            float newCurveLength = param.ModelToView(p);
+            float newCurveLength = renderer.View.WorldToScreen(new Vector2D(p, 0)).X;
             if (!MathF.IsEqual(newCurveLength, curveLength))
             {
                 curveLength = newCurveLength;
                 UpdatePolyline();
             }
+
             poly.Style = Style;
-            poly.Draw(param);
+            renderer.Draw(poly);
         }
 
         public override Extents2D GetExtents()

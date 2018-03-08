@@ -31,22 +31,12 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(Graphics param)
+        public override void Draw(Renderer renderer)
         {
-            if (Points.Count > 2)
-            {
-                PointF[] pts = Points.ToPointF();
-                using (Brush brush = new SolidBrush(Style.Color))
-                {
-                    param.Graphics.FillPolygon(brush, pts);
-                }
-                // The graphics engine overrides CreatePen to highlight the hatch boundary
-                // during selection. Outside selection an invisible border is drawn.
-                using (Pen pen = Style.Transparent.CreatePen(param))
-                {
-                    param.Graphics.DrawPolygon(pen, pts);
-                }
-            }
+            Style.Fill = true;
+            renderer.DrawPolygon(Style, Points);
+            Style.Fill = false;
+            renderer.DrawPolygon(Style, Points);
         }
 
         public Hatch(BinaryReader reader) : base(reader)
