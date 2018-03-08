@@ -1,9 +1,8 @@
 ﻿using SimpleCAD.Drawables;
 using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace SimpleCAD
@@ -24,6 +23,7 @@ namespace SimpleCAD
         private Drawable mouseDownCPItem;
         private ControlPoint mouseDownCP;
         private string cursorMessage;
+        private Type rendererType;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
@@ -51,7 +51,7 @@ namespace SimpleCAD
             }
         }
 
-        [Category("Appearance"), DefaultValue(typeof(PointF), "0,0"), Description("Determines the location of the camera.")]
+        [Category("Appearance"), DefaultValue(typeof(System.Drawing.PointF), "0,0"), Description("Determines the location of the camera.")]
         public Point2D CameraPosition
         {
             get
@@ -109,7 +109,8 @@ namespace SimpleCAD
         public void Attach(Control ctrl)
         {
             control = ctrl;
-            control.BackColor = Document.Settings.Get<Color>("BackColor");
+            Color backColor = Document.Settings.Get<Color>("BackColor");
+            control.BackColor = System.Drawing.Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B);
 
             Width = ctrl.ClientRectangle.Width;
             Height = ctrl.ClientRectangle.Height;
@@ -156,116 +157,112 @@ namespace SimpleCAD
             }
         }
 
-        public void Render(Graphics graphics)
+        public void SetRenderer(Type type)
         {
-            DrawParams param = new DrawParams(this, graphics, false, ZoomFactor);
+            rendererType = type;
+        }
+
+        public void Render(System.Drawing.Graphics graphics)
+        {
+            Renderer renderer = (Renderer)Activator.CreateInstance(rendererType, this, graphics);
 
             // Set an orthogonal projection matrix
             ScaleGraphics(graphics);
 
             // Render drawing objects
-            Document.Model.Draw(param);
+            Document.Model.Draw(renderer);
 
             // Render selected objects
-            DrawSelection(param);
+            DrawSelection(renderer);
 
             // Render jigged objects
-            DrawJigged(param);
+            DrawJigged(renderer);
 
             // Render transient objects
-            Document.Transients.Draw(param);
+            Document.Transients.Draw(renderer);
 
             // Render cursor
-            DrawCursor(param);
+            DrawCursor(renderer);
         }
 
-        private void DrawSelection(DrawParams param)
+        private void DrawSelection(Renderer renderer)
         {
-            param.StyleOverride = new Style(Document.Settings.Get<Color>("SelectionHighlightColor"), 5, DashStyle.Solid);
+            renderer.StyleOverride = new Style(Document.Settings.Get<Color>("SelectionHighlightColor"), 5, DashStyle.Solid);
             // Current selection
             foreach (Drawable selected in Document.Editor.CurrentSelection)
             {
-                selected.Draw(param);
+                renderer.Draw(selected);
             }
             // Picked objects
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
-                selected.Draw(param);
+                renderer.Draw(selected);
             }
-            param.StyleOverride = null;
+            renderer.StyleOverride = null;
             // Control points
-            using (Pen pen = new Pen(Document.Settings.Get<Color>("ControlPointColor")))
-            {
-                pen.Width = param.GetScaledLineWeight(2);
-                float cpSize = param.ViewToModel(ControlPointSize);
+            Style cpStyle = new Style(Document.Settings.Get<Color>("ControlPointColor"), 2);
+            float cpSize = ScreenToWorld(new Vector2D(ControlPointSize, 0)).X;
 
-                foreach (Drawable selected in Document.Editor.PickedSelection)
+            foreach (Drawable selected in Document.Editor.PickedSelection)
+            {
+                foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
                 {
-                    foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
-                    {
-                        param.Graphics.DrawRectangle(pen, pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2, cpSize, cpSize);
-                    }
+                    renderer.DrawRectangle(cpStyle,
+                        new Point2D(pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2),
+                        new Point2D(pt.Location.X + cpSize / 2, pt.Location.Y + cpSize / 2));
                 }
             }
         }
 
-        private void DrawJigged(DrawParams param)
+        private void DrawJigged(Renderer renderer)
         {
-            param.StyleOverride = new Style(Document.Settings.Get<Color>("JigColor"), 0, DashStyle.Dash);
-            Document.Jigged.Draw(param);
-            param.StyleOverride = null;
+            renderer.StyleOverride = new Style(Document.Settings.Get<Color>("JigColor"), 0, DashStyle.Dash);
+            renderer.Draw(Document.Jigged);
+            renderer.StyleOverride = null;
         }
 
-        private void DrawCursor(DrawParams param)
+        private void DrawCursor(Renderer renderer)
         {
             if (hasMouse)
             {
-                RectangleF ex = GetViewPort();
-                using (Pen pen = new Pen(Document.Settings.Get<Color>("CursorColor")))
-                {
-                    // Draw cursor
-                    param.Graphics.DrawLine(pen, ex.Left, CursorLocation.Y, ex.Right, CursorLocation.Y);
-                    param.Graphics.DrawLine(pen, CursorLocation.X, ex.Top, CursorLocation.X, ex.Bottom);
-                }
+                Extents2D ex = GetViewPort();
+                Style cursorStyle = new Style(Document.Settings.Get<Color>("CursorColor"));
+
+                // Draw cursor
+                renderer.DrawLine(cursorStyle, new Point2D(ex.XMin, CursorLocation.Y), new Point2D(ex.XMax, CursorLocation.Y));
+                renderer.DrawLine(cursorStyle, new Point2D(CursorLocation.X, ex.YMin), new Point2D(CursorLocation.X, ex.YMax));
 
                 // Draw cursor prompt
                 if (!string.IsNullOrEmpty(cursorMessage))
                 {
-                    using (Font font = new Font(control.Font.FontFamily, 8))
-                    using (Brush back = new SolidBrush(Document.Settings.Get<Color>("CursorPromptBackColor")))
-                    using (Pen fore = new Pen(Document.Settings.Get<Color>("CursorPromptForeColor")))
-                    using (Brush fontBrush = new SolidBrush(Document.Settings.Get<Color>("CursorPromptForeColor")))
+                    string fontFamily = control.Font.FontFamily.Name;
+                    float textHeight = ScreenToWorld(new Vector2D(8, 0)).X;
+                    float margin = ScreenToWorld(new Vector2D(4, 0)).X;
+                    float offset = ScreenToWorld(new Vector2D(2, 0)).X;
+
+                    // position cursor prompt to lower-right of cursor by default
+                    float x = CursorLocation.X + margin + offset;
+                    float y = CursorLocation.Y + margin + offset;
+                    Vector2D sz = renderer.MeasureString(cursorMessage, fontFamily, textHeight);
+                    Point2D lowerRight = new Point2D(ex.XMax, ex.YMax);
+                    // check if the prompt text fits into the window horizontally
+                    if (x + sz.X + offset > lowerRight.X)
                     {
-                        float margin = 4;
-                        float offset = 2;
-                        Point2D cursorPt = WorldToScreen(CursorLocation.X, CursorLocation.Y);
-                        Point2D lowerRight = WorldToScreen(ex.Right, ex.Bottom);
-                        SizeF sz = param.Graphics.MeasureString(cursorMessage, font);
-                        // position cursor prompt to lower-right of cursor by default
-                        float x = cursorPt.X + margin + offset;
-                        float y = cursorPt.Y + margin + offset;
-                        // check if the prompt text fits into the window horizontally
-                        if (x + sz.Width + offset > lowerRight.X)
-                        {
-                            x = cursorPt.X - margin - offset - (int)sz.Width;
-                        }
-                        // check if the prompt text fits into the window vertically
-                        if (y + sz.Height + offset > lowerRight.Y)
-                        {
-                            y = cursorPt.Y - margin - offset - (int)sz.Height;
-                        }
-                        // Reset transform to draw in device units
-                        Matrix trans = param.Graphics.Transform;
-                        param.Graphics.ResetTransform();
-
-                        // Draw cursor prompt
-                        param.Graphics.FillRectangle(back, x - offset, y - offset, 2 * offset + sz.Width, 2 * offset + sz.Height);
-                        param.Graphics.DrawRectangle(fore, x - offset, y - offset, 2 * offset + sz.Width, 2 * offset + sz.Height);
-                        param.Graphics.DrawString(cursorMessage, font, fontBrush, x, y);
-
-                        // Restore transform
-                        param.Graphics.Transform = trans;
+                        x = CursorLocation.X - margin - offset - sz.X;
                     }
+                    // check if the prompt text fits into the window vertically
+                    if (y + sz.Y + offset > lowerRight.Y)
+                    {
+                        y = CursorLocation.Y - margin - offset - sz.Y;
+                    }
+
+                    // Draw cursor prompt
+                    Style fore = new Style(Document.Settings.Get<Color>("CursorPromptForeColor"));
+                    Style back = new Style(Document.Settings.Get<Color>("CursorPromptBackColor"));
+                    back.Fill = true;
+                    renderer.DrawRectangle(back, new Point2D(x - offset, y - offset), new Point2D(x + 2 * offset + sz.X, y + 2 * offset + sz.Y));
+                    renderer.DrawRectangle(fore, new Point2D(x - offset, y - offset), new Point2D(x + 2 * offset + sz.X, y + 2 * offset + sz.Y));
+                    renderer.DrawString(fore, new Point2D(x, y), cursorMessage, fontFamily, textHeight);
                 }
             }
         }
@@ -331,11 +328,9 @@ namespace SimpleCAD
         /// <summary>
         /// Returns the coordinates of the viewport in world coordinates.
         /// </summary>
-        public RectangleF GetViewPort()
+        public Extents2D GetViewPort()
         {
-            Point2D bl = ScreenToWorld(0, 0);
-            Point2D tr = ScreenToWorld(Width, Height);
-            return new RectangleF(bl.X, bl.Y, tr.X - bl.X, tr.Y - bl.Y);
+            return new Extents2D(0, 0, Width, Height);
         }
 
         /// <summary>
@@ -408,12 +403,12 @@ namespace SimpleCAD
         /// <param name="modelWidth"></param>
         /// <param name="modelHeight"></param>
         /// <param name="deviceOffset"></param>
-        private void ScaleGraphics(Graphics g)
+        private void ScaleGraphics(System.Drawing.Graphics g)
         {
             g.ResetTransform();
             g.TranslateTransform(-CameraPosition.X, -CameraPosition.Y);
-            g.ScaleTransform(1.0f / ZoomFactor, -1.0f / ZoomFactor, MatrixOrder.Append);
-            g.TranslateTransform(Width / 2, Height / 2, MatrixOrder.Append);
+            g.ScaleTransform(1.0f / ZoomFactor, -1.0f / ZoomFactor, System.Drawing.Drawing2D.MatrixOrder.Append);
+            g.TranslateTransform(Width / 2, Height / 2, System.Drawing.Drawing2D.MatrixOrder.Append);
         }
 
         private void Document_SelectionChanged(object sender, EventArgs e)
@@ -661,8 +656,8 @@ namespace SimpleCAD
 
         void CadView_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
             e.Graphics.Clear(control.BackColor);
 

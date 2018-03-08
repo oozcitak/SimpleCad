@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADDocument.cs" />
+    <Compile Include="Graphics\Color.cs" />
+    <Compile Include="Graphics\GDIRenderer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Command_Selection.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="EventArgs.cs" />
     <Compile Include="Geometry\Vector2DConverter.cs" />
     <Compile Include="Geometry\Point2DConverter.cs" />
-    <Compile Include="Drawables\StyleConverter.cs" />
+    <Compile Include="Graphics\StyleConverter.cs" />
     <Compile Include="Geometry\Point2DCollection.cs" />
     <Compile Include="CADView.cs" />
     <Compile Include="CADWindow.cs">
@@ -79,11 +81,6 @@
     <Compile Include="Drawables\Circle.cs" />
     <Compile Include="Drawables\Arc.cs" />
     <Compile Include="Drawables\EllipticArc.cs" />
-    <Compile Include="Drawables\Styles.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Styles.tt</DependentUpon>
-    </Compile>
     <Compile Include="Drawables\Parabola.cs" />
     <Compile Include="Geometry\Point2D.cs" />
     <Compile Include="Geometry\Vector2D.cs" />
@@ -92,12 +89,12 @@
     <Compile Include="Drawables\Dimension.cs" />
     <Compile Include="Drawables\Ellipse.cs" />
     <Compile Include="Geometry\Extents2D.cs" />
-    <Compile Include="Drawables\Style.cs" />
+    <Compile Include="Graphics\Style.cs" />
     <Compile Include="Drawables\Text.cs" />
     <Compile Include="Drawables\Polyline.cs" />
     <Compile Include="Drawables\Rectangle.cs" />
     <Compile Include="Drawables\Drawable.cs" />
-    <Compile Include="Drawables\DrawParams.cs" />
+    <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Drawables\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -105,12 +102,6 @@
     <EmbeddedResource Include="CADWindow.resx">
       <DependentUpon>CADWindow.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Drawables\Styles.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Styles.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

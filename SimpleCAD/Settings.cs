@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
+using SimpleCAD.Graphics;
 using System.Globalization;
 using System.IO;
 
@@ -30,7 +30,7 @@ namespace SimpleCAD
                 }
                 else if (valueType == "color")
                 {
-                    Value = Color.FromArgb(reader.ReadInt32());
+                    Value = Color.FromArgb(reader.ReadUInt32());
                 }
             }
 
@@ -45,7 +45,7 @@ namespace SimpleCAD
                 else if (Value is Color)
                 {
                     writer.Write("color");
-                    writer.Write(((Color)Value).ToArgb());
+                    writer.Write(((Color)Value).Argb);
                 }
             }
         }

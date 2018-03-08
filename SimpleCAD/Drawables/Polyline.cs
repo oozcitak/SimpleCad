@@ -54,7 +54,7 @@ namespace SimpleCAD.Drawables
             NotifyPropertyChanged("Points");
         }
 
-        public override void Draw(DrawParams param)
+        public override void Draw(Graphics param)
         {
             if (Points.Count > 0)
             {

@@ -30,7 +30,7 @@ namespace SimpleCAD.Drawables
             ;
         }
 
-        public override void Draw(DrawParams param)
+        public override void Draw(Graphics param)
         {
             using (Pen pen = Style.CreatePen(param))
             {
