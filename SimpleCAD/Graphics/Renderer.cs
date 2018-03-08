@@ -28,13 +28,13 @@ namespace SimpleCAD
         Bottom
     }
 
-    public abstract class Renderer
+    public abstract class Renderer : IDisposable
     {
         public CADView View { get; private set; }
         public bool ScaleLineWeights { get; set; }
         internal Style StyleOverride { get; set; }
 
-        protected Renderer(CADView view, dynamic graphicsData)
+        protected Renderer(CADView view)
         {
             View = view;
             StyleOverride = null;
@@ -48,6 +48,12 @@ namespace SimpleCAD
                 return View.ScreenToWorld(new Vector2D(lineWeight, 0)).X;
         }
 
+        public abstract void Init(System.Windows.Forms.Control control);
+        public abstract void InitFrame(System.Drawing.Graphics graphics);
+        public abstract void EndFrame();
+        public abstract void Resize(int width, int height);
+        public abstract void Dispose();
+
         public abstract void DrawLine(Style style, Point2D p1, Point2D p2);
         public abstract void DrawRectangle(Style style, Point2D p1, Point2D p2);
         public abstract void DrawCircle(Style style, Point2D center, float radius);
@@ -59,8 +65,8 @@ namespace SimpleCAD
         public abstract Vector2D MeasureString(string text, string fontFamily, float textHeight);
         public abstract void DrawString(Style style, Point2D pt, string text,
             string fontFamily, float textHeight, FontStyle fontStyle = FontStyle.Regular,
-            float rotation = 0, 
-            TextHorizontalAlignment hAlign = TextHorizontalAlignment.Left, 
+            float rotation = 0,
+            TextHorizontalAlignment hAlign = TextHorizontalAlignment.Left,
             TextVerticalAlignment vAlign = TextVerticalAlignment.Bottom);
         public abstract void Draw(Drawable item);
     }

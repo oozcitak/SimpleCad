@@ -20,7 +20,6 @@ namespace SimpleCAD
             set
             {
                 doc = value;
-                if (View != null) View.Detach();
                 View = new CADView(doc);
                 View.Attach(this);
             }

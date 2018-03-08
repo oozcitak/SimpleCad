@@ -7,9 +7,34 @@ namespace SimpleCAD.Graphics
     {
         private System.Drawing.Graphics gdi;
 
-        public GDIRenderer(CADView view, System.Drawing.Graphics graphicsData) : base(view, graphicsData)
+        public GDIRenderer(CADView view) : base(view)
         {
-            gdi = graphicsData;
+            ;
+        }
+
+        public override void Init(System.Windows.Forms.Control control)
+        {
+            ;
+        }
+
+        public override void InitFrame(System.Drawing.Graphics graphics)
+        {
+            gdi = graphics;
+        }
+
+        public override void EndFrame()
+        {
+            ;
+        }
+
+        public override void Resize(int width, int height)
+        {
+            ;
+        }
+
+        public override void Dispose()
+        {
+            ;
         }
 
         public override void DrawLine(Style style, Point2D p1, Point2D p2)
