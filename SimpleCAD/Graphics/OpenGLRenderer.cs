@@ -1,32 +1,20 @@
 ﻿using SimpleCAD.Geometry;
 using System;
-using System.Reflection;
-using System.Windows.Forms;
 
 namespace SimpleCAD.Graphics
 {
-    public class GDIRenderer : Renderer
+    public class OpenGLRenderer : Renderer
     {
         private System.Drawing.Graphics gdi;
 
-        public GDIRenderer(CADView view) : base(view)
+        public OpenGLRenderer(CADView view) : base(view)
         {
             ;
         }
 
-        public override void Init(Control control)
+        public override void Init(System.Windows.Forms.Control control)
         {
-            try
-            {
-                // Enable double buffering
-                Type type = control.GetType();
-                MethodInfo method = type.GetMethod("SetStyle", BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(control, new object[] { ControlStyles.DoubleBuffer, true });
-            }
-            catch (System.Security.SecurityException)
-            {
-                ;
-            }
+
         }
 
         public override void InitFrame(System.Drawing.Graphics graphics)
@@ -128,7 +116,7 @@ namespace SimpleCAD.Graphics
                 float sweepAngle = endAngle - startAngle;
                 while (sweepAngle < 0) sweepAngle += 2 * MathF.PI;
                 while (sweepAngle > 2 * MathF.PI) sweepAngle -= 2 * MathF.PI;
-                gdi.DrawArc(pen, -semiMajorAxis, -semiMinorAxis, 2 * semiMajorAxis, 2 * semiMinorAxis, startAngle * 180 / MathF.PI, sweepAngle * 180 / MathF.PI);
+                gdi.DrawArc(pen, - semiMajorAxis, - semiMinorAxis, 2 * semiMajorAxis, 2 * semiMinorAxis, startAngle * 180 / MathF.PI, sweepAngle * 180 / MathF.PI);
                 gdi.Transform = matrix;
             }
         }
