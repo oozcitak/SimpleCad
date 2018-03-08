@@ -143,7 +143,7 @@ namespace SimpleCAD.Graphics
 
         public override void DrawPolyline(Style style, Point2DCollection points, bool closed)
         {
-            if (points.Count > 0)
+            if (points.Count > 1)
             {
                 var pts = points.ToPointF();
                 using (var pen = CreatePen(style))
@@ -158,7 +158,7 @@ namespace SimpleCAD.Graphics
 
         public override void DrawPolygon(Style style, Point2DCollection points)
         {
-            if (points.Count > 0)
+            if (points.Count > 1)
             {
                 var pts = points.ToPointF();
                 if (style.Fill)
