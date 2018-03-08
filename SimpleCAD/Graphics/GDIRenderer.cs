@@ -201,8 +201,6 @@ namespace SimpleCAD.Graphics
         public override void Draw(Drawable item)
         {
             item.Draw(this);
-            var ex = item.GetExtents();
-            DrawRectangle(new Style(Color.Red), ex.Ptmin, ex.Ptmax);
         }
 
         private System.Drawing.Pen CreatePen(Style style)
