@@ -22,15 +22,17 @@ namespace SimpleCAD.Graphics
 
             if (str != null)
             {
+                ColorConverter colConv = new ColorConverter();
+
                 string[] parts = str.Replace(" ", "").Split(';');
                 if (parts.Length == 1)
                 {
-                    Color col = Color.FromHex(parts[0]);
+                    Color col = (Color)colConv.ConvertFrom(parts[0]);
                     return new Style(col);
                 }
                 else if (parts.Length == 2)
                 {
-                    Color col = Color.FromHex(parts[0]);
+                    Color col = (Color)colConv.ConvertFrom(parts[0]);
                     float lw = float.Parse(parts[1]);
                     return new Style(col, lw);
                 }
@@ -51,12 +53,15 @@ namespace SimpleCAD.Graphics
             if (destinationType == typeof(string) && value is Style)
             {
                 Style os = (Style)value;
+                ColorConverter colConv = new ColorConverter();
+                string colVal = (string)colConv.ConvertTo(os.Color, typeof(string));
+
                 if (os.DashStyle == DashStyle.Solid && os.LineWeight == 0)
-                    return os.Color.ToHex();
+                    return colVal;
                 else if (os.DashStyle == DashStyle.Solid)
-                    return os.Color.ToHex() + "; " + os.LineWeight.ToString("F2");
+                    return colVal + "; " + os.LineWeight.ToString("F2");
                 else
-                    return os.Color.ToHex() + "; " + os.LineWeight.ToString("F2") + "; " + os.DashStyle.ToString();
+                    return colVal + "; " + os.LineWeight.ToString("F2") + "; " + os.DashStyle.ToString();
             }
 
             return base.ConvertTo(context, culture, value, destinationType);

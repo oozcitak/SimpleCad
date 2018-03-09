@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace SimpleCAD.Graphics
@@ -151,6 +152,7 @@ namespace SimpleCAD.Graphics
     }
     #endregion
 
+    [TypeConverter(typeof(ColorConverter))]
     public struct Color
     {
         #region Properties
@@ -248,7 +250,34 @@ namespace SimpleCAD.Graphics
 
         public string ToHex()
         {
-            return "#" + _argb.ToString("H8");
+            return "#" + _argb.ToString("X8");
+        }
+
+        public bool IsKnownColor()
+        {
+            if (IsByLayer)
+                return true;
+
+            foreach (uint argb in knownColorLookup.Values)
+            {
+                if (Argb == argb)
+                    return true;
+            }
+            return false;
+        }
+
+        public KnownColor ToKnownColor()
+        {
+            if (IsByLayer)
+                return KnownColor.ByLayer;
+
+            foreach (KeyValuePair<KnownColor, uint> pair in knownColorLookup)
+            {
+                if (Argb == pair.Value)
+                    return pair.Key;
+            }
+
+            return KnownColor.Transparent;
         }
         #endregion
 
