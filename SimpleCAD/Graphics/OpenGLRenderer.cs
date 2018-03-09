@@ -12,6 +12,11 @@ namespace SimpleCAD.Graphics
         private IntPtr glContext;
         private GLContextSwitch glSwitch;
 
+        private string currentFontFmaily;
+        private FontStyle currentFontStyle;
+        private uint vectorBase;
+        TEXTMETRIC textMetric;
+
         public bool IsAccelerated { get; private set; }
 
         public OpenGLRenderer(CADView view) : base(view)
@@ -98,6 +103,7 @@ namespace SimpleCAD.Graphics
 
         public override void Dispose()
         {
+            glDeleteLists(vectorBase, 256);
             wglMakeCurrent(IntPtr.Zero, IntPtr.Zero);
             wglDeleteContext(glContext);
             if (control != null)
@@ -351,69 +357,75 @@ namespace SimpleCAD.Graphics
             }
         }
 
-        public override Vector2D MeasureString(string text, string fontFamily, float textHeight)
+        public override Vector2D MeasureString(string text, string fontFamily, FontStyle fontStyle, float textHeight)
         {
-            // Revert transformation to identity while drawing text
-            var oldMatrix = gdi.Transform;
-            gdi.ResetTransform();
+            CreateFont(fontFamily, FontStyle.Regular);
 
-            // Calculate alignment in pixel coordinates
-            float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            Vector2D szWorld;
-            using (var font = new System.Drawing.Font(fontFamily, height, System.Drawing.GraphicsUnit.Pixel))
+            int width = 0; // pixels
+            foreach (char c in text)
             {
-                var sz = gdi.MeasureString(text, font);
-                szWorld = View.ScreenToWorld(new Vector2D(Math.Abs(sz.Width), Math.Abs(sz.Height)));
+                width += MeasureCharWidth(c);
             }
 
-            // Restore old transformation
-            gdi.Transform = oldMatrix;
+            POINT pt0 = new POINT();
+            pt0.x = 0;
+            pt0.y = 0;
+            POINT pt1 = new POINT();
+            pt1.x = width;
+            pt1.y = textMetric.tmHeight;
+            POINT[] pts = new POINT[] { pt0, pt1 };
+            LPtoDP(hDC, ref pts, 2);
+            width = pts[1].x - pts[0].x;
+            float height = pts[1].y - pts[0].y;
 
-            return new Vector2D(Math.Abs(szWorld.X), Math.Abs(szWorld.Y));
+            return View.ScreenToWorld(new Vector2D(width, height)) * textHeight;
+        }
+
+        private int MeasureCharWidth(char c)
+        {
+            ABC[] glyph = new ABC[1];
+            GetCharABCWidths(hDC, c, c, glyph);
+            return glyph[0].A + (int)glyph[0].B + glyph[0].C;
         }
 
         public override void DrawString(Style style, Point2D pt, string text,
             string fontFamily, float textHeight, FontStyle fontStyle,
             float rotation, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
         {
-            float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            using (var font = new System.Drawing.Font(fontFamily, height, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.Pixel))
-            using (var brush = CreateBrush(style))
-            {
-                // Convert the text alignment point (x, y) to pixel coordinates
-                var pts = new System.Drawing.PointF[] { new System.Drawing.PointF(pt.X, pt.Y) };
-                gdi.TransformPoints(System.Drawing.Drawing2D.CoordinateSpace.Device, System.Drawing.Drawing2D.CoordinateSpace.World, pts);
-                float x = pts[0].X;
-                float y = pts[0].Y;
+            CreateFont(fontFamily, FontStyle.Regular);
 
-                // Revert transformation to identity while drawing text
-                var oldMatrix = gdi.Transform;
-                gdi.ResetTransform();
+            CreateBrush(style);
 
-                // Calculate alignment in pixel coordinates
-                float dx = 0;
-                float dy = 0;
-                var sz = gdi.MeasureString(text, font);
+            // Calculate alignment in pixel coordinates
+            float dx = 0;
+            float dy = 0;
+            var sz = MeasureString(text, fontFamily, fontStyle, textHeight);
 
-                if (hAlign == TextHorizontalAlignment.Right)
-                    dx = -sz.Width;
-                else if (hAlign == TextHorizontalAlignment.Center)
-                    dx = -sz.Width / 2;
+            if (hAlign == TextHorizontalAlignment.Right)
+                dx = -sz.X;
+            else if (hAlign == TextHorizontalAlignment.Center)
+                dx = -sz.X / 2;
 
-                if (vAlign == TextVerticalAlignment.Bottom)
-                    dy = -sz.Height;
-                else if (vAlign == TextVerticalAlignment.Middle)
-                    dy = -sz.Height / 2;
+            if (vAlign == TextVerticalAlignment.Bottom)
+                dy = -sz.Y;
+            else if (vAlign == TextVerticalAlignment.Middle)
+                dy = -sz.Y / 2;
 
-                gdi.TranslateTransform(dx, dy, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gdi.RotateTransform(-rotation * 180 / MathF.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gdi.TranslateTransform(x, y, System.Drawing.Drawing2D.MatrixOrder.Append);
+            glLoadIdentity();
 
-                gdi.DrawString(text, font, brush, 0, 0);
+            glTranslatef(dx, dy, 0);
+            glScalef(textHeight, textHeight, textHeight);
 
-                // Restore old transformation
-                gdi.Transform = oldMatrix;
-            }
+            glListBase(vectorBase);
+
+            glLoadIdentity();
+            glTranslatef(pt.X, pt.Y, 0);
+            glRotatef(rotation, 0, 0, 1);
+            glScalef(textHeight, textHeight, textHeight);
+
+            IntPtr str = Marshal.StringToHGlobalAnsi(text);
+            glCallLists(text.Length, GL_UNSIGNED_BYTE, str);
+            Marshal.FreeHGlobal(str);
         }
 
         public override void Draw(Drawable item)
@@ -442,6 +454,30 @@ namespace SimpleCAD.Graphics
             glColor4ub(style.Color.R, style.Color.G, style.Color.B, style.Color.A);
 
             return new System.Drawing.SolidBrush(System.Drawing.Color.Transparent);
+        }
+
+        private void CreateFont(string fontFamily, FontStyle fontStyle)
+        {
+            if (fontFamily == currentFontFmaily && fontStyle == currentFontStyle)
+                return;
+
+            using (System.Drawing.Font font = new System.Drawing.Font(fontFamily, 1, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.World))
+            {
+                glDeleteLists(vectorBase, 256);
+
+                IntPtr oldFont = SelectObject(hDC, font.ToHfont());
+                vectorBase = glGenLists(256);
+                // wglUseFontBitmaps(hDC, 0, 256, rasterBase);
+                wglUseFontOutlines(hDC, 0, 256, vectorBase, 0, 0, WGL_FONT_POLYGONS, null);
+
+                textMetric = new TEXTMETRIC();
+                GetTextMetrics(hDC, ref textMetric);
+
+                SelectObject(hDC, oldFont);
+            }
+
+            currentFontFmaily = fontFamily;
+            currentFontStyle = fontStyle;
         }
 
         #region GLContextSwitch Class
@@ -478,6 +514,18 @@ namespace SimpleCAD.Graphics
         #endregion
 
         #region Platform Invoke
+        private const uint GL_BYTE = 0x1400;
+        private const uint GL_UNSIGNED_BYTE = 0x1401;
+        private const uint GL_SHORT = 0x1402;
+        private const uint GL_UNSIGNED_SHORT = 0x1403;
+        private const uint GL_INT = 0x1404;
+        private const uint GL_UNSIGNED_INT = 0x1405;
+        private const uint GL_FLOAT = 0x1406;
+        private const uint GL_2_BYTES = 0x1407;
+        private const uint GL_3_BYTES = 0x1408;
+        private const uint GL_4_BYTES = 0x1409;
+        private const uint GL_DOUBLE = 0x140A;
+
         private const uint GL_FLAT = 0x1D00;
         private const uint GL_SMOOTH = 0x1D01;
 
@@ -533,10 +581,13 @@ namespace SimpleCAD.Graphics
         private const uint GL_QUAD_STRIP = 0x0008;
         private const uint GL_POLYGON = 0x0009;
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        private const uint WGL_FONT_LINES = 0;
+        private const uint WGL_FONT_POLYGONS = 1;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetDC(IntPtr hWnd);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Int32 ReleaseDC(IntPtr hwnd, IntPtr hdc);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -568,6 +619,61 @@ namespace SimpleCAD.Graphics
             public uint dwLayerMask;
             public uint dwVisibleMask;
             public uint dwDamageMask;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ABC
+        {
+            public int A;
+            public uint B;
+            public int C;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TEXTMETRIC
+        {
+            public int tmHeight;
+            public int tmAscent;
+            public int tmDescent;
+            public int tmInternalLeading;
+            public int tmExternalLeading;
+            public int tmAveCharWidth;
+            public int tmMaxCharWidth;
+            public int tmWeight;
+            public int tmOverhang;
+            public int tmDigitizedAspectX;
+            public int tmDigitizedAspectY;
+            public char tmFirstChar;
+            public char tmLastChar;
+            public char tmDefaultChar;
+            public char tmBreakChar;
+            public byte tmItalic;
+            public byte tmUnderlined;
+            public byte tmStruckOut;
+            public byte tmPitchAndFamily;
+            public byte tmCharSet;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct GLYPHMETRICSFLOAT
+        {
+            public float gmfBlackBoxX;
+            public float gmfBlackBoxY;
+            public POINTFLOAT gmfptGlyphOrigin;
+            public float gmfCellIncX;
+            public float gmfCellIncY;
+        }
+
+        private struct POINTFLOAT
+        {
+            public float x;
+            public float y;
+        }
+
+        private struct POINT
+        {
+            public int x;
+            public int y;
         }
 
         [Flags]
@@ -607,72 +713,101 @@ namespace SimpleCAD.Graphics
             PFD_TYPE_COLORINDEX = 1
         }
 
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        private static extern int ChoosePixelFormat(IntPtr hdc, [In] ref PIXELFORMATDESCRIPTOR ppfd);
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int ChoosePixelFormat(IntPtr hdc, ref PIXELFORMATDESCRIPTOR ppfd);
 
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool SetPixelFormat(IntPtr hdc, int iPixelFormat, ref PIXELFORMATDESCRIPTOR ppfd);
 
-        [DllImport("gdi32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("gdi32.dll", SetLastError = true)]
         private static extern bool SwapBuffers(IntPtr deviceContext);
 
-        [DllImport("opengl32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        private static extern IntPtr wglCreateContext(IntPtr hDC);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern int wglMakeCurrent(IntPtr hdc, IntPtr hrc);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern int wglDeleteContext(IntPtr hdc);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern IntPtr wglGetCurrentContext();
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern IntPtr wglGetCurrentDC();
+        [DllImport("gdi32.dll", SetLastError = true)]
+        private static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("gdi32.dll", SetLastError = true)]
+        private static extern bool GetCharABCWidths(IntPtr hdc, uint uFirstChar, uint uLastChar, [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct, SizeConst = 1)] ABC[] lpabc);
+        [DllImport("gdi32.dll", SetLastError = true)]
+        private static extern bool GetTextMetrics(IntPtr hdc, ref TEXTMETRIC lptm);
+
+        [DllImport("gdi32.dll", SetLastError = true)]
+        private static extern bool LPtoDP(IntPtr hdc, [In, Out] ref POINT[] lpPoints, int nCount);
+
+        [DllImport("opengl32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr wglCreateContext(IntPtr hDC);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern int wglMakeCurrent(IntPtr hdc, IntPtr hrc);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern int wglDeleteContext(IntPtr hdc);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern IntPtr wglGetCurrentContext();
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern IntPtr wglGetCurrentDC();
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern bool wglUseFontBitmaps(IntPtr hdc, uint first, uint count, uint listBase);
+        [DllImport("opengl32", SetLastError = true)]
+        private static extern bool wglUseFontOutlines(IntPtr hDC, uint first, uint count, uint listBase, float deviation, float extrusion, uint format, [Out, MarshalAs(UnmanagedType.LPArray)] GLYPHMETRICSFLOAT[] lpgmf);
+
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glViewport(int x, int y, int width, int height);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glShadeModel(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glEnable(uint cap);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glDisable(uint cap);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glBlendFunc(uint src, uint dest);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glMatrixMode(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glLoadIdentity();
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glTranslatef(float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glScalef(float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glRotatef(float angle, float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glOrtho(double left, double right, double bottom, double top, double zNear, double zFar);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glClearColor(float red, float green, float blue, float alpha);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glClear(uint mask);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glFinish();
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glBegin(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glEnd();
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glColor4ub(byte red, byte green, byte blue, byte alpha);
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glVertex2f(float x, float y);
 
-        [DllImport("opengl32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glLineWidth(float width);
+
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern uint glGenLists(int range);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern void glDeleteLists(uint list, int range);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern void glCallList(uint list);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern void glListBase(uint listbase);
+
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern void glRasterPos2f(float x, float y);
+        [DllImport("opengl32.dll", SetLastError = true)]
+        private static extern void glCallLists(int n, uint type, IntPtr lists);
         #endregion
     }
 }

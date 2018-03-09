@@ -63,7 +63,7 @@ namespace SimpleCAD
         public abstract void DrawEllipticArc(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float startAngle, float endAngle, float rotation);
         public abstract void DrawPolyline(Style style, Point2DCollection points, bool closed);
         public abstract void DrawPolygon(Style style, Point2DCollection points);
-        public abstract Vector2D MeasureString(string text, string fontFamily, float textHeight);
+        public abstract Vector2D MeasureString(string text, string fontFamily, FontStyle fontStyle, float textHeight);
         public abstract void DrawString(Style style, Point2D pt, string text,
             string fontFamily, float textHeight, FontStyle fontStyle = FontStyle.Regular,
             float rotation = 0,

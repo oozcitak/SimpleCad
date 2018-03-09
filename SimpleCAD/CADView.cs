@@ -268,7 +268,7 @@ namespace SimpleCAD
                     // position cursor prompt to lower-right of cursor by default
                     float x = CursorLocation.X + margin + offset;
                     float y = CursorLocation.Y - margin - offset;
-                    Vector2D sz = renderer.MeasureString(cursorMessage, fontFamily, textHeight);
+                    Vector2D sz = renderer.MeasureString(cursorMessage, fontFamily, FontStyle.Regular, textHeight);
                     Point2D lowerRight = new Point2D(ex.Xmax, ex.Ymin);
                     // check if the prompt text fits into the window horizontally
                     if (x + sz.X + offset > lowerRight.X)
