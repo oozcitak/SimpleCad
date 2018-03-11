@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SimpleCADTest
@@ -15,6 +16,20 @@ namespace SimpleCADTest
             cadWindow1.Document.DocumentChanged += Document_DocumentChanged;
             cadWindow1.Document.SelectionChanged += CadWindow1_SelectionChanged;
             cadWindow1.Document.Editor.Prompt += Editor_Prompt;
+
+            Assembly assembly = Assembly.GetAssembly(typeof(CADDocument));
+            object selectedObject = null;
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.BaseType == typeof(Renderer))
+                {
+                    Renderer renderer = (Renderer)Activator.CreateInstance(type, cadWindow1.View);
+                    btnRenderer.Items.Add(renderer);
+                    if (type == cadWindow1.View.Renderer)
+                        selectedObject = renderer;
+                }
+            }
+            btnRenderer.SelectedItem = selectedObject;
         }
 
         private void Document_DocumentChanged(object sender, EventArgs e)
@@ -40,6 +55,12 @@ namespace SimpleCADTest
         private void cadWindow1_MouseMove(object sender, MouseEventArgs e)
         {
             statusCoords.Text = cadWindow1.View.CursorLocation.ToString(cadWindow1.Document.Settings.NumberFormat);
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!EnsureDocumentSaved())
+                e.Cancel = true;
         }
 
         private bool EnsureDocumentSaved()
@@ -181,10 +202,10 @@ namespace SimpleCADTest
             cadWindow1.Document.Editor.RunCommand("Transform.Mirror");
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void btnRenderer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!EnsureDocumentSaved())
-                e.Cancel = true;
+            Renderer renderer = (Renderer)btnRenderer.SelectedItem;
+            cadWindow1.View.Renderer = renderer.GetType();
         }
     }
 }

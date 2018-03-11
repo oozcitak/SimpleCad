@@ -1,6 +1,8 @@
 ﻿using SimpleCAD.Geometry;
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace SimpleCAD.Graphics
 {
@@ -15,8 +17,11 @@ namespace SimpleCAD.Graphics
         private string currentFontFmaily;
         private FontStyle currentFontStyle;
         private uint vectorBase;
-        TEXTMETRIC textMetric;
+        private TEXTMETRIC textMetric;
+        private ABC[] glyphs;
+        private float descent;
 
+        public override string Name => "OpenGL Renderer";
         public bool IsAccelerated { get; private set; }
 
         public OpenGLRenderer(CADView view) : base(view)
@@ -26,8 +31,21 @@ namespace SimpleCAD.Graphics
 
         public override void Init(System.Windows.Forms.Control ctrl)
         {
-            // Get the device context
             control = ctrl;
+
+            try
+            {
+                // Disable double buffering
+                Type type = control.GetType();
+                MethodInfo method = type.GetMethod("SetStyle", BindingFlags.NonPublic | BindingFlags.Instance);
+                method.Invoke(control, new object[] { ControlStyles.DoubleBuffer, false });
+            }
+            catch (System.Security.SecurityException)
+            {
+                ;
+            }
+
+            // Get the device context
             hDC = GetDC(control.Handle);
 
             // Choose a pixel format
@@ -56,7 +74,7 @@ namespace SimpleCAD.Graphics
             wglMakeCurrent(hDC, glContext);
 
             // Set the viewport
-            glViewport(0, 0, 300, 300);
+            glViewport(0, 0, ctrl.Width, ctrl.Height);
 
             // Set OpenGL parameters
             glDisable(GL_LIGHTING);
@@ -71,6 +89,7 @@ namespace SimpleCAD.Graphics
 
             glSwitch = new GLContextSwitch(hDC, glContext);
 
+            // Set model-view transformation
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
             glOrtho(View.CameraPosition.X - ((float)control.ClientRectangle.Width) * View.ZoomFactor / 2,
@@ -110,7 +129,7 @@ namespace SimpleCAD.Graphics
                 ReleaseDC(control.Handle, hDC);
         }
 
-        public override void ClearFrame(Color color)
+        public override void Clear(Color color)
         {
             glClearColor(((float)color.R) / 255, ((float)color.G) / 255, ((float)color.B) / 255, ((float)color.A) / 255);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -226,8 +245,8 @@ namespace SimpleCAD.Graphics
         public override void DrawEllipse(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float rotation)
         {
             glLoadIdentity();
-            glRotatef(rotation, 0, 0, 1);
             glTranslatef(center.X, center.Y, 0);
+            glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
 
             float p = 2 * MathF.PI * (3 * (semiMajorAxis + semiMinorAxis) - MathF.Sqrt((3 * semiMajorAxis + semiMinorAxis) * (semiMajorAxis + 3 * semiMinorAxis)));
             float curveLength = View.WorldToScreen(new Vector2D(p, 0)).X;
@@ -271,8 +290,8 @@ namespace SimpleCAD.Graphics
         public override void DrawEllipticArc(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float startAngle, float endAngle, float rotation)
         {
             glLoadIdentity();
-            glRotatef(rotation, 0, 0, 1);
             glTranslatef(center.X, center.Y, 0);
+            glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
 
             float p = 2 * MathF.PI * (3 * (semiMajorAxis + semiMinorAxis) - MathF.Sqrt((3 * semiMajorAxis + semiMinorAxis) * (semiMajorAxis + 3 * semiMinorAxis)));
             float curveLength = View.WorldToScreen(new Vector2D(p, 0)).X;
@@ -374,18 +393,43 @@ namespace SimpleCAD.Graphics
             pt1.x = width;
             pt1.y = textMetric.tmHeight;
             POINT[] pts = new POINT[] { pt0, pt1 };
-            LPtoDP(hDC, ref pts, 2);
+            LPtoDP(hDC, pts, 2);
             width = pts[1].x - pts[0].x;
             float height = pts[1].y - pts[0].y;
 
-            return View.ScreenToWorld(new Vector2D(width, height)) * textHeight;
+            Vector2D deviceSize = new Vector2D(width, height);
+            Vector2D pixelSize = deviceSize * gdi.DpiX / 96;
+            Vector2D worldSize = View.ScreenToWorld(pixelSize);
+            // Calibrate for text height
+            Vector2D calibrated = worldSize * textHeight / worldSize.Y;
+            return new Vector2D(Math.Abs(calibrated.X), Math.Abs(calibrated.Y));
         }
 
         private int MeasureCharWidth(char c)
         {
-            ABC[] glyph = new ABC[1];
-            GetCharABCWidths(hDC, c, c, glyph);
-            return glyph[0].A + (int)glyph[0].B + glyph[0].C;
+            if (c >= 0 && c < glyphs.Length)
+                return glyphs[c].A + (int)glyphs[c].B + glyphs[c].C;
+            else
+                return MeasureCharWidth('A');
+        }
+
+        private float GetDescent(float textHeight)
+        {
+            POINT pt0 = new POINT();
+            pt0.x = 0;
+            pt0.y = 0;
+            POINT pt1 = new POINT();
+            pt1.x = 0;
+            pt1.y = textMetric.tmDescent;
+            POINT[] pts = new POINT[] { pt0, pt1 };
+            LPtoDP(hDC, pts, 2);
+
+            Vector2D deviceSize = new Vector2D(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+            Vector2D pixelSize = deviceSize * gdi.DpiX / 96;
+            Vector2D worldSize = View.ScreenToWorld(pixelSize);
+            // Calibrate for text height
+            Vector2D calibrated = worldSize * textHeight / worldSize.Y;
+            return Math.Abs(calibrated.Y);
         }
 
         public override void DrawString(Style style, Point2D pt, string text,
@@ -407,23 +451,26 @@ namespace SimpleCAD.Graphics
                 dx = -sz.X / 2;
 
             if (vAlign == TextVerticalAlignment.Bottom)
-                dy = -sz.Y;
+                dy = descent * textHeight;
             else if (vAlign == TextVerticalAlignment.Middle)
-                dy = -sz.Y / 2;
+                dy = (descent * textHeight - sz.Y / 2);
+            else if (vAlign == TextVerticalAlignment.Top)
+                dy = (descent * textHeight - sz.Y);
 
             glLoadIdentity();
-
             glTranslatef(dx, dy, 0);
             glScalef(textHeight, textHeight, textHeight);
-
-            glListBase(vectorBase);
+            glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
+            glTranslatef(pt.X / textHeight, pt.Y / textHeight, 0);
 
             glLoadIdentity();
-            glTranslatef(pt.X, pt.Y, 0);
-            glRotatef(rotation, 0, 0, 1);
+            glTranslatef(dx, dy, 0);
             glScalef(textHeight, textHeight, textHeight);
+            glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
+            glTranslatef(pt.X / textHeight, pt.Y / textHeight, 0);
 
             IntPtr str = Marshal.StringToHGlobalAnsi(text);
+            glListBase(vectorBase);
             glCallLists(text.Length, GL_UNSIGNED_BYTE, str);
             Marshal.FreeHGlobal(str);
         }
@@ -461,7 +508,8 @@ namespace SimpleCAD.Graphics
             if (fontFamily == currentFontFmaily && fontStyle == currentFontStyle)
                 return;
 
-            using (System.Drawing.Font font = new System.Drawing.Font(fontFamily, 1, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.World))
+            using (System.Drawing.FontFamily family = new System.Drawing.FontFamily(fontFamily))
+            using (System.Drawing.Font font = new System.Drawing.Font(family, 1, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.World))
             {
                 glDeleteLists(vectorBase, 256);
 
@@ -471,7 +519,14 @@ namespace SimpleCAD.Graphics
                 wglUseFontOutlines(hDC, 0, 256, vectorBase, 0, 0, WGL_FONT_POLYGONS, null);
 
                 textMetric = new TEXTMETRIC();
-                GetTextMetrics(hDC, ref textMetric);
+                GetTextMetrics(hDC, out textMetric);
+
+                glyphs = new ABC[256];
+                GetCharABCWidths(hDC, 0, 255, glyphs);
+
+                float descentPixel = font.Size * family.GetCellDescent((System.Drawing.FontStyle)fontStyle) / family.GetEmHeight((System.Drawing.FontStyle)fontStyle);
+                Vector2D descentWorld = View.ScreenToWorld(new Vector2D(0, descentPixel));
+                descent = Math.Abs(descentWorld.Y);
 
                 SelectObject(hDC, oldFont);
             }
@@ -629,7 +684,7 @@ namespace SimpleCAD.Graphics
             public int C;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         private struct TEXTMETRIC
         {
             public int tmHeight;
@@ -727,11 +782,11 @@ namespace SimpleCAD.Graphics
 
         [DllImport("gdi32.dll", SetLastError = true)]
         private static extern bool GetCharABCWidths(IntPtr hdc, uint uFirstChar, uint uLastChar, [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct, SizeConst = 1)] ABC[] lpabc);
-        [DllImport("gdi32.dll", SetLastError = true)]
-        private static extern bool GetTextMetrics(IntPtr hdc, ref TEXTMETRIC lptm);
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool GetTextMetrics(IntPtr hdc, out TEXTMETRIC lptm);
 
         [DllImport("gdi32.dll", SetLastError = true)]
-        private static extern bool LPtoDP(IntPtr hdc, [In, Out] ref POINT[] lpPoints, int nCount);
+        private static extern bool LPtoDP(IntPtr hdc, [In, Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct)] POINT[] lpPoints, int nCount);
 
         [DllImport("opengl32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr wglCreateContext(IntPtr hDC);

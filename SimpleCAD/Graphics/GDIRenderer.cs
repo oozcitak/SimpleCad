@@ -9,6 +9,8 @@ namespace SimpleCAD.Graphics
     {
         private System.Drawing.Graphics gdi;
 
+        public override string Name => "GDI Renderer";
+
         public GDIRenderer(CADView view) : base(view)
         {
             ;
@@ -35,6 +37,12 @@ namespace SimpleCAD.Graphics
 
             gdi.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             gdi.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            // Calculate model to view transformation
+            gdi.ResetTransform();
+            gdi.TranslateTransform(-View.CameraPosition.X, -View.CameraPosition.Y);
+            gdi.ScaleTransform(1.0f / View.ZoomFactor, -1.0f / View.ZoomFactor, System.Drawing.Drawing2D.MatrixOrder.Append);
+            gdi.TranslateTransform(View.Width / 2, View.Height / 2, System.Drawing.Drawing2D.MatrixOrder.Append);
         }
 
         public override void EndFrame()
@@ -52,7 +60,7 @@ namespace SimpleCAD.Graphics
             ;
         }
 
-        public override void ClearFrame(Color color)
+        public override void Clear(Color color)
         {
             gdi.Clear(System.Drawing.Color.FromArgb((int)color.Argb));
         }

@@ -14,6 +14,8 @@ namespace SimpleCAD
         private Control control;
         private Point2D mCameraPosition;
         private float mZoomFactor;
+        private bool mShowGrid;
+        private bool mShowAxes;
 
         private bool panning;
         private Point2D lastMouseLocationWorld;
@@ -78,6 +80,64 @@ namespace SimpleCAD
             }
         }
 
+        [Category("Appearance"), DefaultValue(true), Description("Determines whether the cartesian grid is shown.")]
+        public bool ShowGrid
+        {
+            get
+            {
+                return mShowGrid;
+            }
+            set
+            {
+                mShowGrid = value;
+                if (control != null)
+                    control.Invalidate();
+            }
+        }
+
+        [Category("Appearance"), DefaultValue(true), Description("Determines whether the X and Y axes are shown.")]
+        public bool ShowAxes
+        {
+            get
+            {
+                return mShowAxes;
+            }
+            set
+            {
+                mShowAxes = value;
+                if (control != null)
+                    control.Invalidate();
+            }
+        }
+
+        [Browsable(false)]
+        public Type Renderer
+        {
+            get
+            {
+                return (renderer == null ? null : renderer.GetType());
+            }
+            set
+            {
+                if (renderer != null)
+                {
+                    renderer.Dispose();
+                    renderer = null;
+                }
+
+                rendererType = value;
+
+                if (rendererType != null)
+                    renderer = (Renderer)Activator.CreateInstance(rendererType, this);
+
+                if (renderer != null && control != null)
+                {
+                    renderer.Init(control);
+                    control.Invalidate();
+                }
+            }
+        }
+
         [Browsable(false)]
         public int Width { get; private set; }
         [Browsable(false)]
@@ -98,11 +158,12 @@ namespace SimpleCAD
 
             mZoomFactor = 5.0f / 3.0f;
             mCameraPosition = new Point2D(0, 0);
+            mShowGrid = true;
 
             panning = false;
 
             //SetRenderer(typeof(GDIRenderer));
-            SetRenderer(typeof(OpenGLRenderer));
+            Renderer = typeof(OpenGLRenderer);
 
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
@@ -143,7 +204,7 @@ namespace SimpleCAD
             control = ctrl;
 
             if (rendererType != null)
-                SetRenderer(rendererType);
+                Renderer = rendererType;
 
             Color backColor = Document.Settings.Get<Color>("BackColor");
             control.BackColor = System.Drawing.Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B);
@@ -170,30 +231,18 @@ namespace SimpleCAD
             control.Invalidate();
         }
 
-        public void SetRenderer(Type type)
-        {
-            if (renderer != null)
-                renderer.Dispose();
-
-            rendererType = type;
-
-            if (rendererType != null)
-                renderer = (Renderer)Activator.CreateInstance(rendererType, this);
-
-            if (renderer != null && control != null)
-                renderer.Init(control);
-        }
-
         public void Render(System.Drawing.Graphics graphics)
         {
+            // Start drawing view
             renderer.InitFrame(graphics);
-            renderer.ClearFrame(Document.Settings.Get<Color>("BackColor"));
+            renderer.Clear(Document.Settings.Get<Color>("BackColor"));
 
-            // Set an orthogonal projection matrix
-            ScaleGraphics(graphics);
+            // Grid and axes
+            DrawGrid(renderer);
+            DrawAxes(renderer);
 
             // Render drawing objects
-            Document.Model.Draw(renderer);
+            renderer.Draw(Document.Model);
 
             // Render selected objects
             DrawSelection(renderer);
@@ -202,12 +251,69 @@ namespace SimpleCAD
             DrawJigged(renderer);
 
             // Render transient objects
-            Document.Transients.Draw(renderer);
+            renderer.Draw(Document.Transients);
 
             // Render cursor
             DrawCursor(renderer);
 
+            // End drawing view
             renderer.EndFrame();
+        }
+
+        private void DrawAxes(Renderer renderer)
+        {
+            Extents2D bounds = GetViewPort();
+            Color axisColor = Document.Settings.Get<Color>("AxisColor");
+
+            renderer.DrawLine(new Style(axisColor), new Point2D(0, bounds.Ymin), new Point2D(0, bounds.Ymax));
+            renderer.DrawLine(new Style(axisColor), new Point2D(bounds.Xmin, 0), new Point2D(bounds.Xmax, 0));
+        }
+
+        private void DrawGrid(Renderer renderer)
+        {
+            if (!ShowGrid)
+                return;
+
+            float spacing = 1;
+            // Dynamic grid spacing
+            while (WorldToScreen(new Vector2D(spacing, 0)).X > 12)
+                spacing /= 10;
+
+            while (WorldToScreen(new Vector2D(spacing, 0)).X < 4)
+                spacing *= 10;
+
+            Extents2D bounds = GetViewPort();
+            Style majorStyle = new Style(Document.Settings.Get<Color>("MajorGridColor"));
+            Style minorStyle = new Style(Document.Settings.Get<Color>("MinorGridColor"));
+
+            int k = 0;
+            for (float i = 0; i > bounds.Xmin; i -= spacing)
+            {
+                Style style = (k == 0 ? majorStyle : minorStyle);
+                k = (k + 1) % 10;
+                renderer.DrawLine(style, new Point2D(i, bounds.Ymax), new Point2D(i, bounds.Ymin));
+            }
+            k = 0;
+            for (float i = 0; i < bounds.Xmax; i += spacing)
+            {
+                Style style = (k == 0 ? majorStyle : minorStyle);
+                k = (k + 1) % 10;
+                renderer.DrawLine(style, new Point2D(i, bounds.Ymax), new Point2D(i, bounds.Ymin));
+            }
+            k = 0;
+            for (float i = 0; i < bounds.Ymax; i += spacing)
+            {
+                Style style = (k == 0 ? majorStyle : minorStyle);
+                k = (k + 1) % 10;
+                renderer.DrawLine(style, new Point2D(bounds.Xmin, i), new Point2D(bounds.Xmax, i));
+            }
+            k = 0;
+            for (float i = 0; i > bounds.Ymin; i -= spacing)
+            {
+                Style style = (k == 0 ? majorStyle : minorStyle);
+                k = (k + 1) % 10;
+                renderer.DrawLine(style, new Point2D(bounds.Xmin, i), new Point2D(bounds.Xmax, i));
+            }
         }
 
         private void DrawSelection(Renderer renderer)
@@ -224,6 +330,7 @@ namespace SimpleCAD
                 renderer.Draw(selected);
             }
             renderer.StyleOverride = null;
+
             // Control points
             Style cpStyle = new Style(Document.Settings.Get<Color>("ControlPointColor"), 2);
             float cpSize = ScreenToWorld(new Vector2D(ControlPointSize, 0)).X;
@@ -426,21 +533,6 @@ namespace SimpleCAD
             Height = height;
 
             renderer.Resize(width, height);
-        }
-
-        /// <summary>
-        /// Calculates graphics scale
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="modelWidth"></param>
-        /// <param name="modelHeight"></param>
-        /// <param name="deviceOffset"></param>
-        private void ScaleGraphics(System.Drawing.Graphics g)
-        {
-            g.ResetTransform();
-            g.TranslateTransform(-CameraPosition.X, -CameraPosition.Y);
-            g.ScaleTransform(1.0f / ZoomFactor, -1.0f / ZoomFactor, System.Drawing.Drawing2D.MatrixOrder.Append);
-            g.TranslateTransform(Width / 2, Height / 2, System.Drawing.Drawing2D.MatrixOrder.Append);
         }
 
         private void Document_SelectionChanged(object sender, EventArgs e)

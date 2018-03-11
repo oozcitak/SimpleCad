@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SimpleCAD.CADDocument cadDocument1 = new SimpleCAD.CADDocument();
+            SimpleCAD.CADDocument cadDocument2 = new SimpleCAD.CADDocument();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -61,6 +61,9 @@
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.lblRenderer = new System.Windows.Forms.ToolStripLabel();
+            this.btnRenderer = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -73,6 +76,7 @@
             this.tsStandard.SuspendLayout();
             this.tsPrimitives.SuspendLayout();
             this.tsTransform.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -96,6 +100,7 @@
             // toolStripContainer1.TopToolStripPanel
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             // 
@@ -148,7 +153,7 @@
             this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
             this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Document = cadDocument1;
+            this.cadWindow1.Document = cadDocument2;
             this.cadWindow1.Location = new System.Drawing.Point(0, 0);
             this.cadWindow1.Name = "cadWindow1";
             this.cadWindow1.Size = new System.Drawing.Size(759, 419);
@@ -172,7 +177,7 @@
             this.btnOpen,
             this.btnSave,
             this.btnSaveAs});
-            this.tsStandard.Location = new System.Drawing.Point(3, 0);
+            this.tsStandard.Location = new System.Drawing.Point(598, 25);
             this.tsStandard.Name = "tsStandard";
             this.tsStandard.Size = new System.Drawing.Size(173, 25);
             this.tsStandard.TabIndex = 1;
@@ -423,6 +428,33 @@
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblRenderer,
+            this.btnRenderer});
+            this.toolStrip1.Location = new System.Drawing.Point(4, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(191, 25);
+            this.toolStrip1.TabIndex = 3;
+            // 
+            // lblRenderer
+            // 
+            this.lblRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.lblRenderer.Image = ((System.Drawing.Image)(resources.GetObject("lblRenderer.Image")));
+            this.lblRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.lblRenderer.Name = "lblRenderer";
+            this.lblRenderer.Size = new System.Drawing.Size(57, 22);
+            this.lblRenderer.Text = "Renderer:";
+            // 
+            // btnRenderer
+            // 
+            this.btnRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnRenderer.Name = "btnRenderer";
+            this.btnRenderer.Size = new System.Drawing.Size(120, 25);
+            this.btnRenderer.SelectedIndexChanged += new System.EventHandler(this.btnRenderer_SelectedIndexChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -452,6 +484,8 @@
             this.tsPrimitives.PerformLayout();
             this.tsTransform.ResumeLayout(false);
             this.tsTransform.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -489,6 +523,9 @@
         private System.Windows.Forms.ToolStripButton btnNew;
         private System.Windows.Forms.ToolStripButton btnMirror;
         private System.Windows.Forms.ToolStripButton btnSaveAs;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripLabel lblRenderer;
+        private System.Windows.Forms.ToolStripComboBox btnRenderer;
     }
 }
 

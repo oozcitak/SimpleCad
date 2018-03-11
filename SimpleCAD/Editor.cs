@@ -48,7 +48,7 @@ namespace SimpleCAD
             {
                 if (type.BaseType == typeof(Command))
                 {
-                    Command com = (Command)assembly.CreateInstance(type.FullName);
+                    Command com = (Command)Activator.CreateInstance(type);
                     if (com == null)
                     {
                         assembly = Assembly.GetExecutingAssembly();
