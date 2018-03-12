@@ -81,6 +81,9 @@ namespace SimpleCAD.Graphics
             glShadeModel(GL_FLAT);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_POLYGON_SMOOTH);
+            glEnable(GL_POINT_SMOOTH);
+            glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
         }
 
         public override void InitFrame(System.Drawing.Graphics graphics)
@@ -437,13 +440,12 @@ namespace SimpleCAD.Graphics
             float rotation, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
         {
             CreateFont(fontFamily, FontStyle.Regular);
-
             CreateBrush(style);
 
-            // Calculate alignment in pixel coordinates
+            // Calculate alignment offset
             float dx = 0;
             float dy = 0;
-            var sz = MeasureString(text, fontFamily, fontStyle, textHeight);
+            var sz = MeasureString(text, fontFamily, fontStyle, 1);
 
             if (hAlign == TextHorizontalAlignment.Right)
                 dx = -sz.X;
@@ -451,23 +453,17 @@ namespace SimpleCAD.Graphics
                 dx = -sz.X / 2;
 
             if (vAlign == TextVerticalAlignment.Bottom)
-                dy = descent * textHeight;
+                dy = descent;
             else if (vAlign == TextVerticalAlignment.Middle)
-                dy = (descent * textHeight - sz.Y / 2);
+                dy = descent - sz.Y / 2;
             else if (vAlign == TextVerticalAlignment.Top)
-                dy = (descent * textHeight - sz.Y);
+                dy = descent - sz.Y;
 
             glLoadIdentity();
-            glTranslatef(dx, dy, 0);
-            glScalef(textHeight, textHeight, textHeight);
+            glTranslatef(pt.X, pt.Y, 0);
             glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
-            glTranslatef(pt.X / textHeight, pt.Y / textHeight, 0);
-
-            glLoadIdentity();
-            glTranslatef(dx, dy, 0);
             glScalef(textHeight, textHeight, textHeight);
-            glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
-            glTranslatef(pt.X / textHeight, pt.Y / textHeight, 0);
+            glTranslatef(dx, dy, 0);
 
             IntPtr str = Marshal.StringToHGlobalAnsi(text);
             glListBase(vectorBase);
@@ -584,10 +580,6 @@ namespace SimpleCAD.Graphics
         private const uint GL_FLAT = 0x1D00;
         private const uint GL_SMOOTH = 0x1D01;
 
-        private const uint GL_BLEND_DST = 0x0BE0;
-        private const uint GL_BLEND_SRC = 0x0BE1;
-        private const uint GL_BLEND = 0x0BE2;
-
         private const uint GL_ZERO = 0;
         private const uint GL_ONE = 1;
         private const uint GL_SRC_COLOR = 0x0300;
@@ -596,8 +588,6 @@ namespace SimpleCAD.Graphics
         private const uint GL_ONE_MINUS_SRC_ALPHA = 0x0303;
         private const uint GL_DST_ALPHA = 0x0304;
         private const uint GL_ONE_MINUS_DST_ALPHA = 0x0305;
-
-        private const uint GL_LIGHTING = 0x0B50;
 
         private const uint GL_MODELVIEW = 0x1700;
         private const uint GL_PROJECTION = 0x1701;
@@ -638,6 +628,220 @@ namespace SimpleCAD.Graphics
 
         private const uint WGL_FONT_LINES = 0;
         private const uint WGL_FONT_POLYGONS = 1;
+
+        private const uint GL_DONT_CARE = 0x1100;
+        private const uint GL_FASTEST = 0x1101;
+        private const uint GL_NICEST = 0x1102;
+
+        private const uint GL_CURRENT_COLOR = 0x0B00;
+        private const uint GL_CURRENT_INDEX = 0x0B01;
+        private const uint GL_CURRENT_NORMAL = 0x0B02;
+        private const uint GL_CURRENT_TEXTURE_COORDS = 0x0B03;
+        private const uint GL_CURRENT_RASTER_COLOR = 0x0B04;
+        private const uint GL_CURRENT_RASTER_INDEX = 0x0B05;
+        private const uint GL_CURRENT_RASTER_TEXTURE_COORDS = 0x0B06;
+        private const uint GL_CURRENT_RASTER_POSITION = 0x0B07;
+        private const uint GL_CURRENT_RASTER_POSITION_VALID = 0x0B08;
+        private const uint GL_CURRENT_RASTER_DISTANCE = 0x0B09;
+        private const uint GL_POINT_SMOOTH = 0x0B10;
+        private const uint GL_POINT_SIZE = 0x0B11;
+        private const uint GL_POINT_SIZE_RANGE = 0x0B12;
+        private const uint GL_POINT_SIZE_GRANULARITY = 0x0B13;
+        private const uint GL_LINE_SMOOTH = 0x0B20;
+        private const uint GL_LINE_WIDTH = 0x0B21;
+        private const uint GL_LINE_WIDTH_RANGE = 0x0B22;
+        private const uint GL_LINE_WIDTH_GRANULARITY = 0x0B23;
+        private const uint GL_LINE_STIPPLE = 0x0B24;
+        private const uint GL_LINE_STIPPLE_PATTERN = 0x0B25;
+        private const uint GL_LINE_STIPPLE_REPEAT = 0x0B26;
+        private const uint GL_LIST_MODE = 0x0B30;
+        private const uint GL_MAX_LIST_NESTING = 0x0B31;
+        private const uint GL_LIST_BASE = 0x0B32;
+        private const uint GL_LIST_INDEX = 0x0B33;
+        private const uint GL_POLYGON_MODE = 0x0B40;
+        private const uint GL_POLYGON_SMOOTH = 0x0B41;
+        private const uint GL_POLYGON_STIPPLE = 0x0B42;
+        private const uint GL_EDGE_FLAG = 0x0B43;
+        private const uint GL_CULL_FACE = 0x0B44;
+        private const uint GL_CULL_FACE_MODE = 0x0B45;
+        private const uint GL_FRONT_FACE = 0x0B46;
+        private const uint GL_LIGHTING = 0x0B50;
+        private const uint GL_LIGHT_MODEL_LOCAL_VIEWER = 0x0B51;
+        private const uint GL_LIGHT_MODEL_TWO_SIDE = 0x0B52;
+        private const uint GL_LIGHT_MODEL_AMBIENT = 0x0B53;
+        private const uint GL_SHADE_MODEL = 0x0B54;
+        private const uint GL_COLOR_MATERIAL_FACE = 0x0B55;
+        private const uint GL_COLOR_MATERIAL_PARAMETER = 0x0B56;
+        private const uint GL_COLOR_MATERIAL = 0x0B57;
+        private const uint GL_FOG = 0x0B60;
+        private const uint GL_FOG_INDEX = 0x0B61;
+        private const uint GL_FOG_DENSITY = 0x0B62;
+        private const uint GL_FOG_START = 0x0B63;
+        private const uint GL_FOG_END = 0x0B64;
+        private const uint GL_FOG_MODE = 0x0B65;
+        private const uint GL_FOG_COLOR = 0x0B66;
+        private const uint GL_DEPTH_RANGE = 0x0B70;
+        private const uint GL_DEPTH_TEST = 0x0B71;
+        private const uint GL_DEPTH_WRITEMASK = 0x0B72;
+        private const uint GL_DEPTH_CLEAR_VALUE = 0x0B73;
+        private const uint GL_DEPTH_FUNC = 0x0B74;
+        private const uint GL_ACCUM_CLEAR_VALUE = 0x0B80;
+        private const uint GL_STENCIL_TEST = 0x0B90;
+        private const uint GL_STENCIL_CLEAR_VALUE = 0x0B91;
+        private const uint GL_STENCIL_FUNC = 0x0B92;
+        private const uint GL_STENCIL_VALUE_MASK = 0x0B93;
+        private const uint GL_STENCIL_FAIL = 0x0B94;
+        private const uint GL_STENCIL_PASS_DEPTH_FAIL = 0x0B95;
+        private const uint GL_STENCIL_PASS_DEPTH_PASS = 0x0B96;
+        private const uint GL_STENCIL_REF = 0x0B97;
+        private const uint GL_STENCIL_WRITEMASK = 0x0B98;
+        private const uint GL_MATRIX_MODE = 0x0BA0;
+        private const uint GL_NORMALIZE = 0x0BA1;
+        private const uint GL_VIEWPORT = 0x0BA2;
+        private const uint GL_MODELVIEW_STACK_DEPTH = 0x0BA3;
+        private const uint GL_PROJECTION_STACK_DEPTH = 0x0BA4;
+        private const uint GL_TEXTURE_STACK_DEPTH = 0x0BA5;
+        private const uint GL_MODELVIEW_MATRIX = 0x0BA6;
+        private const uint GL_PROJECTION_MATRIX = 0x0BA7;
+        private const uint GL_TEXTURE_MATRIX = 0x0BA8;
+        private const uint GL_ATTRIB_STACK_DEPTH = 0x0BB0;
+        private const uint GL_CLIENT_ATTRIB_STACK_DEPTH = 0x0BB1;
+        private const uint GL_ALPHA_TEST = 0x0BC0;
+        private const uint GL_ALPHA_TEST_FUNC = 0x0BC1;
+        private const uint GL_ALPHA_TEST_REF = 0x0BC2;
+        private const uint GL_DITHER = 0x0BD0;
+        private const uint GL_BLEND_DST = 0x0BE0;
+        private const uint GL_BLEND_SRC = 0x0BE1;
+        private const uint GL_BLEND = 0x0BE2;
+        private const uint GL_LOGIC_OP_MODE = 0x0BF0;
+        private const uint GL_INDEX_LOGIC_OP = 0x0BF1;
+        private const uint GL_COLOR_LOGIC_OP = 0x0BF2;
+        private const uint GL_AUX_BUFFERS = 0x0C00;
+        private const uint GL_DRAW_BUFFER = 0x0C01;
+        private const uint GL_READ_BUFFER = 0x0C02;
+        private const uint GL_SCISSOR_BOX = 0x0C10;
+        private const uint GL_SCISSOR_TEST = 0x0C11;
+        private const uint GL_INDEX_CLEAR_VALUE = 0x0C20;
+        private const uint GL_INDEX_WRITEMASK = 0x0C21;
+        private const uint GL_COLOR_CLEAR_VALUE = 0x0C22;
+        private const uint GL_COLOR_WRITEMASK = 0x0C23;
+        private const uint GL_INDEX_MODE = 0x0C30;
+        private const uint GL_RGBA_MODE = 0x0C31;
+        private const uint GL_DOUBLEBUFFER = 0x0C32;
+        private const uint GL_STEREO = 0x0C33;
+        private const uint GL_RENDER_MODE = 0x0C40;
+        private const uint GL_PERSPECTIVE_CORRECTION_HINT = 0x0C50;
+        private const uint GL_POINT_SMOOTH_HINT = 0x0C51;
+        private const uint GL_LINE_SMOOTH_HINT = 0x0C52;
+        private const uint GL_POLYGON_SMOOTH_HINT = 0x0C53;
+        private const uint GL_FOG_HINT = 0x0C54;
+        private const uint GL_TEXTURE_GEN_S = 0x0C60;
+        private const uint GL_TEXTURE_GEN_T = 0x0C61;
+        private const uint GL_TEXTURE_GEN_R = 0x0C62;
+        private const uint GL_TEXTURE_GEN_Q = 0x0C63;
+        private const uint GL_PIXEL_MAP_I_TO_I = 0x0C70;
+        private const uint GL_PIXEL_MAP_S_TO_S = 0x0C71;
+        private const uint GL_PIXEL_MAP_I_TO_R = 0x0C72;
+        private const uint GL_PIXEL_MAP_I_TO_G = 0x0C73;
+        private const uint GL_PIXEL_MAP_I_TO_B = 0x0C74;
+        private const uint GL_PIXEL_MAP_I_TO_A = 0x0C75;
+        private const uint GL_PIXEL_MAP_R_TO_R = 0x0C76;
+        private const uint GL_PIXEL_MAP_G_TO_G = 0x0C77;
+        private const uint GL_PIXEL_MAP_B_TO_B = 0x0C78;
+        private const uint GL_PIXEL_MAP_A_TO_A = 0x0C79;
+        private const uint GL_PIXEL_MAP_I_TO_I_SIZE = 0x0CB0;
+        private const uint GL_PIXEL_MAP_S_TO_S_SIZE = 0x0CB1;
+        private const uint GL_PIXEL_MAP_I_TO_R_SIZE = 0x0CB2;
+        private const uint GL_PIXEL_MAP_I_TO_G_SIZE = 0x0CB3;
+        private const uint GL_PIXEL_MAP_I_TO_B_SIZE = 0x0CB4;
+        private const uint GL_PIXEL_MAP_I_TO_A_SIZE = 0x0CB5;
+        private const uint GL_PIXEL_MAP_R_TO_R_SIZE = 0x0CB6;
+        private const uint GL_PIXEL_MAP_G_TO_G_SIZE = 0x0CB7;
+        private const uint GL_PIXEL_MAP_B_TO_B_SIZE = 0x0CB8;
+        private const uint GL_PIXEL_MAP_A_TO_A_SIZE = 0x0CB9;
+        private const uint GL_UNPACK_SWAP_BYTES = 0x0CF0;
+        private const uint GL_UNPACK_LSB_FIRST = 0x0CF1;
+        private const uint GL_UNPACK_ROW_LENGTH = 0x0CF2;
+        private const uint GL_UNPACK_SKIP_ROWS = 0x0CF3;
+        private const uint GL_UNPACK_SKIP_PIXELS = 0x0CF4;
+        private const uint GL_UNPACK_ALIGNMENT = 0x0CF5;
+        private const uint GL_PACK_SWAP_BYTES = 0x0D00;
+        private const uint GL_PACK_LSB_FIRST = 0x0D01;
+        private const uint GL_PACK_ROW_LENGTH = 0x0D02;
+        private const uint GL_PACK_SKIP_ROWS = 0x0D03;
+        private const uint GL_PACK_SKIP_PIXELS = 0x0D04;
+        private const uint GL_PACK_ALIGNMENT = 0x0D05;
+        private const uint GL_MAP_COLOR = 0x0D10;
+        private const uint GL_MAP_STENCIL = 0x0D11;
+        private const uint GL_INDEX_SHIFT = 0x0D12;
+        private const uint GL_INDEX_OFFSET = 0x0D13;
+        private const uint GL_RED_SCALE = 0x0D14;
+        private const uint GL_RED_BIAS = 0x0D15;
+        private const uint GL_ZOOM_X = 0x0D16;
+        private const uint GL_ZOOM_Y = 0x0D17;
+        private const uint GL_GREEN_SCALE = 0x0D18;
+        private const uint GL_GREEN_BIAS = 0x0D19;
+        private const uint GL_BLUE_SCALE = 0x0D1A;
+        private const uint GL_BLUE_BIAS = 0x0D1B;
+        private const uint GL_ALPHA_SCALE = 0x0D1C;
+        private const uint GL_ALPHA_BIAS = 0x0D1D;
+        private const uint GL_DEPTH_SCALE = 0x0D1E;
+        private const uint GL_DEPTH_BIAS = 0x0D1F;
+        private const uint GL_MAX_EVAL_ORDER = 0x0D30;
+        private const uint GL_MAX_LIGHTS = 0x0D31;
+        private const uint GL_MAX_CLIP_PLANES = 0x0D32;
+        private const uint GL_MAX_TEXTURE_SIZE = 0x0D33;
+        private const uint GL_MAX_PIXEL_MAP_TABLE = 0x0D34;
+        private const uint GL_MAX_ATTRIB_STACK_DEPTH = 0x0D35;
+        private const uint GL_MAX_MODELVIEW_STACK_DEPTH = 0x0D36;
+        private const uint GL_MAX_NAME_STACK_DEPTH = 0x0D37;
+        private const uint GL_MAX_PROJECTION_STACK_DEPTH = 0x0D38;
+        private const uint GL_MAX_TEXTURE_STACK_DEPTH = 0x0D39;
+        private const uint GL_MAX_VIEWPORT_DIMS = 0x0D3A;
+        private const uint GL_MAX_CLIENT_ATTRIB_STACK_DEPTH = 0x0D3B;
+        private const uint GL_SUBPIXEL_BITS = 0x0D50;
+        private const uint GL_INDEX_BITS = 0x0D51;
+        private const uint GL_RED_BITS = 0x0D52;
+        private const uint GL_GREEN_BITS = 0x0D53;
+        private const uint GL_BLUE_BITS = 0x0D54;
+        private const uint GL_ALPHA_BITS = 0x0D55;
+        private const uint GL_DEPTH_BITS = 0x0D56;
+        private const uint GL_STENCIL_BITS = 0x0D57;
+        private const uint GL_ACCUM_RED_BITS = 0x0D58;
+        private const uint GL_ACCUM_GREEN_BITS = 0x0D59;
+        private const uint GL_ACCUM_BLUE_BITS = 0x0D5A;
+        private const uint GL_ACCUM_ALPHA_BITS = 0x0D5B;
+        private const uint GL_NAME_STACK_DEPTH = 0x0D70;
+        private const uint GL_AUTO_NORMAL = 0x0D80;
+        private const uint GL_MAP1_COLOR_4 = 0x0D90;
+        private const uint GL_MAP1_INDEX = 0x0D91;
+        private const uint GL_MAP1_NORMAL = 0x0D92;
+        private const uint GL_MAP1_TEXTURE_COORD_1 = 0x0D93;
+        private const uint GL_MAP1_TEXTURE_COORD_2 = 0x0D94;
+        private const uint GL_MAP1_TEXTURE_COORD_3 = 0x0D95;
+        private const uint GL_MAP1_TEXTURE_COORD_4 = 0x0D96;
+        private const uint GL_MAP1_VERTEX_3 = 0x0D97;
+        private const uint GL_MAP1_VERTEX_4 = 0x0D98;
+        private const uint GL_MAP2_COLOR_4 = 0x0DB0;
+        private const uint GL_MAP2_INDEX = 0x0DB1;
+        private const uint GL_MAP2_NORMAL = 0x0DB2;
+        private const uint GL_MAP2_TEXTURE_COORD_1 = 0x0DB3;
+        private const uint GL_MAP2_TEXTURE_COORD_2 = 0x0DB4;
+        private const uint GL_MAP2_TEXTURE_COORD_3 = 0x0DB5;
+        private const uint GL_MAP2_TEXTURE_COORD_4 = 0x0DB6;
+        private const uint GL_MAP2_VERTEX_3 = 0x0DB7;
+        private const uint GL_MAP2_VERTEX_4 = 0x0DB8;
+        private const uint GL_MAP1_GRID_DOMAIN = 0x0DD0;
+        private const uint GL_MAP1_GRID_SEGMENTS = 0x0DD1;
+        private const uint GL_MAP2_GRID_DOMAIN = 0x0DD2;
+        private const uint GL_MAP2_GRID_SEGMENTS = 0x0DD3;
+        private const uint GL_TEXTURE_1D = 0x0DE0;
+        private const uint GL_TEXTURE_2D = 0x0DE1;
+        private const uint GL_FEEDBACK_BUFFER_POINTER = 0x0DF0;
+        private const uint GL_FEEDBACK_BUFFER_SIZE = 0x0DF1;
+        private const uint GL_FEEDBACK_BUFFER_TYPE = 0x0DF2;
+        private const uint GL_SELECTION_BUFFER_POINTER = 0x0DF3;
+        private const uint GL_SELECTION_BUFFER_SIZE = 0x0DF4;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetDC(IntPtr hWnd);
@@ -812,6 +1016,8 @@ namespace SimpleCAD.Graphics
         private static extern void glEnable(uint cap);
         [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glDisable(uint cap);
+        [DllImport("opengl32.dll")]
+        private static extern void glHint(uint target, uint mode);
 
         [DllImport("opengl32.dll", SetLastError = true)]
         private static extern void glBlendFunc(uint src, uint dest);
