@@ -52,6 +52,7 @@
     <Compile Include="CADDocument.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\Color.cs" />
+    <Compile Include="Graphics\GL.cs" />
     <Compile Include="Graphics\OpenGLRenderer.cs" />
     <Compile Include="Graphics\GDIRenderer.cs" />
     <Compile Include="Settings.cs" />

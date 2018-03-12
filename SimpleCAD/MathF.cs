@@ -46,5 +46,25 @@ namespace SimpleCAD
         {
             return (float)Math.Sqrt(a);
         }
+
+        public static float Log(float a, float newBase)
+        {
+            return (float)Math.Log(a, newBase);
+        }
+
+        public static float Pow(float a, float power)
+        {
+            return (float)Math.Pow(a, power);
+        }
+
+        public static float Floor(float a)
+        {
+            return (float)Math.Floor(a);
+        }
+
+        public static float Ceiling(float a)
+        {
+            return (float)Math.Ceiling(a);
+        }
     }
 }
