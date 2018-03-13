@@ -325,6 +325,8 @@ namespace SimpleCAD.Graphics
         public const uint GL_RGBA = 0x1908;
         public const uint GL_LUMINANCE = 0x1909;
         public const uint GL_LUMINANCE_ALPHA = 0x190A;
+        public const uint GL_BGRA_EXT = 0x80E1;
+        public const uint GL_BGRA8_EXT = 0x93A1;
 
         public const uint GL_ALPHA4 = 0x803B;
         public const uint GL_ALPHA8 = 0x803C;
@@ -384,10 +386,16 @@ namespace SimpleCAD.Graphics
         public const uint GL_CLAMP = 0x2900;
         public const uint GL_REPEAT = 0x2901;
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public const uint GL_TEXTURE_ENV = 0x2300;
+        public const uint GL_TEXTURE_ENV_MODE = 0x2200;
+        public const uint GL_TEXTURE_ENV_COLOR = 0x2201;
+        public const uint GL_MODULATE = 0x2100;
+        public const uint GL_DECAL = 0x2101;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetDC(IntPtr hWnd);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern Int32 ReleaseDC(IntPtr hwnd, IntPtr hdc);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -469,7 +477,7 @@ namespace SimpleCAD.Graphics
             public float x;
             public float y;
 
-            public POINTFLOAT(float _x, float _y) { x = _x;y = _y; }
+            public POINTFLOAT(float _x, float _y) { x = _x; y = _y; }
         }
 
         public struct POINT
@@ -517,117 +525,121 @@ namespace SimpleCAD.Graphics
             PFD_TYPE_COLORINDEX = 1
         }
 
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
         public static extern int ChoosePixelFormat(IntPtr hdc, ref PIXELFORMATDESCRIPTOR ppfd);
 
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
         public static extern bool SetPixelFormat(IntPtr hdc, int iPixelFormat, ref PIXELFORMATDESCRIPTOR ppfd);
 
-        [DllImport("gdi32.dll", SetLastError = true)]
+        [DllImport("gdi32.dll")]
         public static extern bool SwapBuffers(IntPtr deviceContext);
 
-        [DllImport("gdi32.dll", SetLastError = true)]
+        [DllImport("gdi32.dll")]
         public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
 
-        [DllImport("gdi32.dll", SetLastError = true)]
+        [DllImport("gdi32.dll")]
         public static extern bool GetCharABCWidths(IntPtr hdc, uint uFirstChar, uint uLastChar, [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct, SizeConst = 1)] ABC[] lpabc);
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
         public static extern bool GetTextMetrics(IntPtr hdc, out TEXTMETRIC lptm);
 
-        [DllImport("gdi32.dll", SetLastError = true)]
+        [DllImport("gdi32.dll")]
         public static extern bool LPtoDP(IntPtr hdc, [In, Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct)] POINT[] lpPoints, int nCount);
 
         [DllImport("opengl32.dll")]
         public static extern uint glGetError();
-        [DllImport("opengl32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("opengl32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr wglCreateContext(IntPtr hDC);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern int wglMakeCurrent(IntPtr hdc, IntPtr hrc);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern int wglDeleteContext(IntPtr hdc);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern IntPtr wglGetCurrentContext();
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern IntPtr wglGetCurrentDC();
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern bool wglUseFontBitmaps(IntPtr hdc, uint first, uint count, uint listBase);
-        [DllImport("opengl32", SetLastError = true)]
+        [DllImport("opengl32")]
         public static extern bool wglUseFontOutlines(IntPtr hDC, uint first, uint count, uint listBase, float deviation, float extrusion, uint format, [Out, MarshalAs(UnmanagedType.LPArray)] GLYPHMETRICSFLOAT[] lpgmf);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glViewport(int x, int y, int width, int height);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glShadeModel(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glEnable(uint cap);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glDisable(uint cap);
         [DllImport("opengl32.dll")]
         public static extern void glHint(uint target, uint mode);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glBlendFunc(uint src, uint dest);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glMatrixMode(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glLoadIdentity();
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glTranslatef(float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glScalef(float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glRotatef(float angle, float x, float y, float z);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glOrtho(double left, double right, double bottom, double top, double zNear, double zFar);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glClearColor(float red, float green, float blue, float alpha);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glClear(uint mask);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glFinish();
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glBegin(uint mode);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glEnd();
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glColor4ub(byte red, byte green, byte blue, byte alpha);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glVertex2f(float x, float y);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glTexCoord2f(float s, float t);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glLineWidth(float width);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern uint glGenLists(int range);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glDeleteLists(uint list, int range);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glCallList(uint list);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glListBase(uint listbase);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glGenTextures(int n, out uint texture);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glBindTexture(uint target, uint texture);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, IntPtr pixels);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glTexParameteri(uint target, uint pname, int param);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glDeleteTextures(int n, ref uint texture);
+        [DllImport("opengl32.dll")]
+        public static extern void glTexEnvf(uint target, uint pname, float param);
+        [DllImport("opengl32.dll")]
+        public static extern void glTexEnvi(uint target, uint pname, int param);
 
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glRasterPos2f(float x, float y);
-        [DllImport("opengl32.dll", SetLastError = true)]
+        [DllImport("opengl32.dll")]
         public static extern void glCallLists(int n, uint type, IntPtr lists);
     }
 }

@@ -13,6 +13,7 @@ namespace SimpleCAD.Graphics
         private IntPtr hDC;
         private IntPtr glContext;
         private GL.ContextSwitch glSwitch;
+        private uint textTextureID;
 
         public override string Name => "OpenGL Renderer";
         public bool IsAccelerated { get; private set; }
@@ -78,6 +79,8 @@ namespace SimpleCAD.Graphics
             GL.glEnable(GL.GL_POINT_SMOOTH);
             GL.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_DONT_CARE);
             GL.glEnable(GL.GL_TEXTURE_2D);
+
+            GL.glGenTextures(1, out textTextureID);
         }
 
         public override void InitFrame(System.Drawing.Graphics graphics)
@@ -119,6 +122,8 @@ namespace SimpleCAD.Graphics
 
         public override void Dispose()
         {
+            GL.glDeleteTextures(1, ref textTextureID);
+
             GL.wglMakeCurrent(IntPtr.Zero, IntPtr.Zero);
             GL.wglDeleteContext(glContext);
             if (control != null)
@@ -415,14 +420,14 @@ namespace SimpleCAD.Graphics
                     srcgraph.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
                     srcgraph.DrawString(text, font, brush, 0, 0);
-
-                    uint textureID;
-                    GL.glGenTextures(1, out textureID);
-
+                    
                     var data = srcimage.LockBits(new System.Drawing.Rectangle(0, 0, srcimage.Width, srcimage.Height),
                         System.Drawing.Imaging.ImageLockMode.ReadOnly, srcimage.PixelFormat);
-                    GL.glBindTexture(GL.GL_TEXTURE_2D, textureID);
-                    GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, (int)GL.GL_RGBA, srcimage.Width, srcimage.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, data.Scan0);
+
+                    GL.glBindTexture(GL.GL_TEXTURE_2D, textTextureID);
+
+                    //GL.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_MODULATE);
+                    GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, (int)GL.GL_RGBA, srcimage.Width, srcimage.Height, 0, GL.GL_BGRA_EXT, GL.GL_UNSIGNED_BYTE, data.Scan0);
                     srcimage.UnlockBits(data);
 
                     GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, (int)GL.GL_LINEAR);
@@ -444,13 +449,13 @@ namespace SimpleCAD.Graphics
                     else if (vAlign == TextVerticalAlignment.Top)
                         dy = -sz.Height;
 
+                    GL.glColor4ub(255, 255, 255, 255);
+
                     GL.glLoadIdentity();
                     GL.glTranslatef(pt.X, pt.Y, 0);
                     GL.glRotatef(rotation * 180 / MathF.PI, 0, 0, 1);
                     GL.glScalef(textHeight / height, textHeight / height, textHeight / height);
                     GL.glTranslatef(dx, dy, 0);
-
-                    GL.glBindTexture(GL.GL_TEXTURE_2D, textureID);
 
                     GL.glBegin(GL.GL_TRIANGLE_FAN);
 
@@ -468,7 +473,7 @@ namespace SimpleCAD.Graphics
 
                     GL.glEnd();
 
-                    GL.glDeleteTextures(1, ref textureID);
+                    GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
                 }
             }
         }
