@@ -60,9 +60,9 @@ namespace SimpleCAD.Graphics
             renderTarget.BeginDraw();
 
             // Set model-view transformation
-            TransformationMatrix2D m1 = TransformationMatrix2D.Translation(-View.CameraPosition.X, -View.CameraPosition.Y);
-            TransformationMatrix2D m2 = TransformationMatrix2D.Scale(1.0f / View.ZoomFactor, -1.0f / View.ZoomFactor);
-            TransformationMatrix2D m3 = TransformationMatrix2D.Translation(View.Width / 2, View.Height / 2);
+            Matrix2D m1 = Matrix2D.Translation(-View.CameraPosition.X, -View.CameraPosition.Y);
+            Matrix2D m2 = Matrix2D.Scale(1.0f / View.ZoomFactor, -1.0f / View.ZoomFactor);
+            Matrix2D m3 = Matrix2D.Translation(View.Width / 2, View.Height / 2);
             renderTarget.Transform = M2dxM(m3 * m2 * m1);
         }
 
@@ -154,9 +154,9 @@ namespace SimpleCAD.Graphics
             var brush = CreateBrush(style, out var strokeWidth, out var strokeStyle);
 
             var trans = renderTarget.Transform;
-            var transM = new TransformationMatrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
-            var m1 = TransformationMatrix2D.Translation(center.X, center.Y);
-            var m2 = TransformationMatrix2D.Rotation(rotation);
+            var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
+            var m1 = Matrix2D.Translation(center.X, center.Y);
+            var m2 = Matrix2D.Rotation(rotation);
 
             renderTarget.Transform = M2dxM(transM * m1 * m2);
             if (style.Fill)
@@ -205,9 +205,9 @@ namespace SimpleCAD.Graphics
             sink.Close();
 
             var trans = renderTarget.Transform;
-            var transM = new TransformationMatrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
-            var m1 = TransformationMatrix2D.Translation(center.X, center.Y);
-            var m2 = TransformationMatrix2D.Rotation(rotation);
+            var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
+            var m1 = Matrix2D.Translation(center.X, center.Y);
+            var m2 = Matrix2D.Rotation(rotation);
 
             renderTarget.Transform = M2dxM(transM * m1 * m2);
             renderTarget.DrawGeometry(geometry, brush, strokeWidth, strokeStyle);
@@ -291,10 +291,10 @@ namespace SimpleCAD.Graphics
             var layoutRect = P2dxR(new Point2D(0, 0), size.AsPoint2D());
 
             var trans = renderTarget.Transform;
-            var transM = new TransformationMatrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
-            var m1 = TransformationMatrix2D.Translation(pt.X, pt.Y);
-            var m2 = TransformationMatrix2D.Rotation(rotation);
-            var m3 = TransformationMatrix2D.Scale(textHeight / height, -textHeight / height);
+            var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
+            var m1 = Matrix2D.Translation(pt.X, pt.Y);
+            var m2 = Matrix2D.Rotation(rotation);
+            var m3 = Matrix2D.Scale(textHeight / height, -textHeight / height);
 
             renderTarget.Transform = M2dxM(transM * m1 * m2 * m3);
             renderTarget.DrawText(text, format, layoutRect, brush);
@@ -343,7 +343,7 @@ namespace SimpleCAD.Graphics
             return new SharpDX.Mathematics.Interop.RawColor4(v.R / 255f, v.G / 255f, v.B / 255f, v.A / 255f);
         }
 
-        private SharpDX.Mathematics.Interop.RawMatrix3x2 M2dxM(TransformationMatrix2D v)
+        private SharpDX.Mathematics.Interop.RawMatrix3x2 M2dxM(Matrix2D v)
         {
             return new SharpDX.Mathematics.Interop.RawMatrix3x2(v.M11, v.M12, v.M21, v.M22, v.DX, v.DY);
         }

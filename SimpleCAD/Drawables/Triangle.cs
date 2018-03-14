@@ -63,7 +63,7 @@ namespace SimpleCAD.Drawables
             return poly.GetExtents();
         }
 
-        public override void TransformBy(TransformationMatrix2D transformation)
+        public override void TransformBy(Matrix2D transformation)
         {
             p1 = p1.Transform(transformation);
             p2 = p2.Transform(transformation);

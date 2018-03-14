@@ -103,7 +103,7 @@
     <Compile Include="Drawables\Parabola.cs" />
     <Compile Include="Geometry\Point2D.cs" />
     <Compile Include="Geometry\Vector2D.cs" />
-    <Compile Include="Geometry\TransformationMatrix2D.cs" />
+    <Compile Include="Geometry\Matrix2D.cs" />
     <Compile Include="Drawables\Triangle.cs" />
     <Compile Include="Drawables\Dimension.cs" />
     <Compile Include="Drawables\Ellipse.cs" />

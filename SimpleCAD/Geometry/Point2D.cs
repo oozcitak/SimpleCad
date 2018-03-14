@@ -27,7 +27,7 @@ namespace SimpleCAD.Geometry
             _y = pt.Y;
         }
 
-        public Point2D Transform(TransformationMatrix2D transformation)
+        public Point2D Transform(Matrix2D transformation)
         {
             float x = transformation.M11 * X + transformation.M12 * Y + transformation.DX;
             float y = transformation.M21 * X + transformation.M22 * Y + transformation.DY;

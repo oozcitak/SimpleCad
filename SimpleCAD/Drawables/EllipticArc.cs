@@ -73,8 +73,8 @@ namespace SimpleCAD.Drawables
                 a += da;
             }
             poly.Closed = false;
-            poly.TransformBy(TransformationMatrix2D.Rotation(Rotation));
-            poly.TransformBy(TransformationMatrix2D.Translation(Center.X, Center.Y));
+            poly.TransformBy(Matrix2D.Rotation(Rotation));
+            poly.TransformBy(Matrix2D.Translation(Center.X, Center.Y));
         }
 
         public override void Draw(Renderer renderer)
@@ -97,7 +97,7 @@ namespace SimpleCAD.Drawables
             return poly.GetExtents();
         }
 
-        public override void TransformBy(TransformationMatrix2D transformation)
+        public override void TransformBy(Matrix2D transformation)
         {
             Center = Center.Transform(transformation);
             Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;

@@ -27,7 +27,7 @@ namespace SimpleCAD.Commands
             PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
                 (p) =>
                 {
-                    consItems.TransformBy(TransformationMatrix2D.Translation(p - lastPt));
+                    consItems.TransformBy(Matrix2D.Translation(p - lastPt));
                     lastPt = p;
                 });
             doc.Transients.Remove(consItems);
@@ -35,7 +35,7 @@ namespace SimpleCAD.Commands
 
             foreach (Drawable item in s.Value)
             {
-                item.TransformBy(TransformationMatrix2D.Translation(p2.Value - p1.Value));
+                item.TransformBy(Matrix2D.Translation(p2.Value - p1.Value));
             }
         }
     }
@@ -66,7 +66,7 @@ namespace SimpleCAD.Commands
                 PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
                     (p) =>
                     {
-                        consItems.TransformBy(TransformationMatrix2D.Translation(p - lastPt));
+                        consItems.TransformBy(Matrix2D.Translation(p - lastPt));
                         lastPt = p;
                     });
 
@@ -79,7 +79,7 @@ namespace SimpleCAD.Commands
                     foreach (Drawable item in s.Value)
                     {
                         Drawable newItem = item.Clone();
-                        newItem.TransformBy(TransformationMatrix2D.Translation(p2.Value - p1.Value));
+                        newItem.TransformBy(Matrix2D.Translation(p2.Value - p1.Value));
                         doc.Model.Add(newItem);
                     }
                 }
@@ -112,7 +112,7 @@ namespace SimpleCAD.Commands
             AngleResult p2 = await ed.GetAngle("Rotation angle: ", p1.Value,
                 (p) =>
                 {
-                    consItems.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p - lastAngle));
+                    consItems.TransformBy(Matrix2D.Rotation(p1.Value, p - lastAngle));
                     lastAngle = p;
                 });
             doc.Transients.Remove(consItems);
@@ -120,7 +120,7 @@ namespace SimpleCAD.Commands
 
             foreach (Drawable item in s.Value)
             {
-                item.TransformBy(TransformationMatrix2D.Rotation(p1.Value, p2.Value));
+                item.TransformBy(Matrix2D.Rotation(p1.Value, p2.Value));
             }
         }
     }
@@ -148,7 +148,7 @@ namespace SimpleCAD.Commands
             DistanceResult d1 = await ed.GetDistance("Scale: ", p1.Value,
                 (p) =>
                 {
-                    consItems.TransformBy(TransformationMatrix2D.Scale(p1.Value, p / lastScale));
+                    consItems.TransformBy(Matrix2D.Scale(p1.Value, p / lastScale));
                     lastScale = p;
                 });
             doc.Transients.Remove(consItems);
@@ -156,7 +156,7 @@ namespace SimpleCAD.Commands
 
             foreach (Drawable item in s.Value)
             {
-                item.TransformBy(TransformationMatrix2D.Scale(p1.Value, d1.Value));
+                item.TransformBy(Matrix2D.Scale(p1.Value, d1.Value));
             }
         }
     }
@@ -180,11 +180,11 @@ namespace SimpleCAD.Commands
                 consItems.Add(item.Clone());
             }
             doc.Transients.Add(consItems);
-            TransformationMatrix2D lastTrans = TransformationMatrix2D.Identity;
+            Matrix2D lastTrans = Matrix2D.Identity;
             PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
                 (p) =>
                 {
-                    TransformationMatrix2D mirror = TransformationMatrix2D.Mirror(p1.Value, p - p1.Value);
+                    Matrix2D mirror = Matrix2D.Mirror(p1.Value, p - p1.Value);
                     consItems.TransformBy(lastTrans.Inverse);
                     consItems.TransformBy(mirror);
                     lastTrans = mirror;
@@ -195,7 +195,7 @@ namespace SimpleCAD.Commands
             foreach (Drawable item in s.Value)
             {
                 Drawable newItem = item.Clone();
-                newItem.TransformBy(TransformationMatrix2D.Mirror(p1.Value, p2.Value - p1.Value));
+                newItem.TransformBy(Matrix2D.Mirror(p1.Value, p2.Value - p1.Value));
                 doc.Model.Add(newItem);
             }
         }

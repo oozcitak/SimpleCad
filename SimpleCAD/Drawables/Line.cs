@@ -47,7 +47,7 @@ namespace SimpleCAD.Drawables
             return extents;
         }
 
-        public override void TransformBy(TransformationMatrix2D transformation)
+        public override void TransformBy(Matrix2D transformation)
         {
             StartPoint = StartPoint.Transform(transformation);
             EndPoint = EndPoint.Transform(transformation);

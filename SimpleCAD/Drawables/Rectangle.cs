@@ -19,11 +19,11 @@ namespace SimpleCAD.Drawables
         {
             get
             {
-                return Center + new Vector2D(Width / 2, Height / 2).Transform(TransformationMatrix2D.Rotation(Rotation)); ;
+                return Center + new Vector2D(Width / 2, Height / 2).Transform(Matrix2D.Rotation(Rotation)); ;
             }
             set
             {
-                Vector2D size = (value - center).Transform(TransformationMatrix2D.Rotation(-Rotation));
+                Vector2D size = (value - center).Transform(Matrix2D.Rotation(-Rotation));
                 width = size.X * 2;
                 height = size.Y * 2;
                 UpdatePolyline();
@@ -68,8 +68,8 @@ namespace SimpleCAD.Drawables
             poly.Points.Add(+Width / 2, +Height / 2);
             poly.Points.Add(-Width / 2, +Height / 2);
             poly.Closed = true;
-            poly.TransformBy(TransformationMatrix2D.Rotation(rotation));
-            poly.TransformBy(TransformationMatrix2D.Translation(X, Y));
+            poly.TransformBy(Matrix2D.Rotation(rotation));
+            poly.TransformBy(Matrix2D.Translation(X, Y));
         }
 
         public override void Draw(Renderer renderer)
@@ -83,7 +83,7 @@ namespace SimpleCAD.Drawables
             return poly.GetExtents();
         }
 
-        public override void TransformBy(TransformationMatrix2D transformation)
+        public override void TransformBy(Matrix2D transformation)
         {
             Center = Center.Transform(transformation);
             Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;

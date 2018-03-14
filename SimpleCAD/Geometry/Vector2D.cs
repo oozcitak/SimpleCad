@@ -26,7 +26,7 @@ namespace SimpleCAD.Geometry
             _y = y;
         }
 
-        public Vector2D Transform(TransformationMatrix2D transformation)
+        public Vector2D Transform(Matrix2D transformation)
         {
             float x = transformation.M11 * X + transformation.M12 * Y;
             float y = transformation.M21 * X + transformation.M22 * Y;

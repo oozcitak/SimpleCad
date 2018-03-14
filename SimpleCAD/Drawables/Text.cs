@@ -84,7 +84,7 @@ namespace SimpleCAD.Drawables
             p2 = p2 + offset;
             p3 = p3 + offset;
             p4 = p4 + offset;
-            TransformationMatrix2D trans = TransformationMatrix2D.Transformation(1, 1, angle, Location.X, Location.Y);
+            Matrix2D trans = Matrix2D.Transformation(1, 1, angle, Location.X, Location.Y);
             p1 = p1.Transform(trans);
             p2 = p2.Transform(trans);
             p3 = p3.Transform(trans);
@@ -98,7 +98,7 @@ namespace SimpleCAD.Drawables
             return extents;
         }
 
-        public override void TransformBy(TransformationMatrix2D transformation)
+        public override void TransformBy(Matrix2D transformation)
         {
             Location = Location.Transform(transformation);
             TextHeight = (Vector2D.XAxis * TextHeight).Transform(transformation).Length;
