@@ -271,7 +271,7 @@ namespace SimpleCAD.Graphics
         public override Vector2D MeasureString(string text, string fontFamily, FontStyle fontStyle, float textHeight)
         {
             float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            var format = CreateTextFormat(fontFamily, height, fontStyle, TextHorizontalAlignment.Left, TextVerticalAlignment.Top);
+            var format = CreateTextFormat(fontFamily, height, fontStyle);
             return MeasureString(text, format);
         }
 
@@ -282,23 +282,77 @@ namespace SimpleCAD.Graphics
             return new Vector2D(Math.Abs(worldSize.X), Math.Abs(worldSize.Y));
         }
 
-        public override void DrawString(Style style, Point2D pt, string text, string fontFamily, float textHeight, FontStyle fontStyle = FontStyle.Regular, float rotation = 0, TextHorizontalAlignment hAlign = TextHorizontalAlignment.Left, TextVerticalAlignment vAlign = TextVerticalAlignment.Bottom)
+        public override void DrawString(Style style, Point2D pt, string text, string fontFamily, float textHeight, FontStyle fontStyle, float rotation, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
         {
             float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
+            var format = CreateTextFormat(fontFamily, height, fontStyle);
             var brush = CreateBrush(style, out _, out _);
-            var format = CreateTextFormat(fontFamily, height, fontStyle, hAlign, vAlign);
-            Vector2D size = MeasureString(text, format);
-            var layoutRect = P2dxR(new Point2D(0, 0), size.AsPoint2D());
+            using (var font = new System.Drawing.Font(fontFamily, height, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.Pixel))
+            {
+                var layout = new TextLayout(factoryDWrite, text, format, 1e10f, format.FontSize);
+                var sz = new Vector2D(Math.Abs(layout.Metrics.Width), Math.Abs(layout.Metrics.Height));
+                var szWorld = View.ScreenToWorld(new Vector2D(Math.Abs(sz.X), Math.Abs(sz.Y)));
+                var layoutRect = P2dxR(Point2D.Zero, sz.AsPoint2D());
 
-            var trans = renderTarget.Transform;
-            var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
-            var m1 = Matrix2D.Translation(pt.X, pt.Y);
-            var m2 = Matrix2D.Rotation(rotation);
-            var m3 = Matrix2D.Scale(textHeight / height, -textHeight / height);
+                // Calculate alignment offset
+                float dx = 0;
+                float dy = 0;
 
-            renderTarget.Transform = M2dxM(transM * m1 * m2 * m3);
-            renderTarget.DrawText(text, format, layoutRect, brush);
-            renderTarget.Transform = trans;
+                if (hAlign == TextHorizontalAlignment.Right)
+                    dx = -sz.X;
+                else if (hAlign == TextHorizontalAlignment.Center)
+                    dx = -sz.X / 2;
+
+                if (vAlign == TextVerticalAlignment.Middle)
+                    dy = -sz.Y / 2;
+                else if (vAlign == TextVerticalAlignment.Top)
+                    dy = -sz.Y;
+
+                var trans = renderTarget.Transform;
+                var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
+                var m1 = Matrix2D.Translation(pt.X, pt.Y);
+                var m2 = Matrix2D.Rotation(rotation);
+                var m3 = Matrix2D.Scale(textHeight / height, textHeight / height);
+                var m4 = Matrix2D.Translation(dx, dy);
+
+                renderTarget.Transform = M2dxM(transM * m1 * m2 * m3 * m4);
+                renderTarget.DrawText(text, format, layoutRect, brush);
+                renderTarget.DrawRectangle(layoutRect, brush);
+                renderTarget.Transform = trans;
+            }
+
+            //float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
+            //var brush = CreateBrush(style, out _, out _);
+            //var format = CreateTextFormat(fontFamily, height, fontStyle);
+            //var layout = new TextLayout(factoryDWrite, text, format, 1e10f, format.FontSize);
+            //Vector2D size = new Vector2D(Math.Abs(layout.Metrics.Width), Math.Abs(layout.Metrics.Height));
+            //var layoutRect = P2dxR(new Point2D(0, 0), size.AsPoint2D());
+
+            //// Calculate alignment offset
+            //float dx = 0;
+            //float dy = 0;
+
+            //if (hAlign == TextHorizontalAlignment.Right)
+            //    dx = -size.X;
+            //else if (hAlign == TextHorizontalAlignment.Center)
+            //    dx = -size.X / 2;
+
+            //if (vAlign == TextVerticalAlignment.Middle)
+            //    dy = -size.Y / 2;
+            //else if (vAlign == TextVerticalAlignment.Top)
+            //    dy = -size.Y;
+
+            //var trans = renderTarget.Transform;
+            //var transM = new Matrix2D(trans.M11, trans.M12, trans.M21, trans.M22, trans.M31, trans.M32);
+            //var m1 = Matrix2D.Translation(pt.X, pt.Y);
+            //var m2 = Matrix2D.Rotation(-rotation);
+            //var m3 = Matrix2D.Scale(textHeight / height, -textHeight / height);
+            //var m4 = Matrix2D.Translation(dx, dy);
+
+            //renderTarget.Transform = M2dxM(transM * m1 * m2 * m3 * m4);
+            //renderTarget.DrawText(text, format, layoutRect, brush);
+            //renderTarget.DrawRectangle(layoutRect, brush);
+            //renderTarget.Transform = trans;
         }
 
         public override void Draw(Drawable item)
@@ -319,11 +373,9 @@ namespace SimpleCAD.Graphics
             return new SolidColorBrush(renderTarget, C2dxC(appliedStyle.Color));
         }
 
-        private TextFormat CreateTextFormat(string fontFamily, float textHeight, FontStyle fontStyle, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
+        private TextFormat CreateTextFormat(string fontFamily, float textHeight, FontStyle fontStyle)
         {
             var format = new TextFormat(factoryDWrite, fontFamily, textHeight);
-            format.TextAlignment = (hAlign == TextHorizontalAlignment.Left ? TextAlignment.Leading : (hAlign == TextHorizontalAlignment.Right ? TextAlignment.Trailing : TextAlignment.Center));
-            format.ParagraphAlignment = (vAlign == TextVerticalAlignment.Top ? ParagraphAlignment.Near : (vAlign == TextVerticalAlignment.Bottom ? ParagraphAlignment.Far : ParagraphAlignment.Center));
 
             return format;
         }
