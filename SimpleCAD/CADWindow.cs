@@ -29,12 +29,10 @@ namespace SimpleCAD
         {
             InitializeComponent();
 
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.Opaque, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.Opaque | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.DoubleBuffer, false);
+            UpdateStyles();
             DoubleBuffered = false;
-            SetStyle(ControlStyles.ResizeRedraw, true);
-            SetStyle(ControlStyles.UserPaint, true);
 
             BorderStyle = BorderStyle.Fixed3D;
         }

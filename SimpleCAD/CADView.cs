@@ -162,8 +162,7 @@ namespace SimpleCAD
 
             panning = false;
 
-            //SetRenderer(typeof(GDIRenderer));
-            Renderer = typeof(OpenGLRenderer);
+            Renderer = typeof(DirectXRenderer);
 
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
