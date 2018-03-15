@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 namespace SimpleCAD
 {
-    public class SelectionSet : ISet<Drawable>, INotifyCollectionChanged
+    public sealed class SelectionSet : ISet<Drawable>, INotifyCollectionChanged
     {
         HashSet<Drawable> items = new HashSet<Drawable>();
 
@@ -65,7 +65,7 @@ namespace SimpleCAD
             return GetEnumerator();
         }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(this, e);
         }

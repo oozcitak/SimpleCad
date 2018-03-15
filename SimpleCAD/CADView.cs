@@ -68,7 +68,7 @@ namespace SimpleCAD
         {
             get
             {
-                return (renderer == null ? null : renderer.GetType());
+                return (renderer?.GetType());
             }
             set
             {
@@ -759,6 +759,12 @@ namespace SimpleCAD
         }
 
         public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
             if (renderer != null)
                 renderer.Dispose();

@@ -54,7 +54,16 @@ namespace SimpleCAD
         public abstract void InitFrame(System.Drawing.Graphics graphics);
         public abstract void EndFrame();
         public abstract void Resize(int width, int height);
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        ~Renderer()
+        {
+            Dispose(false);
+        }
+        protected abstract void Dispose(bool disposing);
 
         public abstract void Clear(Color color);
         public abstract void DrawLine(Style style, Point2D p1, Point2D p2);

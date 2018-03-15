@@ -13,8 +13,8 @@ namespace SimpleCAD
     [Serializable]
     public abstract class Drawable : INotifyPropertyChanged, IPersistable
     {
-        public virtual Style Style { get; set; } = new Style(Color.White);
-        public virtual bool Visible { get; set; } = true;
+        public Style Style { get; set; } = new Style(Color.White);
+        public bool Visible { get; set; } = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -55,7 +55,7 @@ namespace SimpleCAD.Graphics
             ;
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             ;
         }

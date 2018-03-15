@@ -76,15 +76,18 @@ namespace SimpleCAD.Graphics
             renderTarget.Resize(new SharpDX.Size2(control.ClientSize.Width, control.ClientSize.Height));
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (renderTarget != null)
+            if (disposing)
             {
-                renderTarget.Dispose();
-                factory2D.Dispose();
-                factoryDWrite.Dispose();
+                if (renderTarget != null)
+                {
+                    renderTarget.Dispose();
+                    factory2D.Dispose();
+                    factoryDWrite.Dispose();
+                }
+                renderTarget = null;
             }
-            renderTarget = null;
         }
 
         public override void Clear(Color color)
