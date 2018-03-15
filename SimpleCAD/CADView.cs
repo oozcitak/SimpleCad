@@ -768,6 +768,8 @@ namespace SimpleCAD
         {
             if (renderer != null)
                 renderer.Dispose();
+            renderer = null;
+            rendererType = null;
         }
     }
 }
