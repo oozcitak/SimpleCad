@@ -30,10 +30,6 @@ namespace SimpleCAD
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
-        [Category("Behavior"), DefaultValue(4), Description("Determines the size of the pick box around the selection cursor.")]
-        public int PickBoxSize { get; set; } = 4;
-        [Category("Behavior"), DefaultValue(4), Description("Determines the size of the control points of drawable objects.")]
-        public int ControlPointSize { get; set; } = 7;
 
         [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
         public float ZoomFactor
@@ -332,7 +328,7 @@ namespace SimpleCAD
 
             // Control points
             Style cpStyle = new Style(Document.Settings.Get<Color>("ControlPointColor"), 2);
-            float cpSize = ScreenToWorld(new Vector2D(ControlPointSize, 0)).X;
+            float cpSize = ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X;
 
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
@@ -600,8 +596,8 @@ namespace SimpleCAD
             }
             else if (e.Button == MouseButtons.Left && Interactive)
             {
-                mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(PickBoxSize, 0)).X);
-                Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(ControlPointSize, 0)).X);
+                mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("PickBoxSize"), 0)).X);
+                Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
                 mouseDownCPItem = find.Item1;
                 mouseDownCP = find.Item2;
             }
@@ -618,7 +614,7 @@ namespace SimpleCAD
             {
                 if (mouseDownItem != null)
                 {
-                    Drawable mouseUpItem = FindItem(e.Location, ScreenToWorld(new Vector2D(PickBoxSize, 0)).X);
+                    Drawable mouseUpItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("PickBoxSize"), 0)).X);
                     if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.PickedSelection.Contains(mouseDownItem))
                     {
                         if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
@@ -627,7 +623,7 @@ namespace SimpleCAD
                         }
                         else
                         {
-                            float cpSize = ScreenToWorld(new Vector2D(ControlPointSize + 4, 0)).X;
+                            float cpSize = ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize") + 4, 0)).X;
                             Document.Editor.PickedSelection.Add(mouseDownItem);
                         }
                     }
@@ -635,7 +631,7 @@ namespace SimpleCAD
 
                 if (mouseDownCP != null)
                 {
-                    Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(ControlPointSize, 0)).X);
+                    Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
                     Drawable item = find.Item1;
                     ControlPoint mouseUpCP = find.Item2;
                     if (mouseUpCP != null && ReferenceEquals(mouseDownCPItem, item) &&
