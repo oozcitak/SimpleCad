@@ -70,6 +70,7 @@ namespace SimpleCAD
             CollectionChanged?.Invoke(this, e);
         }
 
+        #region Not Implemented
         void ISet<Drawable>.UnionWith(IEnumerable<Drawable> other)
         {
             throw new NotImplementedException();
@@ -124,5 +125,6 @@ namespace SimpleCAD
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

@@ -8,6 +8,50 @@ namespace SimpleCAD.Graphics
 {
     public class OpenGLRenderer : Renderer
     {
+        #region Context switch class
+        public class ContextSwitch : IDisposable
+        {
+            private IntPtr hOldDC;
+            private IntPtr oldContext;
+            bool contextDifferent;
+
+            public ContextSwitch(IntPtr hDC, IntPtr context)
+            {
+                // Save previous context and make our context current
+                contextDifferent = (SafeNativeMethods.wglGetCurrentContext() != context);
+                hOldDC = IntPtr.Zero;
+                oldContext = IntPtr.Zero;
+
+                if (contextDifferent)
+                {
+                    hOldDC = SafeNativeMethods.wglGetCurrentDC();
+                    oldContext = SafeNativeMethods.wglGetCurrentContext();
+                    SafeNativeMethods.wglMakeCurrent(hDC, context);
+                }
+            }
+
+            ~ContextSwitch()
+            {
+                Dispose(false);
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected void Dispose(bool disposing)
+            {
+                // Restore previous context
+                if (contextDifferent)
+                {
+                    SafeNativeMethods.wglMakeCurrent(hOldDC, oldContext);
+                }
+            }
+        }
+        #endregion
+
         private System.Drawing.Graphics gdi;
         private Control control;
         private IntPtr hDC;

@@ -4,51 +4,9 @@ using System.Security;
 
 namespace SimpleCAD.Graphics
 {
-    [SuppressUnmanagedCodeSecurityAttribute]
+    [SuppressUnmanagedCodeSecurity]
     internal static class SafeNativeMethods
     {
-        public class ContextSwitch : IDisposable
-        {
-            private IntPtr hOldDC;
-            private IntPtr oldContext;
-            bool contextDifferent;
-
-            public ContextSwitch(IntPtr hDC, IntPtr context)
-            {
-                // Save previous context and make our context current
-                contextDifferent = (wglGetCurrentContext() != context);
-                hOldDC = IntPtr.Zero;
-                oldContext = IntPtr.Zero;
-
-                if (contextDifferent)
-                {
-                    hOldDC = wglGetCurrentDC();
-                    oldContext = wglGetCurrentContext();
-                    wglMakeCurrent(hDC, context);
-                }
-            }
-
-            ~ContextSwitch()
-            {
-                Dispose(false);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            protected void Dispose(bool disposing)
-            {
-                // Restore previous context
-                if (contextDifferent)
-                {
-                    wglMakeCurrent(hOldDC, oldContext);
-                }
-            }
-        }
-
         public const uint GL_BYTE = 0x1400;
         public const uint GL_UNSIGNED_BYTE = 0x1401;
         public const uint GL_SHORT = 0x1402;
