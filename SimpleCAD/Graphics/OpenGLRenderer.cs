@@ -92,10 +92,10 @@ namespace SimpleCAD.Graphics
             // Set model-view transformation
             GL.glMatrixMode(GL.GL_PROJECTION);
             GL.glLoadIdentity();
-            GL.glOrtho(View.CameraPosition.X - ((float)control.ClientRectangle.Width) * View.ZoomFactor / 2,
-                View.CameraPosition.X + ((float)control.ClientRectangle.Width) * View.ZoomFactor / 2,
-                View.CameraPosition.Y - ((float)control.ClientRectangle.Height) * View.ZoomFactor / 2,
-                View.CameraPosition.Y + ((float)control.ClientRectangle.Height) * View.ZoomFactor / 2,
+            GL.glOrtho(View.Camera.Position.X - ((float)control.ClientRectangle.Width) * View.Camera.Zoom / 2,
+                View.Camera.Position.X + ((float)control.ClientRectangle.Width) * View.Camera.Zoom / 2,
+                View.Camera.Position.Y - ((float)control.ClientRectangle.Height) * View.Camera.Zoom / 2,
+                View.Camera.Position.Y + ((float)control.ClientRectangle.Height) * View.Camera.Zoom / 2,
                 -1.0f, 1.0f);
 
             // Set the model matrix as the current matrix

@@ -40,8 +40,8 @@ namespace SimpleCAD.Graphics
 
             // Calculate model to view transformation
             gdi.ResetTransform();
-            gdi.TranslateTransform(-View.CameraPosition.X, -View.CameraPosition.Y);
-            gdi.ScaleTransform(1.0f / View.ZoomFactor, -1.0f / View.ZoomFactor, System.Drawing.Drawing2D.MatrixOrder.Append);
+            gdi.TranslateTransform(-View.Camera.Position.X, -View.Camera.Position.Y);
+            gdi.ScaleTransform(1.0f / View.Camera.Zoom, -1.0f / View.Camera.Zoom, System.Drawing.Drawing2D.MatrixOrder.Append);
             gdi.TranslateTransform(View.Width / 2, View.Height / 2, System.Drawing.Drawing2D.MatrixOrder.Append);
         }
 

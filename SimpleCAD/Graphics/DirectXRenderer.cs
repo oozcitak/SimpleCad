@@ -60,8 +60,8 @@ namespace SimpleCAD.Graphics
             renderTarget.BeginDraw();
 
             // Set model-view transformation
-            Matrix2D m1 = Matrix2D.Translation(-View.CameraPosition.X, -View.CameraPosition.Y);
-            Matrix2D m2 = Matrix2D.Scale(1.0f / View.ZoomFactor, -1.0f / View.ZoomFactor);
+            Matrix2D m1 = Matrix2D.Translation(-View.Camera.Position.X, -View.Camera.Position.Y);
+            Matrix2D m2 = Matrix2D.Scale(1.0f / View.Camera.Zoom, -1.0f / View.Camera.Zoom);
             Matrix2D m3 = Matrix2D.Translation(View.Width / 2, View.Height / 2);
             renderTarget.Transform = M2dxM(m3 * m2 * m1);
         }

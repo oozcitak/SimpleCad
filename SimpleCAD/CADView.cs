@@ -12,15 +12,13 @@ namespace SimpleCAD
         public delegate void CursorEventHandler(object sender, CursorEventArgs e);
 
         private Control control;
-        private Point2D mCameraPosition;
-        private float mZoomFactor;
+
         private bool mShowGrid;
         private bool mShowAxes;
 
         private bool panning;
         private Point2D lastMouseLocationWorld;
         private Drawable mouseDownItem;
-        private Point2D currentMouseLocationWorld;
         private bool hasMouse;
         private Drawable mouseDownCPItem;
         private ControlPoint mouseDownCP;
@@ -31,50 +29,9 @@ namespace SimpleCAD
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
 
-        [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
-        public float ZoomFactor
-        {
-            get
-            {
-                return mZoomFactor;
-            }
-            set
-            {
-                mZoomFactor = value;
-
-                if (float.IsNaN(mZoomFactor) || float.IsNegativeInfinity(mZoomFactor) || float.IsPositiveInfinity(mZoomFactor) ||
-                    mZoomFactor < float.Epsilon * 1000.0f || mZoomFactor > float.MaxValue / 1000.0f)
-                {
-                    mZoomFactor = 1;
-                }
-            }
-        }
-
-        [Category("Appearance"), DefaultValue(typeof(System.Drawing.PointF), "0,0"), Description("Determines the location of the camera.")]
-        public Point2D CameraPosition
-        {
-            get
-            {
-                return mCameraPosition;
-            }
-            set
-            {
-                mCameraPosition = value;
-                float x = mCameraPosition.X;
-                float y = mCameraPosition.Y;
-                if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) ||
-                    x < float.MinValue / 1000.0f || x > float.MaxValue / 1000.0f)
-                {
-                    x = 0;
-                }
-                if (float.IsNaN(y) || float.IsNegativeInfinity(y) || float.IsPositiveInfinity(y) ||
-                    y < float.MinValue / 1000.0f || y > float.MaxValue / 1000.0f)
-                {
-                    y = 0;
-                }
-                mCameraPosition = new Point2D(x, y);
-            }
-        }
+        [Browsable(false)]
+        [Category("Appearance"), DefaultValue(true), Description("Determines the viewing position.")]
+        public Camera Camera { get; private set; }
 
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cartesian grid is shown.")]
         public bool ShowGrid
@@ -143,7 +100,7 @@ namespace SimpleCAD
         public CADDocument Document { get; private set; }
 
         [Browsable(false)]
-        public Point2D CursorLocation { get { return currentMouseLocationWorld; } }
+        public Point2D CursorLocation { get; private set; }
 
         public CADView(CADDocument document)
         {
@@ -152,9 +109,10 @@ namespace SimpleCAD
             Width = 1;
             Height = 1;
 
-            mZoomFactor = 5.0f / 3.0f;
-            mCameraPosition = new Point2D(0, 0);
+            Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
+
             mShowGrid = true;
+            mShowAxes = true;
 
             panning = false;
 
@@ -173,8 +131,7 @@ namespace SimpleCAD
                 Width = 1;
                 Height = 1;
 
-                mZoomFactor = 5.0f / 3.0f;
-                mCameraPosition = new Point2D(0, 0);
+                Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
 
                 control.Resize -= CadView_Resize;
                 control.MouseDown -= CadView_MouseDown;
@@ -207,8 +164,7 @@ namespace SimpleCAD
             Width = ctrl.ClientRectangle.Width;
             Height = ctrl.ClientRectangle.Height;
 
-            mZoomFactor = 5.0f / 3.0f;
-            mCameraPosition = new Point2D(0, 0);
+            Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
 
             control.Resize += CadView_Resize;
             control.MouseDown += CadView_MouseDown;
@@ -404,8 +360,8 @@ namespace SimpleCAD
         /// <returns>A Point in screen coordinates.</returns>
         public Point2D WorldToScreen(float x, float y)
         {
-            return new Point2D(((x - CameraPosition.X) / ZoomFactor) + Width / 2,
-                -((y - CameraPosition.Y) / ZoomFactor) + Height / 2);
+            return new Point2D(((x - Camera.Position.X) / Camera.Zoom) + Width / 2,
+                -((y - Camera.Position.Y) / Camera.Zoom) + Height / 2);
         }
         /// <summary>
         /// Converts the given point from world coordinates to screen coordinates.
@@ -433,8 +389,8 @@ namespace SimpleCAD
         /// <returns>A PointF in world coordinates.</returns>
         public Point2D ScreenToWorld(float x, float y)
         {
-            return new Point2D((x - Width / 2) * ZoomFactor + CameraPosition.X,
-                -(y - Height / 2) * ZoomFactor + CameraPosition.Y);
+            return new Point2D((x - Width / 2) * Camera.Zoom + Camera.Position.X,
+                -(y - Height / 2) * Camera.Zoom + Camera.Position.Y);
         }
         /// <summary>
         /// Converts the given point from screen coordinates to world coordinates.
@@ -483,11 +439,11 @@ namespace SimpleCAD
         /// <param name="limits">The new limits of the viewport in model coordinates.</param>
         public void ZoomToWindow(Extents2D limits)
         {
-            CameraPosition = limits.Center;
+            Camera.Position = limits.Center;
             if ((Height != 0) && (Width != 0))
-                ZoomFactor = Math.Max(limits.Height / Height, limits.Width / Width);
+                Camera.Zoom = Math.Max(limits.Height / Height, limits.Width / Width);
             else
-                ZoomFactor = 1;
+                Camera.Zoom = 1;
         }
 
         /// <summary>
@@ -504,7 +460,7 @@ namespace SimpleCAD
 
         public void Zoom(float zoomFactor)
         {
-            ZoomFactor *= zoomFactor;
+            Camera.Zoom *= zoomFactor;
         }
 
         public void ZoomIn()
@@ -519,7 +475,7 @@ namespace SimpleCAD
 
         public void Pan(Vector2D distance)
         {
-            CameraPosition -= distance;
+            Camera.Position -= distance;
         }
 
         public void Resize(int width, int height)
@@ -690,14 +646,14 @@ namespace SimpleCAD
 
         void CadView_CursorMove(object sender, CursorEventArgs e)
         {
-            currentMouseLocationWorld = e.Location;
+            CursorLocation = e.Location;
             control.Invalidate();
 
             if (e.Button == MouseButtons.Middle && panning)
             {
                 // Relative mouse movement
                 Point2D scrPt = WorldToScreen(e.Location);
-                Pan(currentMouseLocationWorld - lastMouseLocationWorld);
+                Pan(CursorLocation - lastMouseLocationWorld);
                 lastMouseLocationWorld = ScreenToWorld(scrPt);
                 control.Invalidate();
             }
