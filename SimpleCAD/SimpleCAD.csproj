@@ -64,33 +64,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CADDocument.cs" />
-    <Compile Include="Camera.cs" />
+    <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="View\Camera.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\SafeNativeMethods.cs" />
     <Compile Include="Graphics\DirectXRenderer.cs" />
     <Compile Include="Graphics\OpenGLRenderer.cs" />
     <Compile Include="Graphics\GDIRenderer.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Document\Settings.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Command_Selection.cs" />
     <Compile Include="Commands\Command_Document.cs" />
     <Compile Include="Commands\Command_Transform.cs" />
     <Compile Include="Commands\Command_Primitives.cs" />
     <Compile Include="Drawables\ControlPoint.cs" />
-    <Compile Include="EditorInput.cs" />
+    <Compile Include="Document\EditorInput.cs" />
     <Compile Include="Drawables\Hatch.cs" />
-    <Compile Include="IPersistable.cs" />
+    <Compile Include="Document\IPersistable.cs" />
     <Compile Include="MathF.cs" />
-    <Compile Include="SelectionSet.cs" />
-    <Compile Include="Editor.cs" />
-    <Compile Include="EventArgs.cs" />
+    <Compile Include="Document\SelectionSet.cs" />
+    <Compile Include="Document\Editor.cs" />
+    <Compile Include="Document\EventArgs.cs" />
     <Compile Include="Geometry\Vector2DConverter.cs" />
     <Compile Include="Geometry\Point2DConverter.cs" />
     <Compile Include="Graphics\StyleConverter.cs" />
     <Compile Include="Geometry\Point2DCollection.cs" />
-    <Compile Include="CADView.cs" />
+    <Compile Include="View\CADView.cs" />
     <Compile Include="CADWindow.cs">
       <SubType>UserControl</SubType>
     </Compile>
