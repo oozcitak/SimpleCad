@@ -316,16 +316,16 @@ namespace SimpleCAD
         /// <param name="y1">X coordinate of the bottom left corner of the viewport in model coordinates.</param>
         /// <param name="x2">X coordinate of the top right corner of the viewport in model coordinates.</param>
         /// <param name="y2">X coordinate of the top right corner of the viewport in model coordinates.</param>
-        public void ZoomToWindow(float x1, float y1, float x2, float y2)
+        public void SetViewPort(float x1, float y1, float x2, float y2)
         {
-            ZoomToWindow(new Extents2D(x1, y1, x2, y2));
+            SetViewPort(new Extents2D(x1, y1, x2, y2));
         }
 
         /// <summary>
         /// Sets the viewport to the given model coordinates.
         /// </summary>
         /// <param name="limits">The new limits of the viewport in model coordinates.</param>
-        public void ZoomToWindow(Extents2D limits)
+        public void SetViewPort(Extents2D limits)
         {
             Camera.Position = limits.Center;
             if ((Height != 0) && (Width != 0))
@@ -337,12 +337,12 @@ namespace SimpleCAD
         /// <summary>
         /// Sets the viewport to the drawing extents.
         /// </summary>
-        public void ZoomToExtents()
+        public void SetViewPort()
         {
             Extents2D limits = Document.Model.GetExtents();
             if (limits.IsEmpty) limits = new Extents2D(-250, -250, 250, 250);
 
-            ZoomToWindow(limits);
+            SetViewPort(limits);
             ZoomOut();
         }
 
@@ -581,7 +581,7 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Middle && Interactive)
             {
-                ZoomToExtents();
+                SetViewPort();
             }
         }
 
