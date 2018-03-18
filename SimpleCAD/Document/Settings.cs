@@ -92,6 +92,7 @@ namespace SimpleCAD
             Set("SelectionHighlightColor", Color.FromArgb(64, 46, 116, 251));
             Set("JigColor", Color.Orange);
             Set("ControlPointColor", Color.FromArgb(46, 116, 251));
+            Set("ActiveControlPointColor", Color.FromArgb(251, 116, 46));
 
             Set("MinorGridColor", Color.FromArgb(64, 64, 64));
             Set("MajorGridColor", Color.FromArgb(96, 96, 96));
