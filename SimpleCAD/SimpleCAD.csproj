@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\Color.cs" />
@@ -117,6 +118,10 @@
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Drawables\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\Axes.cs" />
+    <Compile Include="View\Grid.cs" />
+    <Compile Include="View\Cursor.cs" />
+    <Compile Include="View\ViewItems.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CADWindow.resx">
