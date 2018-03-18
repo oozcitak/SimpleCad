@@ -30,13 +30,14 @@ namespace SimpleCAD.View
 
             Extents2D ex = view.GetViewPort();
             Style cursorStyle = new Style(doc.Settings.Get<Color>("CursorColor"));
+            float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize") + 4, 0)).X / 2;
             float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize"), 0)).X / 2;
 
             // Draw cursor
-            renderer.DrawLine(cursorStyle, new Point2D(ex.Xmin, Location.Y), new Point2D(Location.X - pickBoxSize, Location.Y));
-            renderer.DrawLine(cursorStyle, new Point2D(Location.X + pickBoxSize, Location.Y), new Point2D(ex.Xmax, Location.Y));
-            renderer.DrawLine(cursorStyle, new Point2D(Location.X, ex.Ymin), new Point2D(Location.X, Location.Y - pickBoxSize));
-            renderer.DrawLine(cursorStyle, new Point2D(Location.X, Location.Y + pickBoxSize), new Point2D(Location.X, ex.Ymax));
+            renderer.DrawLine(cursorStyle, new Point2D(ex.Xmin, Location.Y), new Point2D(Location.X - emptyBoxSize, Location.Y));
+            renderer.DrawLine(cursorStyle, new Point2D(Location.X + emptyBoxSize, Location.Y), new Point2D(ex.Xmax, Location.Y));
+            renderer.DrawLine(cursorStyle, new Point2D(Location.X, ex.Ymin), new Point2D(Location.X, Location.Y - emptyBoxSize));
+            renderer.DrawLine(cursorStyle, new Point2D(Location.X, Location.Y + emptyBoxSize), new Point2D(Location.X, ex.Ymax));
             renderer.DrawRectangle(cursorStyle, new Point2D(Location.X - pickBoxSize, Location.Y - pickBoxSize),
                 new Point2D(Location.X + pickBoxSize, Location.Y + pickBoxSize));
 
