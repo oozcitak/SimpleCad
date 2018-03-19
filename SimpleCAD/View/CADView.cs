@@ -13,18 +13,16 @@ namespace SimpleCAD
 
         private Control control;
 
-        private bool mShowGrid;
-        private bool mShowAxes;
-
         private bool panning;
         private Point2D lastMouseLocationWorld;
         private Drawable mouseDownItem;
-        private bool hasMouse;
         private Drawable mouseDownCPItem;
         private ControlPoint mouseDownCP;
-        private string cursorMessage;
+        private ControlPoint activeCP;
         private Renderer renderer;
         private Type rendererType;
+
+        private View.ViewItems ViewItems { get; set; } = new View.ViewItems();
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
@@ -38,11 +36,11 @@ namespace SimpleCAD
         {
             get
             {
-                return mShowGrid;
+                return ViewItems.Grid.Visible;
             }
             set
             {
-                mShowGrid = value;
+                ViewItems.Grid.Visible = value;
                 if (control != null)
                     control.Invalidate();
             }
@@ -53,11 +51,11 @@ namespace SimpleCAD
         {
             get
             {
-                return mShowAxes;
+                return ViewItems.Axes.Visible;
             }
             set
             {
-                mShowAxes = value;
+                ViewItems.Axes.Visible = value;
                 if (control != null)
                     control.Invalidate();
             }
@@ -110,13 +108,9 @@ namespace SimpleCAD
             Height = 1;
 
             Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-
-            mShowGrid = true;
-            mShowAxes = true;
+            Renderer = typeof(DirectXRenderer);
 
             panning = false;
-
-            Renderer = typeof(DirectXRenderer);
 
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
@@ -184,13 +178,12 @@ namespace SimpleCAD
 
         public void Render(System.Drawing.Graphics graphics)
         {
-            // Start drawing view
+            // Start drawing
             renderer.InitFrame(graphics);
             renderer.Clear(Document.Settings.Get<Color>("BackColor"));
 
             // Grid and axes
-            DrawGrid(renderer);
-            DrawAxes(renderer);
+            renderer.Draw(ViewItems.Background);
 
             // Render drawing objects
             renderer.Draw(Document.Model);
@@ -205,66 +198,10 @@ namespace SimpleCAD
             renderer.Draw(Document.Transients);
 
             // Render cursor
-            DrawCursor(renderer);
+            renderer.Draw(ViewItems.Foreground);
 
             // End drawing view
             renderer.EndFrame();
-        }
-
-        private void DrawAxes(Renderer renderer)
-        {
-            Extents2D bounds = GetViewPort();
-            Color axisColor = Document.Settings.Get<Color>("AxisColor");
-
-            renderer.DrawLine(new Style(axisColor), new Point2D(0, bounds.Ymin), new Point2D(0, bounds.Ymax));
-            renderer.DrawLine(new Style(axisColor), new Point2D(bounds.Xmin, 0), new Point2D(bounds.Xmax, 0));
-        }
-
-        private void DrawGrid(Renderer renderer)
-        {
-            if (!ShowGrid)
-                return;
-
-            float spacing = 1;
-            // Dynamic grid spacing
-            while (WorldToScreen(new Vector2D(spacing, 0)).X > 12)
-                spacing /= 10;
-
-            while (WorldToScreen(new Vector2D(spacing, 0)).X < 4)
-                spacing *= 10;
-
-            Extents2D bounds = GetViewPort();
-            Style majorStyle = new Style(Document.Settings.Get<Color>("MajorGridColor"));
-            Style minorStyle = new Style(Document.Settings.Get<Color>("MinorGridColor"));
-
-            int k = 0;
-            for (float i = 0; i > bounds.Xmin; i -= spacing)
-            {
-                Style style = (k == 0 ? majorStyle : minorStyle);
-                k = (k + 1) % 10;
-                renderer.DrawLine(style, new Point2D(i, bounds.Ymax), new Point2D(i, bounds.Ymin));
-            }
-            k = 0;
-            for (float i = 0; i < bounds.Xmax; i += spacing)
-            {
-                Style style = (k == 0 ? majorStyle : minorStyle);
-                k = (k + 1) % 10;
-                renderer.DrawLine(style, new Point2D(i, bounds.Ymax), new Point2D(i, bounds.Ymin));
-            }
-            k = 0;
-            for (float i = 0; i < bounds.Ymax; i += spacing)
-            {
-                Style style = (k == 0 ? majorStyle : minorStyle);
-                k = (k + 1) % 10;
-                renderer.DrawLine(style, new Point2D(bounds.Xmin, i), new Point2D(bounds.Xmax, i));
-            }
-            k = 0;
-            for (float i = 0; i > bounds.Ymin; i -= spacing)
-            {
-                Style style = (k == 0 ? majorStyle : minorStyle);
-                k = (k + 1) % 10;
-                renderer.DrawLine(style, new Point2D(bounds.Xmin, i), new Point2D(bounds.Xmax, i));
-            }
         }
 
         private void DrawSelection(Renderer renderer)
@@ -284,13 +221,14 @@ namespace SimpleCAD
 
             // Control points
             Style cpStyle = new Style(Document.Settings.Get<Color>("ControlPointColor"), 2);
+            Style cpActiveStyle = new Style(Document.Settings.Get<Color>("ActiveControlPointColor"), 2);
             float cpSize = ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X;
 
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
                 foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
                 {
-                    renderer.DrawRectangle(cpStyle,
+                    renderer.DrawRectangle(pt.Equals(activeCP) ? cpActiveStyle : cpStyle,
                         new Point2D(pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2),
                         new Point2D(pt.Location.X + cpSize / 2, pt.Location.Y + cpSize / 2));
                 }
@@ -302,54 +240,6 @@ namespace SimpleCAD
             renderer.StyleOverride = new Style(Document.Settings.Get<Color>("JigColor"), 0, DashStyle.Dash);
             renderer.Draw(Document.Jigged);
             renderer.StyleOverride = null;
-        }
-
-        private void DrawCursor(Renderer renderer)
-        {
-            if (hasMouse)
-            {
-                Extents2D ex = GetViewPort();
-                Style cursorStyle = new Style(Document.Settings.Get<Color>("CursorColor"));
-
-                // Draw cursor
-                renderer.DrawLine(cursorStyle, new Point2D(ex.Xmin, CursorLocation.Y), new Point2D(ex.Xmax, CursorLocation.Y));
-                renderer.DrawLine(cursorStyle, new Point2D(CursorLocation.X, ex.Ymin), new Point2D(CursorLocation.X, ex.Ymax));
-
-                // Draw cursor prompt
-                if (!string.IsNullOrEmpty(cursorMessage))
-                {
-                    string fontFamily = control.Font.FontFamily.Name;
-                    float textHeight = Math.Abs(ScreenToWorld(new Vector2D(0, 12)).Y);
-                    float margin = Math.Abs(ScreenToWorld(new Vector2D(4, 0)).X);
-                    float offset = Math.Abs(ScreenToWorld(new Vector2D(2, 0)).X);
-
-                    // position cursor prompt to lower-right of cursor by default
-                    float x = CursorLocation.X + margin + offset;
-                    float y = CursorLocation.Y - margin - offset;
-                    Vector2D sz = renderer.MeasureString(cursorMessage, fontFamily, FontStyle.Regular, textHeight);
-                    Point2D lowerRight = new Point2D(ex.Xmax, ex.Ymin);
-                    // check if the prompt text fits into the window horizontally
-                    if (x + sz.X + offset > lowerRight.X)
-                    {
-                        x = CursorLocation.X - margin - offset - sz.X;
-                    }
-                    // check if the prompt text fits into the window vertically
-                    if (y - sz.Y - offset < lowerRight.Y)
-                    {
-                        y = CursorLocation.Y + margin + offset + sz.Y;
-                    }
-
-                    // Draw cursor prompt
-                    Style fore = new Style(Document.Settings.Get<Color>("CursorPromptForeColor"));
-                    Style back = new Style(Document.Settings.Get<Color>("CursorPromptBackColor"));
-                    back.Fill = true;
-                    renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                    back.Fill = false;
-                    renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                    renderer.DrawString(fore, new Point2D(x, y), cursorMessage, fontFamily, textHeight,
-                        hAlign: TextHorizontalAlignment.Left, vAlign: TextVerticalAlignment.Top);
-                }
-            }
         }
 
         /// <summary>
@@ -428,16 +318,16 @@ namespace SimpleCAD
         /// <param name="y1">X coordinate of the bottom left corner of the viewport in model coordinates.</param>
         /// <param name="x2">X coordinate of the top right corner of the viewport in model coordinates.</param>
         /// <param name="y2">X coordinate of the top right corner of the viewport in model coordinates.</param>
-        public void ZoomToWindow(float x1, float y1, float x2, float y2)
+        public void SetViewPort(float x1, float y1, float x2, float y2)
         {
-            ZoomToWindow(new Extents2D(x1, y1, x2, y2));
+            SetViewPort(new Extents2D(x1, y1, x2, y2));
         }
 
         /// <summary>
         /// Sets the viewport to the given model coordinates.
         /// </summary>
         /// <param name="limits">The new limits of the viewport in model coordinates.</param>
-        public void ZoomToWindow(Extents2D limits)
+        public void SetViewPort(Extents2D limits)
         {
             Camera.Position = limits.Center;
             if ((Height != 0) && (Width != 0))
@@ -449,12 +339,12 @@ namespace SimpleCAD
         /// <summary>
         /// Sets the viewport to the drawing extents.
         /// </summary>
-        public void ZoomToExtents()
+        public void SetViewPort()
         {
             Extents2D limits = Document.Model.GetExtents();
             if (limits.IsEmpty) limits = new Extents2D(-250, -250, 250, 250);
 
-            ZoomToWindow(limits);
+            SetViewPort(limits);
             ZoomOut();
         }
 
@@ -503,7 +393,7 @@ namespace SimpleCAD
 
         private void Editor_CursorPrompt(object sender, CursorPromptEventArgs e)
         {
-            cursorMessage = e.Status;
+            ViewItems.Cursor.Message = e.Status;
             control.Invalidate();
         }
 
@@ -566,7 +456,7 @@ namespace SimpleCAD
                 panning = false;
                 control.Invalidate();
             }
-            else if (e.Button == MouseButtons.Left && Interactive)
+            else if (e.Button == MouseButtons.Left && Interactive && Document.Editor.Mode == InputMode.None)
             {
                 if (mouseDownItem != null)
                 {
@@ -590,9 +480,9 @@ namespace SimpleCAD
                     Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
                     Drawable item = find.Item1;
                     ControlPoint mouseUpCP = find.Item2;
-                    if (mouseUpCP != null && ReferenceEquals(mouseDownCPItem, item) &&
-                        mouseDownCP.PropertyName == mouseUpCP.PropertyName && mouseDownCP.PropertyIndex == mouseUpCP.PropertyIndex)
+                    if (mouseUpCP != null && mouseDownCP.Equals(mouseUpCP))
                     {
+                        activeCP = mouseDownCP;
                         ControlPoint cp = mouseDownCP;
                         Drawable consItem = item.Clone();
                         Document.Transients.Add(consItem);
@@ -634,19 +524,26 @@ namespace SimpleCAD
                             trans = Matrix2D.Translation(dir * (res.Value - orjVal));
                             result = res.Result;
                         }
+
+                        // Transform the control point1
                         if (result == ResultMode.OK)
                         {
                             item.TransformControlPoint(cp, trans);
                         }
                         Document.Transients.Remove(consItem);
+                        activeCP = null;
                     }
                 }
+                mouseDownItem = null;
+                mouseDownCPItem = null;
+                mouseDownCP = null;
             }
         }
 
         void CadView_CursorMove(object sender, CursorEventArgs e)
         {
             CursorLocation = e.Location;
+            ViewItems.Cursor.Location = CursorLocation;
             control.Invalidate();
 
             if (e.Button == MouseButtons.Middle && panning)
@@ -692,21 +589,22 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Middle && Interactive)
             {
-                ZoomToExtents();
+                SetViewPort();
             }
         }
 
         private void CadView_MouseLeave(object sender, EventArgs e)
         {
-            hasMouse = false;
+            ViewItems.Cursor.Visible = false;
             Cursor.Show();
             control.Invalidate();
         }
 
         private void CadView_MouseEnter(object sender, EventArgs e)
         {
-            hasMouse = true;
+            ViewItems.Cursor.Visible = true;
             Cursor.Hide();
+            control.Invalidate();
         }
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)

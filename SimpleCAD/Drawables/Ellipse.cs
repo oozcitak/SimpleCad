@@ -64,6 +64,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
+            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.Get<int>("ControlPointSize"), 0)).X;
             // Approximate perimeter (Ramanujan)
             float p = 2 * MathF.PI * (3 * (SemiMajorAxis + SemiMinorAxis) - MathF.Sqrt((3 * SemiMajorAxis + SemiMinorAxis) * (SemiMajorAxis + 3 * SemiMinorAxis)));
             float newCurveLength = renderer.View.WorldToScreen(new Vector2D(p, 0)).X;
