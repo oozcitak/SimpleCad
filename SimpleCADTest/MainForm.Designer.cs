@@ -42,6 +42,9 @@
             this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSave = new System.Windows.Forms.ToolStripButton();
             this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.lblRenderer = new System.Windows.Forms.ToolStripLabel();
+            this.btnRenderer = new System.Windows.Forms.ToolStripComboBox();
             this.tsPrimitives = new System.Windows.Forms.ToolStrip();
             this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
             this.btnDrawCircle = new System.Windows.Forms.ToolStripButton();
@@ -61,9 +64,8 @@
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.lblRenderer = new System.Windows.Forms.ToolStripLabel();
-            this.btnRenderer = new System.Windows.Forms.ToolStripComboBox();
+            this.btnShowGrid = new System.Windows.Forms.ToolStripButton();
+            this.btnShowAxes = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -74,9 +76,9 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.tsStandard.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.tsPrimitives.SuspendLayout();
             this.tsTransform.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -89,7 +91,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 419);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 444);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -99,9 +101,9 @@
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             // 
             // statusStrip1
@@ -143,7 +145,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 419);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 444);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -156,7 +158,7 @@
             this.cadWindow1.Document = cadDocument2;
             this.cadWindow1.Location = new System.Drawing.Point(0, 0);
             this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
+            this.cadWindow1.Size = new System.Drawing.Size(759, 444);
             this.cadWindow1.TabIndex = 0;
             this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
@@ -165,7 +167,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 419);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 444);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -177,7 +179,7 @@
             this.btnOpen,
             this.btnSave,
             this.btnSaveAs});
-            this.tsStandard.Location = new System.Drawing.Point(598, 25);
+            this.tsStandard.Location = new System.Drawing.Point(222, 25);
             this.tsStandard.Name = "tsStandard";
             this.tsStandard.Size = new System.Drawing.Size(173, 25);
             this.tsStandard.TabIndex = 1;
@@ -222,6 +224,35 @@
             this.btnSaveAs.Text = "Save As";
             this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblRenderer,
+            this.btnRenderer,
+            this.btnShowGrid,
+            this.btnShowAxes});
+            this.toolStrip1.Location = new System.Drawing.Point(598, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(354, 25);
+            this.toolStrip1.TabIndex = 3;
+            // 
+            // lblRenderer
+            // 
+            this.lblRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.lblRenderer.Image = ((System.Drawing.Image)(resources.GetObject("lblRenderer.Image")));
+            this.lblRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.lblRenderer.Name = "lblRenderer";
+            this.lblRenderer.Size = new System.Drawing.Size(57, 22);
+            this.lblRenderer.Text = "Renderer:";
+            // 
+            // btnRenderer
+            // 
+            this.btnRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnRenderer.Name = "btnRenderer";
+            this.btnRenderer.Size = new System.Drawing.Size(120, 25);
+            this.btnRenderer.SelectedIndexChanged += new System.EventHandler(this.btnRenderer_SelectedIndexChanged);
+            // 
             // tsPrimitives
             // 
             this.tsPrimitives.Dock = System.Windows.Forms.DockStyle.None;
@@ -238,7 +269,7 @@
             this.btnDrawRectangle,
             this.btnDrawTriangle,
             this.btnDrawHatch});
-            this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
+            this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
             this.tsPrimitives.Name = "tsPrimitives";
             this.tsPrimitives.Size = new System.Drawing.Size(595, 25);
             this.tsPrimitives.TabIndex = 0;
@@ -373,7 +404,7 @@
             this.btnRotate,
             this.btnScale,
             this.btnMirror});
-            this.tsTransform.Location = new System.Drawing.Point(3, 50);
+            this.tsTransform.Location = new System.Drawing.Point(3, 25);
             this.tsTransform.Name = "tsTransform";
             this.tsTransform.Size = new System.Drawing.Size(219, 25);
             this.tsTransform.TabIndex = 2;
@@ -428,32 +459,31 @@
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
             // 
-            // toolStrip1
+            // btnShowGrid
             // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblRenderer,
-            this.btnRenderer});
-            this.toolStrip1.Location = new System.Drawing.Point(4, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(191, 25);
-            this.toolStrip1.TabIndex = 3;
+            this.btnShowGrid.Checked = true;
+            this.btnShowGrid.CheckOnClick = true;
+            this.btnShowGrid.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.btnShowGrid.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnShowGrid.Image = ((System.Drawing.Image)(resources.GetObject("btnShowGrid.Image")));
+            this.btnShowGrid.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnShowGrid.Name = "btnShowGrid";
+            this.btnShowGrid.Size = new System.Drawing.Size(65, 22);
+            this.btnShowGrid.Text = "Show Grid";
+            this.btnShowGrid.Click += new System.EventHandler(this.btnShowGrid_Click);
             // 
-            // lblRenderer
+            // btnShowAxes
             // 
-            this.lblRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.lblRenderer.Image = ((System.Drawing.Image)(resources.GetObject("lblRenderer.Image")));
-            this.lblRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.lblRenderer.Name = "lblRenderer";
-            this.lblRenderer.Size = new System.Drawing.Size(57, 22);
-            this.lblRenderer.Text = "Renderer:";
-            // 
-            // btnRenderer
-            // 
-            this.btnRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.btnRenderer.Name = "btnRenderer";
-            this.btnRenderer.Size = new System.Drawing.Size(120, 25);
-            this.btnRenderer.SelectedIndexChanged += new System.EventHandler(this.btnRenderer_SelectedIndexChanged);
+            this.btnShowAxes.Checked = true;
+            this.btnShowAxes.CheckOnClick = true;
+            this.btnShowAxes.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.btnShowAxes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnShowAxes.Image = ((System.Drawing.Image)(resources.GetObject("btnShowAxes.Image")));
+            this.btnShowAxes.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnShowAxes.Name = "btnShowAxes";
+            this.btnShowAxes.Size = new System.Drawing.Size(67, 22);
+            this.btnShowAxes.Text = "Show Axes";
+            this.btnShowAxes.Click += new System.EventHandler(this.btnShowAxes_Click);
             // 
             // MainForm
             // 
@@ -480,12 +510,12 @@
             this.splitContainer1.ResumeLayout(false);
             this.tsStandard.ResumeLayout(false);
             this.tsStandard.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.tsPrimitives.ResumeLayout(false);
             this.tsPrimitives.PerformLayout();
             this.tsTransform.ResumeLayout(false);
             this.tsTransform.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -526,6 +556,8 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel lblRenderer;
         private System.Windows.Forms.ToolStripComboBox btnRenderer;
+        private System.Windows.Forms.ToolStripButton btnShowGrid;
+        private System.Windows.Forms.ToolStripButton btnShowAxes;
     }
 }
 

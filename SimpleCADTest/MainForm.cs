@@ -207,5 +207,15 @@ namespace SimpleCADTest
             Renderer renderer = (Renderer)btnRenderer.SelectedItem;
             cadWindow1.View.Renderer = renderer.GetType();
         }
+
+        private void btnShowGrid_Click(object sender, EventArgs e)
+        {
+            cadWindow1.View.ShowGrid = btnShowGrid.Checked;
+        }
+
+        private void btnShowAxes_Click(object sender, EventArgs e)
+        {
+            cadWindow1.View.ShowAxes = btnShowAxes.Checked;
+        }
     }
 }

@@ -12,8 +12,8 @@ namespace SimpleCAD.View
         public Drawables.DrawableDictionary Background { get; } = new Drawables.DrawableDictionary();
 
         public Cursor Cursor { get => (Cursor)Foreground["Cursor"]; }
-        public Grid Grid { get => (Grid)Foreground["Grid"]; }
-        public Axes Axes { get => (Axes)Foreground["Axes"]; }
+        public Grid Grid { get => (Grid)Background["Grid"]; }
+        public Axes Axes { get => (Axes)Background["Axes"]; }
 
         public ViewItems()
         {
