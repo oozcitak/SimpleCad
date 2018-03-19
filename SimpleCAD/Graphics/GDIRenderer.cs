@@ -216,13 +216,10 @@ namespace SimpleCAD.Graphics
             using (var brush = CreateBrush(style))
             {
                 // Convert the text alignment point (x, y) to pixel coordinates
-                var pts = new System.Drawing.PointF[] { new System.Drawing.PointF(pt.X, pt.Y) };
-                gdi.TransformPoints(System.Drawing.Drawing2D.CoordinateSpace.Device, System.Drawing.Drawing2D.CoordinateSpace.World, pts);
-                float x = pts[0].X;
-                float y = pts[0].Y;
+                var pts = View.WorldToScreen(pt);
 
                 // Revert transformation to identity while drawing text
-                var oldMatrix = gdi.Transform;
+                var oldTrans = gdi.Transform;
                 gdi.ResetTransform();
 
                 // Calculate alignment in pixel coordinates
@@ -242,12 +239,12 @@ namespace SimpleCAD.Graphics
 
                 gdi.TranslateTransform(dx, dy, System.Drawing.Drawing2D.MatrixOrder.Append);
                 gdi.RotateTransform(-rotation * 180 / MathF.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gdi.TranslateTransform(x, y, System.Drawing.Drawing2D.MatrixOrder.Append);
+                gdi.TranslateTransform(pts.X, pts.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
 
                 gdi.DrawString(text, font, brush, 0, 0);
 
                 // Restore old transformation
-                gdi.Transform = oldMatrix;
+                gdi.Transform = oldTrans;
             }
         }
 
