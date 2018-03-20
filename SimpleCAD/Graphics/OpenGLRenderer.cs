@@ -537,7 +537,27 @@ namespace SimpleCAD.Graphics
             SafeNativeMethods.glLineWidth(1);
             SafeNativeMethods.glColor4ub(style.Color.R, style.Color.G, style.Color.B, style.Color.A);
             SafeNativeMethods.glLineWidth(GetScaledLineWeight(style.LineWeight));
-            // DashStyle??
+
+            if (style.DashStyle == DashStyle.Solid)
+                SafeNativeMethods.glDisable(SafeNativeMethods.GL_LINE_STIPPLE);
+            else
+                SafeNativeMethods.glEnable(SafeNativeMethods.GL_LINE_STIPPLE);
+            
+            switch (style.DashStyle)
+            {
+                case DashStyle.Dot:
+                    SafeNativeMethods.glLineStipple(1, 0b0001000100010001);
+                    break;
+                case DashStyle.Dash:
+                    SafeNativeMethods.glLineStipple(1, 0b0000111100001111);
+                    break;
+                case DashStyle.DashDot:
+                    SafeNativeMethods.glLineStipple(1, 0b0001110001000111);
+                    break;
+                case DashStyle.DashDotDot:
+                    SafeNativeMethods.glLineStipple(1, 0b0011110001000100);
+                    break;
+            }
         }
 
         private void CreateBrush(Style style)

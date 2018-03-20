@@ -592,6 +592,10 @@ namespace SimpleCAD.Graphics
         public static extern void glCallList(uint list);
         [DllImport("opengl32.dll")]
         public static extern void glListBase(uint listbase);
+        [DllImport("opengl32.dll")]
+        public static extern void glLineStipple(int factor, ushort pattern);
+        [DllImport("opengl32.dll")]
+        public static extern void glPolygonStipple(byte[] mask);
 
         [DllImport("opengl32.dll")]
         public static extern void glGenTextures(int n, out uint texture);
