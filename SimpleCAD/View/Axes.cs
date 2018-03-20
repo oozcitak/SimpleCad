@@ -15,7 +15,7 @@ namespace SimpleCAD.View
             var view = renderer.View;
             var doc = view.Document;
 
-            Extents2D bounds = view.GetViewPort();
+            Extents2D bounds = view.GetViewport();
             Color axisColor = doc.Settings.Get<Color>("AxisColor");
 
             renderer.DrawLine(new Style(axisColor), new Point2D(0, bounds.Ymin), new Point2D(0, bounds.Ymax));

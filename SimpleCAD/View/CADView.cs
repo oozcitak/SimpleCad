@@ -139,6 +139,8 @@ namespace SimpleCAD
                 control.Paint -= CadView_Paint;
                 control.MouseEnter -= CadView_MouseEnter;
                 control.MouseLeave -= CadView_MouseLeave;
+                control.GotFocus -= Control_GotFocus;
+                control.LostFocus -= Control_LostFocus;
             }
 
             if (renderer != null)
@@ -172,8 +174,21 @@ namespace SimpleCAD
             control.Paint += CadView_Paint;
             control.MouseEnter += CadView_MouseEnter;
             control.MouseLeave += CadView_MouseLeave;
+            control.GotFocus += Control_GotFocus;
+            control.LostFocus += Control_LostFocus;
 
             control.Invalidate();
+        }
+
+        private void Control_LostFocus(object sender, EventArgs e)
+        {
+            if (ReferenceEquals(Document.ActiveView, this))
+                Document.ActiveView = null;
+        }
+
+        private void Control_GotFocus(object sender, EventArgs e)
+        {
+            Document.ActiveView = this;
         }
 
         public void Render(System.Drawing.Graphics graphics)
@@ -303,7 +318,7 @@ namespace SimpleCAD
         /// <summary>
         /// Returns the coordinates of the viewport in world coordinates.
         /// </summary>
-        public Extents2D GetViewPort()
+        public Extents2D GetViewport()
         {
             Extents2D ex = new Extents2D();
             ex.Add((ScreenToWorld(new Point2D(0, 0))));
@@ -318,16 +333,26 @@ namespace SimpleCAD
         /// <param name="y1">X coordinate of the bottom left corner of the viewport in model coordinates.</param>
         /// <param name="x2">X coordinate of the top right corner of the viewport in model coordinates.</param>
         /// <param name="y2">X coordinate of the top right corner of the viewport in model coordinates.</param>
-        public void SetViewPort(float x1, float y1, float x2, float y2)
+        public void SetViewport(float x1, float y1, float x2, float y2)
         {
-            SetViewPort(new Extents2D(x1, y1, x2, y2));
+            SetViewport(new Extents2D(x1, y1, x2, y2));
+        }
+
+        /// <summary>
+        /// Sets the viewport to the given model coordinates.
+        /// </summary>
+        /// <param name="p1">One corner of the viewport in model coordinates.</param>
+        /// <param name="p2">Other corner of the viewport in model coordinates.</param>
+        public void SetViewport(Point2D p1, Point2D p2)
+        {
+            SetViewport(new Extents2D(p1.X, p1.Y, p2.X, p2.Y));
         }
 
         /// <summary>
         /// Sets the viewport to the given model coordinates.
         /// </summary>
         /// <param name="limits">The new limits of the viewport in model coordinates.</param>
-        public void SetViewPort(Extents2D limits)
+        public void SetViewport(Extents2D limits)
         {
             Camera.Position = limits.Center;
             if ((Height != 0) && (Width != 0))
@@ -344,7 +369,7 @@ namespace SimpleCAD
             Extents2D limits = Document.Model.GetExtents();
             if (limits.IsEmpty) limits = new Extents2D(-250, -250, 250, 250);
 
-            SetViewPort(limits);
+            SetViewport(limits);
             ZoomOut();
         }
 

@@ -28,23 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SimpleCAD.CADDocument cadDocument2 = new SimpleCAD.CADDocument();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            SimpleCAD.CADDocument cadDocument1 = new SimpleCAD.CADDocument();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.tsStandard = new System.Windows.Forms.ToolStrip();
-            this.btnNew = new System.Windows.Forms.ToolStripButton();
-            this.btnOpen = new System.Windows.Forms.ToolStripButton();
-            this.btnSave = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.tsGraphics = new System.Windows.Forms.ToolStrip();
             this.lblRenderer = new System.Windows.Forms.ToolStripLabel();
             this.btnRenderer = new System.Windows.Forms.ToolStripComboBox();
+            this.btnShowGrid = new System.Windows.Forms.ToolStripButton();
+            this.btnShowAxes = new System.Windows.Forms.ToolStripButton();
             this.tsPrimitives = new System.Windows.Forms.ToolStrip();
             this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
             this.btnDrawCircle = new System.Windows.Forms.ToolStripButton();
@@ -58,14 +54,20 @@
             this.btnDrawRectangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawTriangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
+            this.tsStandard = new System.Windows.Forms.ToolStrip();
+            this.btnNew = new System.Windows.Forms.ToolStripButton();
+            this.btnOpen = new System.Windows.Forms.ToolStripButton();
+            this.btnSave = new System.Windows.Forms.ToolStripButton();
+            this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
             this.tsTransform = new System.Windows.Forms.ToolStrip();
             this.btnMove = new System.Windows.Forms.ToolStripButton();
             this.btnCopy = new System.Windows.Forms.ToolStripButton();
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
-            this.btnShowGrid = new System.Windows.Forms.ToolStripButton();
-            this.btnShowAxes = new System.Windows.Forms.ToolStripButton();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnZoom = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -75,10 +77,11 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.tsStandard.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
+            this.tsGraphics.SuspendLayout();
             this.tsPrimitives.SuspendLayout();
+            this.tsStandard.SuspendLayout();
             this.tsTransform.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -91,7 +94,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 444);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 419);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -101,10 +104,11 @@
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
             // statusStrip1
             // 
@@ -145,97 +149,31 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 444);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 419);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Document = cadDocument2;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 444);
-            this.cadWindow1.TabIndex = 0;
-            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 444);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 419);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
-            // tsStandard
+            // tsGraphics
             // 
-            this.tsStandard.Dock = System.Windows.Forms.DockStyle.None;
-            this.tsStandard.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnNew,
-            this.btnOpen,
-            this.btnSave,
-            this.btnSaveAs});
-            this.tsStandard.Location = new System.Drawing.Point(222, 25);
-            this.tsStandard.Name = "tsStandard";
-            this.tsStandard.Size = new System.Drawing.Size(173, 25);
-            this.tsStandard.TabIndex = 1;
-            // 
-            // btnNew
-            // 
-            this.btnNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnNew.Image = ((System.Drawing.Image)(resources.GetObject("btnNew.Image")));
-            this.btnNew.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(35, 22);
-            this.btnNew.Text = "New";
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-            // 
-            // btnOpen
-            // 
-            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnOpen.Image = ((System.Drawing.Image)(resources.GetObject("btnOpen.Image")));
-            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(40, 22);
-            this.btnOpen.Text = "Open";
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
-            this.btnSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(35, 22);
-            this.btnSave.Text = "Save";
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnSaveAs
-            // 
-            this.btnSaveAs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnSaveAs.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveAs.Image")));
-            this.btnSaveAs.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(51, 22);
-            this.btnSaveAs.Text = "Save As";
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsGraphics.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsGraphics.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblRenderer,
             this.btnRenderer,
             this.btnShowGrid,
             this.btnShowAxes});
-            this.toolStrip1.Location = new System.Drawing.Point(598, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(354, 25);
-            this.toolStrip1.TabIndex = 3;
+            this.tsGraphics.Location = new System.Drawing.Point(179, 0);
+            this.tsGraphics.Name = "tsGraphics";
+            this.tsGraphics.Size = new System.Drawing.Size(323, 25);
+            this.tsGraphics.TabIndex = 3;
             // 
             // lblRenderer
             // 
@@ -253,6 +191,32 @@
             this.btnRenderer.Size = new System.Drawing.Size(120, 25);
             this.btnRenderer.SelectedIndexChanged += new System.EventHandler(this.btnRenderer_SelectedIndexChanged);
             // 
+            // btnShowGrid
+            // 
+            this.btnShowGrid.Checked = true;
+            this.btnShowGrid.CheckOnClick = true;
+            this.btnShowGrid.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.btnShowGrid.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnShowGrid.Image = ((System.Drawing.Image)(resources.GetObject("btnShowGrid.Image")));
+            this.btnShowGrid.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnShowGrid.Name = "btnShowGrid";
+            this.btnShowGrid.Size = new System.Drawing.Size(65, 22);
+            this.btnShowGrid.Text = "Show Grid";
+            this.btnShowGrid.Click += new System.EventHandler(this.btnShowGrid_Click);
+            // 
+            // btnShowAxes
+            // 
+            this.btnShowAxes.Checked = true;
+            this.btnShowAxes.CheckOnClick = true;
+            this.btnShowAxes.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.btnShowAxes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnShowAxes.Image = ((System.Drawing.Image)(resources.GetObject("btnShowAxes.Image")));
+            this.btnShowAxes.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnShowAxes.Name = "btnShowAxes";
+            this.btnShowAxes.Size = new System.Drawing.Size(67, 22);
+            this.btnShowAxes.Text = "Show Axes";
+            this.btnShowAxes.Click += new System.EventHandler(this.btnShowAxes_Click);
+            // 
             // tsPrimitives
             // 
             this.tsPrimitives.Dock = System.Windows.Forms.DockStyle.None;
@@ -269,7 +233,7 @@
             this.btnDrawRectangle,
             this.btnDrawTriangle,
             this.btnDrawHatch});
-            this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
+            this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
             this.tsPrimitives.Name = "tsPrimitives";
             this.tsPrimitives.Size = new System.Drawing.Size(595, 25);
             this.tsPrimitives.TabIndex = 0;
@@ -395,6 +359,59 @@
             this.btnDrawHatch.Text = "Hatch";
             this.btnDrawHatch.Click += new System.EventHandler(this.btnDrawHatch_Click);
             // 
+            // tsStandard
+            // 
+            this.tsStandard.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsStandard.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnNew,
+            this.btnOpen,
+            this.btnSave,
+            this.btnSaveAs});
+            this.tsStandard.Location = new System.Drawing.Point(6, 0);
+            this.tsStandard.Name = "tsStandard";
+            this.tsStandard.Size = new System.Drawing.Size(173, 25);
+            this.tsStandard.TabIndex = 1;
+            // 
+            // btnNew
+            // 
+            this.btnNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnNew.Image = ((System.Drawing.Image)(resources.GetObject("btnNew.Image")));
+            this.btnNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnNew.Name = "btnNew";
+            this.btnNew.Size = new System.Drawing.Size(35, 22);
+            this.btnNew.Text = "New";
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnOpen.Image = ((System.Drawing.Image)(resources.GetObject("btnOpen.Image")));
+            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(40, 22);
+            this.btnOpen.Text = "Open";
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
+            this.btnSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(35, 22);
+            this.btnSave.Text = "Save";
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSaveAs.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveAs.Image")));
+            this.btnSaveAs.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(51, 22);
+            this.btnSaveAs.Text = "Save As";
+            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            // 
             // tsTransform
             // 
             this.tsTransform.Dock = System.Windows.Forms.DockStyle.None;
@@ -404,7 +421,7 @@
             this.btnRotate,
             this.btnScale,
             this.btnMirror});
-            this.tsTransform.Location = new System.Drawing.Point(3, 25);
+            this.tsTransform.Location = new System.Drawing.Point(3, 50);
             this.tsTransform.Name = "tsTransform";
             this.tsTransform.Size = new System.Drawing.Size(219, 25);
             this.tsTransform.TabIndex = 2;
@@ -459,31 +476,38 @@
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
             // 
-            // btnShowGrid
+            // cadWindow1
             // 
-            this.btnShowGrid.Checked = true;
-            this.btnShowGrid.CheckOnClick = true;
-            this.btnShowGrid.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.btnShowGrid.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnShowGrid.Image = ((System.Drawing.Image)(resources.GetObject("btnShowGrid.Image")));
-            this.btnShowGrid.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnShowGrid.Name = "btnShowGrid";
-            this.btnShowGrid.Size = new System.Drawing.Size(65, 22);
-            this.btnShowGrid.Text = "Show Grid";
-            this.btnShowGrid.Click += new System.EventHandler(this.btnShowGrid_Click);
+            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Document = cadDocument1;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
+            this.cadWindow1.TabIndex = 0;
+            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
-            // btnShowAxes
+            // toolStrip1
             // 
-            this.btnShowAxes.Checked = true;
-            this.btnShowAxes.CheckOnClick = true;
-            this.btnShowAxes.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.btnShowAxes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnShowAxes.Image = ((System.Drawing.Image)(resources.GetObject("btnShowAxes.Image")));
-            this.btnShowAxes.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnShowAxes.Name = "btnShowAxes";
-            this.btnShowAxes.Size = new System.Drawing.Size(67, 22);
-            this.btnShowAxes.Text = "Show Axes";
-            this.btnShowAxes.Click += new System.EventHandler(this.btnShowAxes_Click);
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnZoom});
+            this.toolStrip1.Location = new System.Drawing.Point(222, 50);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(86, 25);
+            this.toolStrip1.TabIndex = 4;
+            // 
+            // btnZoom
+            // 
+            this.btnZoom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnZoom.Image = ((System.Drawing.Image)(resources.GetObject("btnZoom.Image")));
+            this.btnZoom.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnZoom.Name = "btnZoom";
+            this.btnZoom.Size = new System.Drawing.Size(43, 22);
+            this.btnZoom.Text = "Zoom";
+            this.btnZoom.Click += new System.EventHandler(this.btnZoom_Click);
             // 
             // MainForm
             // 
@@ -508,14 +532,16 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.tsStandard.ResumeLayout(false);
-            this.tsStandard.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
+            this.tsGraphics.ResumeLayout(false);
+            this.tsGraphics.PerformLayout();
             this.tsPrimitives.ResumeLayout(false);
             this.tsPrimitives.PerformLayout();
+            this.tsStandard.ResumeLayout(false);
+            this.tsStandard.PerformLayout();
             this.tsTransform.ResumeLayout(false);
             this.tsTransform.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -553,11 +579,13 @@
         private System.Windows.Forms.ToolStripButton btnNew;
         private System.Windows.Forms.ToolStripButton btnMirror;
         private System.Windows.Forms.ToolStripButton btnSaveAs;
-        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStrip tsGraphics;
         private System.Windows.Forms.ToolStripLabel lblRenderer;
         private System.Windows.Forms.ToolStripComboBox btnRenderer;
         private System.Windows.Forms.ToolStripButton btnShowGrid;
         private System.Windows.Forms.ToolStripButton btnShowAxes;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton btnZoom;
     }
 }
 

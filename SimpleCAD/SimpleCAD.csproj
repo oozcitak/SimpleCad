@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />

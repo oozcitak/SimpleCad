@@ -25,6 +25,7 @@ namespace SimpleCAD
 
         private TaskCompletionSource<SelectionResult> selectionCompletion;
         private TaskCompletionSource<PointResult> pointCompletion;
+        private TaskCompletionSource<PointResult> cornerCompletion;
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
         private TaskCompletionSource<DistanceResult> distanceCompletion;
@@ -275,6 +276,42 @@ namespace SimpleCAD
             return res;
         }
 
+        public async Task<PointResult> GetCorner(string message, Point2D basePoint)
+        {
+            return await GetCorner(new CornerOptions(message, basePoint));
+        }
+
+        public async Task<PointResult> GetCorner(string message, Point2D basePoint, Action<Point2D> jig)
+        {
+            return await GetCorner(new CornerOptions(message, basePoint, jig));
+        }
+
+        public async Task<PointResult> GetCorner(CornerOptions options)
+        {
+            PointResult res = new PointResult(ResultMode.Cancel);
+
+            Mode = InputMode.Corner;
+            currentText = "";
+            currentOptions = options;
+            OnEditorPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                consLine = new Polyline(options.BasePoint, options.BasePoint, options.BasePoint, options.BasePoint);
+                consLine.Closed = true;
+                Document.Jigged.Add(consLine);
+                cornerCompletion = new TaskCompletionSource<PointResult>();
+                res = await cornerCompletion.Task;
+                Document.Jigged.Remove(consLine);
+            }
+
+            Mode = InputMode.None;
+            OnEditorPrompt(new EditorPromptEventArgs());
+
+            return res;
+        }
+
         public async Task<AngleResult> GetAngle(string message, Point2D basePoint, Action<float> jig)
         {
             return await GetAngle(new AngleOptions(message, basePoint, jig));
@@ -425,6 +462,19 @@ namespace SimpleCAD
                     OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
                     ((PointOptions)currentOptions).Jig(currentMouseLocation);
                     break;
+                case InputMode.Corner:
+                    Point2D pc1 = consLine.Points[0];
+                    Point2D pc2 = new Point2D(e.X, pc1.Y);
+                    Point2D pc3 = e.Location;
+                    Point2D pc4 = new Point2D(pc1.X, e.Y);
+                    consLine.Points[0] = pc1;
+                    consLine.Points[1] = pc2;
+                    consLine.Points[2] = pc3;
+                    consLine.Points[3] = pc4;
+                    cursorMessage = currentMouseLocation.ToString(Document.Settings.NumberFormat);
+                    OnCursorPrompt(new CursorPromptEventArgs(cursorMessage));
+                    ((CornerOptions)currentOptions).Jig(currentMouseLocation);
+                    break;
                 case InputMode.Angle:
                     consLine.Points[1] = currentMouseLocation;
                     float angle = (currentMouseLocation - ((AngleOptions)currentOptions).BasePoint).Angle;
@@ -480,6 +530,11 @@ namespace SimpleCAD
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
                         pointCompletion.SetResult(new PointResult(e.Location));
+                        break;
+                    case InputMode.Corner:
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        cornerCompletion.SetResult(new PointResult(e.Location));
                         break;
                     case InputMode.Angle:
                         inputCompleted = true;
@@ -540,6 +595,35 @@ namespace SimpleCAD
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
                         pointCompletion.SetResult(new PointResult(ResultMode.Cancel));
+                    }
+                    break;
+                case InputMode.Corner:
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || e.KeyCode == Keys.Space)
+                    {
+                        Point2DConverter conv = new Point2DConverter();
+                        if (conv.IsValid(currentText))
+                        {
+                            inputCompleted = true;
+                            OnCursorPrompt(new CursorPromptEventArgs());
+                            cornerCompletion.SetResult(new PointResult((Point2D)conv.ConvertFrom(currentText)));
+                        }
+                        else if (!string.IsNullOrEmpty(keyword))
+                        {
+                            inputCompleted = true;
+                            OnCursorPrompt(new CursorPromptEventArgs());
+                            cornerCompletion.SetResult(new PointResult(keyword));
+                        }
+                        else
+                        {
+                            currentText = "";
+                            OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                    }
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        cornerCompletion.SetResult(new PointResult(ResultMode.Cancel));
                     }
                     break;
                 case InputMode.Angle:

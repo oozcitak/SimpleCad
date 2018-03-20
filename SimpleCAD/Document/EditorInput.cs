@@ -13,7 +13,8 @@ namespace SimpleCAD
         Point,
         Angle,
         Text,
-        Distance
+        Distance,
+        Corner
     }
 
     public enum ResultMode
@@ -237,6 +238,21 @@ namespace SimpleCAD
         }
 
         public PointOptions(string message) : this(message, (p) => { })
+        {
+            ;
+        }
+    }
+
+    public class CornerOptions : JigOptions<Point2D>
+    {
+        public Point2D BasePoint { get; private set; }
+
+        public CornerOptions(string message, Point2D basePoint, Action<Point2D> jig) : base(message, jig)
+        {
+            BasePoint = basePoint;
+        }
+
+        public CornerOptions(string message, Point2D basePoint) : this(message, basePoint, (p) => { })
         {
             ;
         }

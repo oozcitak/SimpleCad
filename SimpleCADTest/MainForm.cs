@@ -217,5 +217,10 @@ namespace SimpleCADTest
         {
             cadWindow1.View.ShowAxes = btnShowAxes.Checked;
         }
+
+        private void btnZoom_Click(object sender, EventArgs e)
+        {
+            cadWindow1.Document.Editor.RunCommand("View.Zoom");
+        }
     }
 }
