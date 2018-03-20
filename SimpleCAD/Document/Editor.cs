@@ -29,6 +29,8 @@ namespace SimpleCAD
         private TaskCompletionSource<AngleResult> angleCompletion;
         private TaskCompletionSource<TextResult> textCompletion;
         private TaskCompletionSource<DistanceResult> distanceCompletion;
+        private TaskCompletionSource<IntResult> intCompletion;
+        private TaskCompletionSource<FloatResult> floatCompletion;
         private bool inputCompleted;
 
         private InputOptions currentOptions;
@@ -414,6 +416,60 @@ namespace SimpleCAD
             return res;
         }
 
+        public async Task<IntResult> GetInt(string message, Action<int> jig)
+        {
+            return await GetInt(new IntOptions(message, jig));
+        }
+
+        public async Task<IntResult> GetInt(IntOptions options)
+        {
+            IntResult res = new IntResult(ResultMode.Cancel);
+
+            Mode = InputMode.Int;
+            currentText = "";
+            currentOptions = options;
+            OnEditorPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                intCompletion = new TaskCompletionSource<IntResult>();
+                res = await intCompletion.Task;
+            }
+
+            Mode = InputMode.None;
+            OnEditorPrompt(new EditorPromptEventArgs());
+
+            return res;
+        }
+
+        public async Task<FloatResult> GetFloat(string message, Action<float> jig)
+        {
+            return await GetFloat(new FloatOptions(message, jig));
+        }
+
+        public async Task<FloatResult> GetFloat(FloatOptions options)
+        {
+            FloatResult res = new FloatResult(ResultMode.Cancel);
+
+            Mode = InputMode.Float;
+            currentText = "";
+            currentOptions = options;
+            OnEditorPrompt(new EditorPromptEventArgs(options.GetFullPrompt()));
+
+            inputCompleted = false;
+            while (!inputCompleted)
+            {
+                floatCompletion = new TaskCompletionSource<FloatResult>();
+                res = await floatCompletion.Task;
+            }
+
+            Mode = InputMode.None;
+            OnEditorPrompt(new EditorPromptEventArgs());
+
+            return res;
+        }
+
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
             currentMouseLocation = e.Location;
@@ -701,6 +757,64 @@ namespace SimpleCAD
                         inputCompleted = true;
                         OnCursorPrompt(new CursorPromptEventArgs());
                         textCompletion.SetResult(new TextResult(ResultMode.Cancel));
+                    }
+                    break;
+                case InputMode.Int:
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        if (!int.TryParse(currentText, out int val))
+                        {
+                            OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                        else
+                        {
+                            IntOptions opts = (IntOptions)currentOptions;
+                            if (!opts.AllowNegative && val < 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Negative numbers are not allowed*"));
+                            else if (!opts.AllowPositive && val > 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Positive numbers are not allowed*"));
+                            else if (!opts.AllowZero && val == 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Zero is not allowed*"));
+                            else
+                                intCompletion.SetResult(new IntResult(val));
+                        }
+                    }
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        intCompletion.SetResult(new IntResult(ResultMode.Cancel));
+                    }
+                    break;
+                case InputMode.Float:
+                    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        if (!float.TryParse(currentText, out float val))
+                        {
+                            OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Invalid input*"));
+                        }
+                        else
+                        {
+                            FloatOptions opts = (FloatOptions)currentOptions;
+                            if (!opts.AllowNegative && val < 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Negative numbers are not allowed*"));
+                            else if (!opts.AllowPositive && val > 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Positive numbers are not allowed*"));
+                            else if (!opts.AllowZero && val == 0)
+                                OnEditorPrompt(new EditorPromptEventArgs(currentOptions.GetFullPrompt() + "*Zero is not allowed*"));
+                            else
+                                floatCompletion.SetResult(new FloatResult(val));
+                        }
+                    }
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        inputCompleted = true;
+                        OnCursorPrompt(new CursorPromptEventArgs());
+                        floatCompletion.SetResult(new FloatResult(ResultMode.Cancel));
                     }
                     break;
             }

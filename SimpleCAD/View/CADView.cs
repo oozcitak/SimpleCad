@@ -364,7 +364,7 @@ namespace SimpleCAD
         /// <summary>
         /// Sets the viewport to the drawing extents.
         /// </summary>
-        public void SetViewPort()
+        public void SetViewport()
         {
             Extents2D limits = Document.Model.GetExtents();
             if (limits.IsEmpty) limits = new Extents2D(-250, -250, 250, 250);
@@ -614,7 +614,7 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Middle && Interactive)
             {
-                SetViewPort();
+                SetViewport();
             }
         }
 
