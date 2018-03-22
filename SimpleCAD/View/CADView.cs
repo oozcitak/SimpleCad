@@ -390,7 +390,7 @@ namespace SimpleCAD
 
         public void Pan(Vector2D distance)
         {
-            Camera.Position -= distance;
+            Camera.Position += distance;
         }
 
         public void Resize(int width, int height)
@@ -575,7 +575,7 @@ namespace SimpleCAD
             {
                 // Relative mouse movement
                 Point2D scrPt = WorldToScreen(e.Location);
-                Pan(CursorLocation - lastMouseLocationWorld);
+                Pan(lastMouseLocationWorld - CursorLocation);
                 lastMouseLocationWorld = ScreenToWorld(scrPt);
                 control.Invalidate();
             }

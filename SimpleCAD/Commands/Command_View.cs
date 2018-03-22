@@ -56,4 +56,24 @@ namespace SimpleCAD.Commands
             }
         }
     }
+
+    public class ViewPan : Command
+    {
+        public override string RegisteredName => "View.Pan";
+        public override string Name => "Pan";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            CADView view = doc.ActiveView;
+            if (view == null) return;
+
+            Editor ed = doc.Editor;
+
+            PointResult p1 = await ed.GetPoint("Base point: ");
+            if (p1.Result == ResultMode.Cancel) return;
+            DistanceResult p2 = await ed.GetDistance("Second point: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
+            view.Pan(p2.Point - p1.Value);
+        }
+    }
 }

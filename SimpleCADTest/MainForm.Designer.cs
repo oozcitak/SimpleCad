@@ -28,14 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             SimpleCAD.CADDocument cadDocument1 = new SimpleCAD.CADDocument();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.tsTransform = new System.Windows.Forms.ToolStrip();
+            this.btnMove = new System.Windows.Forms.ToolStripButton();
+            this.btnCopy = new System.Windows.Forms.ToolStripButton();
+            this.btnRotate = new System.Windows.Forms.ToolStripButton();
+            this.btnScale = new System.Windows.Forms.ToolStripButton();
+            this.btnMirror = new System.Windows.Forms.ToolStripButton();
             this.tsGraphics = new System.Windows.Forms.ToolStrip();
             this.lblRenderer = new System.Windows.Forms.ToolStripLabel();
             this.btnRenderer = new System.Windows.Forms.ToolStripComboBox();
@@ -59,15 +66,9 @@
             this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSave = new System.Windows.Forms.ToolStripButton();
             this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
-            this.tsTransform = new System.Windows.Forms.ToolStrip();
-            this.btnMove = new System.Windows.Forms.ToolStripButton();
-            this.btnCopy = new System.Windows.Forms.ToolStripButton();
-            this.btnRotate = new System.Windows.Forms.ToolStripButton();
-            this.btnScale = new System.Windows.Forms.ToolStripButton();
-            this.btnMirror = new System.Windows.Forms.ToolStripButton();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnZoom = new System.Windows.Forms.ToolStripButton();
+            this.btnPan = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -77,10 +78,10 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.tsTransform.SuspendLayout();
             this.tsGraphics.SuspendLayout();
             this.tsPrimitives.SuspendLayout();
             this.tsStandard.SuspendLayout();
-            this.tsTransform.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -104,10 +105,10 @@
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
             // statusStrip1
@@ -153,6 +154,19 @@
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Document = cadDocument1;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
+            this.cadWindow1.TabIndex = 0;
+            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
+            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -162,6 +176,70 @@
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
+            // tsTransform
+            // 
+            this.tsTransform.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsTransform.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnMove,
+            this.btnCopy,
+            this.btnRotate,
+            this.btnScale,
+            this.btnMirror});
+            this.tsTransform.Location = new System.Drawing.Point(3, 25);
+            this.tsTransform.Name = "tsTransform";
+            this.tsTransform.Size = new System.Drawing.Size(219, 25);
+            this.tsTransform.TabIndex = 2;
+            // 
+            // btnMove
+            // 
+            this.btnMove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnMove.Image = ((System.Drawing.Image)(resources.GetObject("btnMove.Image")));
+            this.btnMove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnMove.Name = "btnMove";
+            this.btnMove.Size = new System.Drawing.Size(41, 22);
+            this.btnMove.Text = "Move";
+            this.btnMove.Click += new System.EventHandler(this.btnMove_Click);
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnCopy.Image = ((System.Drawing.Image)(resources.GetObject("btnCopy.Image")));
+            this.btnCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(39, 22);
+            this.btnCopy.Text = "Copy";
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
+            // btnRotate
+            // 
+            this.btnRotate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRotate.Image = ((System.Drawing.Image)(resources.GetObject("btnRotate.Image")));
+            this.btnRotate.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRotate.Name = "btnRotate";
+            this.btnRotate.Size = new System.Drawing.Size(45, 22);
+            this.btnRotate.Text = "Rotate";
+            this.btnRotate.Click += new System.EventHandler(this.btnRotate_Click);
+            // 
+            // btnScale
+            // 
+            this.btnScale.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnScale.Image = ((System.Drawing.Image)(resources.GetObject("btnScale.Image")));
+            this.btnScale.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnScale.Name = "btnScale";
+            this.btnScale.Size = new System.Drawing.Size(38, 22);
+            this.btnScale.Text = "Scale";
+            this.btnScale.Click += new System.EventHandler(this.btnScale_Click);
+            // 
+            // btnMirror
+            // 
+            this.btnMirror.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnMirror.Image = ((System.Drawing.Image)(resources.GetObject("btnMirror.Image")));
+            this.btnMirror.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnMirror.Name = "btnMirror";
+            this.btnMirror.Size = new System.Drawing.Size(44, 22);
+            this.btnMirror.Text = "Mirror";
+            this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
+            // 
             // tsGraphics
             // 
             this.tsGraphics.Dock = System.Windows.Forms.DockStyle.None;
@@ -170,7 +248,7 @@
             this.btnRenderer,
             this.btnShowGrid,
             this.btnShowAxes});
-            this.tsGraphics.Location = new System.Drawing.Point(179, 0);
+            this.tsGraphics.Location = new System.Drawing.Point(598, 0);
             this.tsGraphics.Name = "tsGraphics";
             this.tsGraphics.Size = new System.Drawing.Size(323, 25);
             this.tsGraphics.TabIndex = 3;
@@ -233,7 +311,7 @@
             this.btnDrawRectangle,
             this.btnDrawTriangle,
             this.btnDrawHatch});
-            this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
+            this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
             this.tsPrimitives.Name = "tsPrimitives";
             this.tsPrimitives.Size = new System.Drawing.Size(595, 25);
             this.tsPrimitives.TabIndex = 0;
@@ -367,7 +445,7 @@
             this.btnOpen,
             this.btnSave,
             this.btnSaveAs});
-            this.tsStandard.Location = new System.Drawing.Point(6, 0);
+            this.tsStandard.Location = new System.Drawing.Point(222, 25);
             this.tsStandard.Name = "tsStandard";
             this.tsStandard.Size = new System.Drawing.Size(173, 25);
             this.tsStandard.TabIndex = 1;
@@ -412,91 +490,15 @@
             this.btnSaveAs.Text = "Save As";
             this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
             // 
-            // tsTransform
-            // 
-            this.tsTransform.Dock = System.Windows.Forms.DockStyle.None;
-            this.tsTransform.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnMove,
-            this.btnCopy,
-            this.btnRotate,
-            this.btnScale,
-            this.btnMirror});
-            this.tsTransform.Location = new System.Drawing.Point(3, 50);
-            this.tsTransform.Name = "tsTransform";
-            this.tsTransform.Size = new System.Drawing.Size(219, 25);
-            this.tsTransform.TabIndex = 2;
-            // 
-            // btnMove
-            // 
-            this.btnMove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnMove.Image = ((System.Drawing.Image)(resources.GetObject("btnMove.Image")));
-            this.btnMove.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnMove.Name = "btnMove";
-            this.btnMove.Size = new System.Drawing.Size(41, 22);
-            this.btnMove.Text = "Move";
-            this.btnMove.Click += new System.EventHandler(this.btnMove_Click);
-            // 
-            // btnCopy
-            // 
-            this.btnCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnCopy.Image = ((System.Drawing.Image)(resources.GetObject("btnCopy.Image")));
-            this.btnCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(39, 22);
-            this.btnCopy.Text = "Copy";
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
-            // 
-            // btnRotate
-            // 
-            this.btnRotate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnRotate.Image = ((System.Drawing.Image)(resources.GetObject("btnRotate.Image")));
-            this.btnRotate.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRotate.Name = "btnRotate";
-            this.btnRotate.Size = new System.Drawing.Size(45, 22);
-            this.btnRotate.Text = "Rotate";
-            this.btnRotate.Click += new System.EventHandler(this.btnRotate_Click);
-            // 
-            // btnScale
-            // 
-            this.btnScale.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnScale.Image = ((System.Drawing.Image)(resources.GetObject("btnScale.Image")));
-            this.btnScale.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnScale.Name = "btnScale";
-            this.btnScale.Size = new System.Drawing.Size(38, 22);
-            this.btnScale.Text = "Scale";
-            this.btnScale.Click += new System.EventHandler(this.btnScale_Click);
-            // 
-            // btnMirror
-            // 
-            this.btnMirror.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnMirror.Image = ((System.Drawing.Image)(resources.GetObject("btnMirror.Image")));
-            this.btnMirror.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnMirror.Name = "btnMirror";
-            this.btnMirror.Size = new System.Drawing.Size(44, 22);
-            this.btnMirror.Text = "Mirror";
-            this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Document = cadDocument1;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
-            this.cadWindow1.TabIndex = 0;
-            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
-            // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnZoom});
-            this.toolStrip1.Location = new System.Drawing.Point(222, 50);
+            this.btnZoom,
+            this.btnPan});
+            this.toolStrip1.Location = new System.Drawing.Point(95, 50);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(86, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(117, 25);
             this.toolStrip1.TabIndex = 4;
             // 
             // btnZoom
@@ -508,6 +510,16 @@
             this.btnZoom.Size = new System.Drawing.Size(43, 22);
             this.btnZoom.Text = "Zoom";
             this.btnZoom.Click += new System.EventHandler(this.btnZoom_Click);
+            // 
+            // btnPan
+            // 
+            this.btnPan.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPan.Image = ((System.Drawing.Image)(resources.GetObject("btnPan.Image")));
+            this.btnPan.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnPan.Name = "btnPan";
+            this.btnPan.Size = new System.Drawing.Size(31, 22);
+            this.btnPan.Text = "Pan";
+            this.btnPan.Click += new System.EventHandler(this.btnPan_Click);
             // 
             // MainForm
             // 
@@ -532,14 +544,14 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.tsTransform.ResumeLayout(false);
+            this.tsTransform.PerformLayout();
             this.tsGraphics.ResumeLayout(false);
             this.tsGraphics.PerformLayout();
             this.tsPrimitives.ResumeLayout(false);
             this.tsPrimitives.PerformLayout();
             this.tsStandard.ResumeLayout(false);
             this.tsStandard.PerformLayout();
-            this.tsTransform.ResumeLayout(false);
-            this.tsTransform.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -586,6 +598,7 @@
         private System.Windows.Forms.ToolStripButton btnShowAxes;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnZoom;
+        private System.Windows.Forms.ToolStripButton btnPan;
     }
 }
 
