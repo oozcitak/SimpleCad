@@ -104,6 +104,21 @@ namespace SimpleCAD.Geometry
                 string.Format(provider, format, X, Y);
         }
 
+        public static bool TryParse(string s, out Point2D result)
+        {
+            Point2DConverter conv = new Point2DConverter();
+            if (conv.IsValid(s))
+            {
+                result = (Point2D)conv.ConvertFrom(s);
+                return true;
+            }
+            else
+            {
+                result = Point2D.Zero;
+                return false;
+            }
+        }
+
         public Point2D(BinaryReader reader)
         {
             _x = reader.ReadSingle();

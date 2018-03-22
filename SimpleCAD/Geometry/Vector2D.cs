@@ -5,7 +5,7 @@ using System.IO;
 namespace SimpleCAD.Geometry
 {
     [TypeConverter(typeof(Vector2DConverter))]
-    public struct Vector2D: IPersistable
+    public struct Vector2D : IPersistable
     {
         private readonly float _x;
         private readonly float _y;
@@ -17,6 +17,7 @@ namespace SimpleCAD.Geometry
         public Vector2D Normal { get { float len = Length; return new Vector2D(X / len, Y / len); } }
         public Vector2D Perpendicular { get { return new Vector2D(-Y, X); } }
 
+        public static Vector2D Zero { get { return new Vector2D(0, 0); } }
         public static Vector2D XAxis { get { return new Vector2D(1, 0); } }
         public static Vector2D YAxis { get { return new Vector2D(0, 1); } }
 
@@ -127,6 +128,21 @@ namespace SimpleCAD.Geometry
             return (provider == null) ?
                 string.Format(format, X, Y) :
                 string.Format(provider, format, X, Y);
+        }
+
+        public static bool TryParse(string s, out Vector2D result)
+        {
+            Vector2DConverter conv = new Vector2DConverter();
+            if (conv.IsValid(s))
+            {
+                result = (Vector2D)conv.ConvertFrom(s);
+                return true;
+            }
+            else
+            {
+                result = Vector2D.Zero;
+                return false;
+            }
         }
 
         public Vector2D(BinaryReader reader)
