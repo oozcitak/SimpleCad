@@ -43,19 +43,4 @@ namespace SimpleCAD
             ;
         }
     }
-
-    internal class CursorPromptEventArgs : EventArgs
-    {
-        public string Status { get; private set; }
-
-        public CursorPromptEventArgs() : this("")
-        {
-            ;
-        }
-
-        public CursorPromptEventArgs(string status) : base()
-        {
-            Status = status;
-        }
-    }
 }

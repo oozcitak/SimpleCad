@@ -115,7 +115,7 @@ namespace SimpleCAD
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
             Document.SelectionChanged += Document_SelectionChanged;
-            Document.Editor.CursorPrompt += Editor_CursorPrompt;
+            Document.Editor.Prompt += Editor_Prompt;
         }
 
         public void Attach(Control ctrl)
@@ -416,7 +416,7 @@ namespace SimpleCAD
             control.Invalidate();
         }
 
-        private void Editor_CursorPrompt(object sender, CursorPromptEventArgs e)
+        private void Editor_Prompt(object sender, EditorPromptEventArgs e)
         {
             ViewItems.Cursor.Message = e.Status;
             control.Invalidate();

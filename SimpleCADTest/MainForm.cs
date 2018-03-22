@@ -15,7 +15,6 @@ namespace SimpleCADTest
 
             cadWindow1.Document.DocumentChanged += Document_DocumentChanged;
             cadWindow1.Document.SelectionChanged += CadWindow1_SelectionChanged;
-            cadWindow1.Document.Editor.Prompt += Editor_Prompt;
 
             Assembly assembly = Assembly.GetAssembly(typeof(CADDocument));
             object selectedObject = null;
@@ -35,11 +34,6 @@ namespace SimpleCADTest
         private void Document_DocumentChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.PickedSelection.ToArray();
-        }
-
-        private void Editor_Prompt(object sender, EditorPromptEventArgs e)
-        {
-            statusLabel.Text = string.IsNullOrEmpty(e.Status) ? "Ready" : e.Status;
         }
 
         private void CadWindow1_SelectionChanged(object sender, EventArgs e)
