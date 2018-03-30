@@ -12,8 +12,6 @@ namespace SimpleCAD
 {
     public class Editor
     {
-        public delegate void EditorPromptEventHandler(object sender, EditorPromptEventArgs e);
-
         private static Dictionary<string, Command> commands = new Dictionary<string, Command>();
 
         public CADDocument Document { get; private set; }
