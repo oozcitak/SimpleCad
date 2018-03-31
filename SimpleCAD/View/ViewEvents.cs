@@ -4,20 +4,7 @@ using System.Windows.Forms;
 
 namespace SimpleCAD
 {
-    public class EditorPromptEventArgs : EventArgs
-    {
-        public string Status { get; private set; }
-
-        public EditorPromptEventArgs() : this("")
-        {
-            ;
-        }
-
-        public EditorPromptEventArgs(string status) : base()
-        {
-            Status = status;
-        }
-    }
+    public delegate void CursorEventHandler(object sender, CursorEventArgs e);
 
     public class CursorEventArgs : EventArgs
     {
