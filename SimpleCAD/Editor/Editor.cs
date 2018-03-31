@@ -19,6 +19,11 @@ namespace SimpleCAD
 
         public event EditorPromptEventHandler Prompt;
 
+        internal event CursorEventHandler CursorMove;
+        internal event CursorEventHandler CursorClick;
+        internal event KeyEventHandler KeyDown;
+        internal event KeyPressEventHandler KeyPress;
+
         private TaskCompletionSource<SelectionResult> selectionCompletion;
         private TaskCompletionSource<PointResult> pointCompletion;
         private TaskCompletionSource<PointResult> cornerCompletion;
@@ -64,6 +69,11 @@ namespace SimpleCAD
         public Editor(CADDocument doc)
         {
             Document = doc;
+        }
+
+        public void DoPrompt(string message)
+        {
+            OnPrompt(new EditorPromptEventArgs(message));
         }
 
         public void RunCommand(string registeredName, params string[] args)
@@ -248,6 +258,12 @@ namespace SimpleCAD
 
         public async Task<PointResult> GetPoint(PointOptions options)
         {
+            Mode = InputMode.Point;
+            PointGetter getter = new PointGetter();
+            PointResult res = await getter.Run(this, options);
+            Mode = InputMode.None;
+            return res;
+            /*
             PointResult res = new PointResult(ResultMode.Cancel);
 
             Mode = InputMode.Point;
@@ -271,7 +287,7 @@ namespace SimpleCAD
             Mode = InputMode.None;
             OnPrompt(new EditorPromptEventArgs());
 
-            return res;
+            return res;*/
         }
 
         public async Task<PointResult> GetCorner(string message, Point2D basePoint)
@@ -468,6 +484,8 @@ namespace SimpleCAD
 
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
+            CursorMove?.Invoke(sender, e);
+            return;
             currentMouseLocation = e.Location;
             string cursorMessage = "";
             switch (Mode)
@@ -546,6 +564,8 @@ namespace SimpleCAD
 
         internal void OnViewMouseClick(object sender, CursorEventArgs e)
         {
+            CursorClick?.Invoke(sender, e);
+            return;
             if (e.Button == MouseButtons.Left)
             {
                 switch (Mode)
@@ -609,6 +629,8 @@ namespace SimpleCAD
 
         internal void OnViewKeyDown(object sender, KeyEventArgs e)
         {
+            KeyDown?.Invoke(sender, e);
+
             string keyword = currentOptions.MatchKeyword(currentText);
             switch (Mode)
             {
@@ -818,6 +840,8 @@ namespace SimpleCAD
 
         internal void OnViewKeyPress(object sender, KeyPressEventArgs e)
         {
+            KeyPress?.Invoke(sender, e);
+
             bool textChanged = false;
 
             if (e.KeyChar == '\b') // backspace
@@ -851,9 +875,6 @@ namespace SimpleCAD
             }
         }
 
-        protected void OnPrompt(EditorPromptEventArgs e)
-        {
-            Prompt?.Invoke(this, e);
-        }
+        protected void OnPrompt(EditorPromptEventArgs e) { Prompt?.Invoke(this, e); }
     }
 }

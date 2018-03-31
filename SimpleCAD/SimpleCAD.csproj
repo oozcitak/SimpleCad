@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="Editor\EditorGetter.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />
