@@ -17,8 +17,8 @@ namespace SimpleCAD
         {
             Value = default(TValue);
             InputValid = true;
-            ErrorMessage = "*Invalid input*";
             ContinueAsync = true;
+            ErrorMessage = "*Invalid input*";
         }
     }
 }

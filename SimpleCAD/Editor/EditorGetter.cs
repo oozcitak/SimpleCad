@@ -63,17 +63,6 @@ namespace SimpleCAD
                     else
                         getter.Completion.SetResult(InputResult<TValue>.CancelResult());
                 }
-                else
-                {
-                    await getter.InitAsync(initArgs);
-                    if (!initArgs.ContinueAsync)
-                    {
-                        if (initArgs.InputValid)
-                            getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
-                        else
-                            getter.Completion.SetResult(InputResult<TValue>.CancelResult());
-                    }
-                }
 
                 if (initArgs.ContinueAsync)
                 {
@@ -107,7 +96,8 @@ namespace SimpleCAD
                 {
                     Editor.DoPrompt("");
                     var result = InputResult<TValue>.AcceptResult(args.Value);
-                    Completion.SetResult(result);
+                    if (args.InputCompleted)
+                        Completion.SetResult(result);
                 }
                 else
                 {
@@ -149,7 +139,8 @@ namespace SimpleCAD
                     {
                         Editor.DoPrompt("");
                         var result = InputResult<TValue>.AcceptResult(args.Value);
-                        Completion.SetResult(result);
+                        if (args.InputCompleted)
+                            Completion.SetResult(result);
                     }
                     else
                     {
@@ -191,7 +182,6 @@ namespace SimpleCAD
         }
 
         protected virtual void Init(InitArgs<TValue> args) { }
-        protected virtual Task InitAsync(InitArgs<TValue> args) { return Task.CompletedTask; }
         protected virtual void CoordsChanged(Point2D pt) { }
         protected virtual void TextChanged(string text) { }
         protected virtual void AcceptCoordsInput(InputArgs<Point2D, TValue> args) { }
