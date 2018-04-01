@@ -35,7 +35,7 @@ namespace SimpleCAD.View
             float pxSize = view.ScreenToWorld(new Vector2D(1, 0)).X / 2;
 
             // Draw cursor
-            if (doc.Editor.Mode == InputMode.None)
+            if (!doc.Editor.InputMode)
             {
                 renderer.DrawLine(cursorStyle, new Point2D(ex.Xmin, Location.Y), new Point2D(Location.X - emptyBoxSize, Location.Y));
                 renderer.DrawLine(cursorStyle, new Point2D(Location.X + emptyBoxSize, Location.Y), new Point2D(ex.Xmax, Location.Y));

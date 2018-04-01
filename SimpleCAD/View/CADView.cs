@@ -479,7 +479,7 @@ namespace SimpleCAD
                 panning = false;
                 control.Invalidate();
             }
-            else if (e.Button == MouseButtons.Left && Interactive && Document.Editor.Mode == InputMode.None)
+            else if (e.Button == MouseButtons.Left && Interactive && !Document.Editor.InputMode)
             {
                 if (mouseDownItem != null)
                 {
@@ -513,7 +513,7 @@ namespace SimpleCAD
                         Matrix2D trans = Matrix2D.Identity;
                         if (cp.Type == ControlPoint.ControlPointType.Point)
                         {
-                            PointResult res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
+                            var res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = Matrix2D.Translation(p - cp.BasePoint);
@@ -525,7 +525,7 @@ namespace SimpleCAD
                         else if (cp.Type == ControlPoint.ControlPointType.Angle)
                         {
                             float orjVal = (cp.Location - cp.BasePoint).Angle;
-                            AngleResult res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
+                            var res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = Matrix2D.Rotation(cp.BasePoint, p - orjVal);
@@ -538,7 +538,7 @@ namespace SimpleCAD
                         {
                             Vector2D dir = (cp.Location - cp.BasePoint).Normal;
                             float orjVal = (cp.Location - cp.BasePoint).Length;
-                            DistanceResult res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
+                            var res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
                                 (p) =>
                                 {
                                     trans = Matrix2D.Translation(dir * (p - orjVal));
@@ -578,7 +578,7 @@ namespace SimpleCAD
                 control.Invalidate();
             }
 
-            if (Document.Editor.Mode != InputMode.None)
+            if (Document.Editor.InputMode)
             {
                 Document.Editor.OnViewMouseMove(this, e);
             }
@@ -586,7 +586,7 @@ namespace SimpleCAD
 
         private void CadView_CursorClick(object sender, CursorEventArgs e)
         {
-            if (Document.Editor.Mode != InputMode.None)
+            if (Document.Editor.InputMode)
             {
                 Document.Editor.OnViewMouseClick(this, e);
             }
@@ -632,7 +632,7 @@ namespace SimpleCAD
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Document.Editor.Mode != InputMode.None)
+            if (Document.Editor.InputMode)
             {
                 Document.Editor.OnViewKeyDown(this, e);
             }
@@ -644,7 +644,7 @@ namespace SimpleCAD
 
         private void CadView_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (Document.Editor.Mode != InputMode.None)
+            if (Document.Editor.InputMode)
             {
                 Document.Editor.OnViewKeyPress(this, e);
             }

@@ -24,7 +24,7 @@ namespace SimpleCAD.Commands
             Editor ed = doc.Editor;
             ed.PickedSelection.Clear();
 
-            FilenameResult res = await ed.GetOpenFilename("Open file");
+            var res = await ed.GetOpenFilename("Open file");
             if (res.Result == ResultMode.OK)
             {
                 doc.Open(res.Value);
@@ -45,7 +45,7 @@ namespace SimpleCAD.Commands
             string filename = doc.FileName;
             if (string.IsNullOrEmpty(filename))
             {
-                FilenameResult res = await ed.GetSaveFilename("Save file");
+                var res = await ed.GetSaveFilename("Save file");
                 if (res.Result == ResultMode.OK)
                     filename = res.Value;
                 else
@@ -65,7 +65,7 @@ namespace SimpleCAD.Commands
             Editor ed = doc.Editor;
             ed.PickedSelection.Clear();
 
-            FilenameResult res = await ed.GetSaveFilename("Save file");
+            var res = await ed.GetSaveFilename("Save file");
             if (res.Result == ResultMode.OK)
             {
                 doc.Save(res.Value);

@@ -13,9 +13,9 @@ namespace SimpleCAD.Commands
         {
             Editor ed = doc.Editor;
 
-            SelectionResult s = await ed.GetSelection("Select objects: ");
+            var s = await ed.GetSelection("Select objects: ");
             if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
-            PointResult p1 = await ed.GetPoint("Base point: ");
+            var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
             foreach (Drawable item in s.Value)
@@ -24,7 +24,7 @@ namespace SimpleCAD.Commands
             }
             doc.Transients.Add(consItems);
             Point2D lastPt = p1.Value;
-            PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
+            var p2 = await ed.GetPoint("Second point: ", p1.Value,
                 (p) =>
                 {
                     consItems.TransformBy(Matrix2D.Translation(p - lastPt));
@@ -49,9 +49,9 @@ namespace SimpleCAD.Commands
         {
             Editor ed = doc.Editor;
 
-            SelectionResult s = await ed.GetSelection("Select objects: ");
+            var s = await ed.GetSelection("Select objects: ");
             if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
-            PointResult p1 = await ed.GetPoint("Base point: ");
+            var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
             foreach (Drawable item in s.Value)
@@ -63,7 +63,7 @@ namespace SimpleCAD.Commands
             bool flag = true;
             while (flag)
             {
-                PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
+                var p2 = await ed.GetPoint("Second point: ", p1.Value,
                     (p) =>
                     {
                         consItems.TransformBy(Matrix2D.Translation(p - lastPt));
@@ -98,9 +98,9 @@ namespace SimpleCAD.Commands
         {
             Editor ed = doc.Editor;
 
-            SelectionResult s = await ed.GetSelection("Select objects: ");
+            var s = await ed.GetSelection("Select objects: ");
             if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
-            PointResult p1 = await ed.GetPoint("Base point: ");
+            var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
             foreach (Drawable item in s.Value)
@@ -109,7 +109,7 @@ namespace SimpleCAD.Commands
             }
             doc.Transients.Add(consItems);
             float lastAngle = 0;
-            AngleResult p2 = await ed.GetAngle("Rotation angle: ", p1.Value,
+            var p2 = await ed.GetAngle("Rotation angle: ", p1.Value,
                 (p) =>
                 {
                     consItems.TransformBy(Matrix2D.Rotation(p1.Value, p - lastAngle));
@@ -134,9 +134,9 @@ namespace SimpleCAD.Commands
         {
             Editor ed = doc.Editor;
 
-            SelectionResult s = await ed.GetSelection("Select objects: ");
+            var s = await ed.GetSelection("Select objects: ");
             if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
-            PointResult p1 = await ed.GetPoint("Base point: ");
+            var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
             foreach (Drawable item in s.Value)
@@ -145,7 +145,7 @@ namespace SimpleCAD.Commands
             }
             doc.Transients.Add(consItems);
             float lastScale = 1;
-            DistanceResult d1 = await ed.GetDistance("Scale: ", p1.Value,
+            var d1 = await ed.GetDistance("Scale: ", p1.Value,
                 (p) =>
                 {
                     consItems.TransformBy(Matrix2D.Scale(p1.Value, p / lastScale));
@@ -170,9 +170,9 @@ namespace SimpleCAD.Commands
         {
             Editor ed = doc.Editor;
 
-            SelectionResult s = await ed.GetSelection("Select objects: ");
+            var s = await ed.GetSelection("Select objects: ");
             if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
-            PointResult p1 = await ed.GetPoint("Base point: ");
+            var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
             foreach (Drawable item in s.Value)
@@ -181,7 +181,7 @@ namespace SimpleCAD.Commands
             }
             doc.Transients.Add(consItems);
             Matrix2D lastTrans = Matrix2D.Identity;
-            PointResult p2 = await ed.GetPoint("Second point: ", p1.Value,
+            var p2 = await ed.GetPoint("Second point: ", p1.Value,
                 (p) =>
                 {
                     Matrix2D mirror = Matrix2D.Mirror(p1.Value, p - p1.Value);

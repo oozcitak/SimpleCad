@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleCAD</RootNamespace>
     <AssemblyName>SimpleCAD</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -69,6 +69,20 @@
   <ItemGroup>
     <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="Drawables\Polygon.cs" />
+    <Compile Include="Editor\FloatGetter.cs" />
+    <Compile Include="Editor\SelectionGetter.cs" />
+    <Compile Include="Editor\SaveFilenameGetter.cs" />
+    <Compile Include="Editor\InitArgs.cs" />
+    <Compile Include="Editor\IntGetter.cs" />
+    <Compile Include="Editor\OpenFilenameGetter.cs" />
+    <Compile Include="Editor\TextGetter.cs" />
+    <Compile Include="Editor\DistanceGetter.cs" />
+    <Compile Include="Editor\CornerGetter.cs" />
+    <Compile Include="Editor\InputOptions.cs" />
+    <Compile Include="Editor\InputResult.cs" />
+    <Compile Include="Editor\AngleGetter.cs" />
+    <Compile Include="Editor\PointGetter.cs" />
     <Compile Include="Editor\EditorGetter.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
@@ -86,7 +100,7 @@
     <Compile Include="Commands\Command_Transform.cs" />
     <Compile Include="Commands\Command_Primitives.cs" />
     <Compile Include="Drawables\ControlPoint.cs" />
-    <Compile Include="Editor\EditorInput.cs" />
+    <Compile Include="Editor\InputArgs.cs" />
     <Compile Include="Drawables\Hatch.cs" />
     <Compile Include="Document\IPersistable.cs" />
     <Compile Include="MathF.cs" />

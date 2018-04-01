@@ -1,15 +1,11 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SimpleCAD
 {
-    public abstract class EditorGetter<TOptions, TResult, TValue> where TOptions : InputOptions where TResult : InputResult<TValue>
+    internal abstract class EditorGetter<TOptions, TValue> : IDisposable where TOptions : InputOptions<TValue>
     {
         private Drawable jigged = null;
         private string currentText = "";
@@ -29,52 +25,94 @@ namespace SimpleCAD
             }
         }
         protected bool SpaceAccepts { get; set; } = true;
-        protected TaskCompletionSource<TResult> Completion { get; private set; }
+        protected TaskCompletionSource<InputResult<TValue>> Completion { get; private set; }
 
-        public async Task<TResult> Run(Editor editor, TOptions options)
+        public void Dispose()
         {
-            Editor = editor;
-            Options = options;
-            Editor.DoPrompt("");
-
-            Editor.CursorMove += Editor_CursorMove;
-            Editor.CursorClick += Editor_CursorClick;
-            Editor.KeyDown += Editor_KeyDown;
-            Editor.KeyPress += Editor_KeyPress;
-
-            currentText = "";
-            Init();
-            Completion = new TaskCompletionSource<TResult>();
-            TResult result = await Completion.Task;
-
-            Editor.DoPrompt("");
             Jigged = null;
 
-            return result;
+            Editor.DoPrompt("");
+
+            Editor.CursorMove -= Editor_CursorMove;
+            Editor.CursorClick -= Editor_CursorClick;
+            Editor.KeyDown -= Editor_KeyDown;
+            Editor.KeyPress -= Editor_KeyPress;
+
+            Editor.InputMode = false;
+        }
+
+        public static async Task<InputResult<TValue>> Run<T>(Editor editor, TOptions options) where T : EditorGetter<TOptions, TValue>
+        {
+            using (var getter = Activator.CreateInstance<T>())
+            {
+                getter.Editor = editor;
+
+                getter.Completion = new TaskCompletionSource<InputResult<TValue>>();
+
+                getter.Editor.InputMode = true;
+                getter.Editor.DoPrompt("");
+
+                getter.Options = options;
+
+                var initArgs = new InitArgs<TValue>();
+                getter.Init(initArgs);
+                if (!initArgs.ContinueAsync)
+                {
+                    if (initArgs.InputValid)
+                        getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
+                    else
+                        getter.Completion.SetResult(InputResult<TValue>.CancelResult());
+                }
+                else
+                {
+                    await getter.InitAsync(initArgs);
+                    if (!initArgs.ContinueAsync)
+                    {
+                        if (initArgs.InputValid)
+                            getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
+                        else
+                            getter.Completion.SetResult(InputResult<TValue>.CancelResult());
+                    }
+                }
+
+                if (initArgs.ContinueAsync)
+                {
+                    getter.Editor.CursorMove += getter.Editor_CursorMove;
+                    getter.Editor.CursorClick += getter.Editor_CursorClick;
+                    getter.Editor.KeyDown += getter.Editor_KeyDown;
+                    getter.Editor.KeyPress += getter.Editor_KeyPress;
+                }
+
+                return await getter.Completion.Task;
+            }
         }
 
         private void Editor_CursorMove(object sender, CursorEventArgs e)
         {
-            MouseCoordsChanged(e.Location);
+            CoordsChanged(e.Location);
+        }
+
+        protected void SetCursorText(string text)
+        {
+            Editor.DoPrompt(Options.GetFullPrompt() + text);
         }
 
         private void Editor_CursorClick(object sender, CursorEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                bool inputCompleted = AcceptMouseClick(e.Location, out TValue value, out string errorMessage);
-                if (inputCompleted)
+                var args = new InputArgs<Point2D, TValue>(e.Location);
+                AcceptCoordsInput(args);
+                if (args.InputValid)
                 {
                     Editor.DoPrompt("");
-                    TResult result = (TResult)typeof(TResult).GetConstructor(
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-                        null, new Type[] { typeof(TValue) }, null).Invoke(new object[] { value });
+                    var result = InputResult<TValue>.AcceptResult(args.Value);
                     Completion.SetResult(result);
                 }
                 else
                 {
                     currentText = "";
-                    Editor.DoPrompt(Options.GetFullPrompt() + errorMessage);
+                    Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                 }
             }
             else if (e.Button == MouseButtons.Right)
@@ -90,7 +128,8 @@ namespace SimpleCAD
             {
                 Editor.DoPrompt("");
                 CancelInput();
-                Completion.SetCanceled();
+                var result = InputResult<TValue>.CancelResult();
+                Completion.SetResult(result);
             }
             else if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || (SpaceAccepts && e.KeyCode == Keys.Space))
             {
@@ -99,26 +138,23 @@ namespace SimpleCAD
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     Editor.DoPrompt("");
-                    TResult result = (TResult)typeof(TResult).GetConstructor(
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-                        null, new Type[] { typeof(string) }, null).Invoke(new object[] { keyword });
+                    var result = InputResult<TValue>.KeywordResult(keyword);
                     Completion.SetResult(result);
                 }
                 else
                 {
-                    bool inputCompleted = AcceptInput(currentText, out TValue value, out string errorMessage);
-                    if (inputCompleted)
+                    var args = new InputArgs<string, TValue>(currentText);
+                    AcceptTextInput(args);
+                    if (args.InputValid)
                     {
                         Editor.DoPrompt("");
-                        TResult result = (TResult)typeof(TResult).GetConstructor(
-                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-                            null, new Type[] { typeof(TValue) }, null).Invoke(new object[] { value });
+                        var result = InputResult<TValue>.AcceptResult(args.Value);
                         Completion.SetResult(result);
                     }
                     else
                     {
                         currentText = "";
-                        Editor.DoPrompt(Options.GetFullPrompt() + errorMessage);
+                        Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                     }
                 }
             }
@@ -154,59 +190,12 @@ namespace SimpleCAD
             }
         }
 
-        protected virtual void Init() { }
-        protected virtual void MouseCoordsChanged(Point2D pt) { }
+        protected virtual void Init(InitArgs<TValue> args) { }
+        protected virtual Task InitAsync(InitArgs<TValue> args) { return Task.CompletedTask; }
+        protected virtual void CoordsChanged(Point2D pt) { }
         protected virtual void TextChanged(string text) { }
-        protected virtual bool AcceptMouseClick(Point2D pt, out TValue value, out string errorMessage)
-        {
-            value = default(TValue);
-            errorMessage = "*Invalid input*";
-            return true;
-        }
-        protected virtual bool AcceptInput(string text, out TValue value, out string errorMessage)
-        {
-            value = default(TValue);
-            errorMessage = "*Invalid input*";
-            return true;
-        }
+        protected virtual void AcceptCoordsInput(InputArgs<Point2D, TValue> args) { }
+        protected virtual void AcceptTextInput(InputArgs<string, TValue> args) { }
         protected virtual void CancelInput() { }
-    }
-
-    public class PointGetter : EditorGetter<PointOptions, PointResult, Point2D>
-    {
-        protected override void Init()
-        {
-            if (Options.HasBasePoint)
-            {
-                Jigged = new Line(Options.BasePoint, Options.BasePoint);
-            }
-        }
-
-        protected override void MouseCoordsChanged(Point2D pt)
-        {
-            if (Options.HasBasePoint)
-                (Jigged as Line).EndPoint = pt;
-            string cursorMessage = pt.ToString(Editor.Document.Settings.NumberFormat);
-            Editor.DoPrompt(Options.GetFullPrompt() + cursorMessage);
-            Options.Jig(pt);
-        }
-
-        protected override bool AcceptMouseClick(Point2D pt, out Point2D value, out string errorMessage)
-        {
-            value = pt;
-            errorMessage = "";
-            return true;
-        }
-
-        protected override bool AcceptInput(string text, out Point2D value, out string errorMessage)
-        {
-            if (Point2D.TryParse(text, out value))
-            {
-                errorMessage = "";
-                return true;
-            }
-
-            return base.AcceptInput(text, out value, out errorMessage);
-        }
     }
 }
