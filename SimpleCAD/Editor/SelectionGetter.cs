@@ -1,7 +1,6 @@
 ﻿using SimpleCAD.Drawables;
 using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
-using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
@@ -17,9 +16,13 @@ namespace SimpleCAD
             // Immediately return existing picked-selection if any
             if (Editor.PickedSelection.Count != 0)
             {
-                SelectionSet picked = Editor.PickedSelection;
+                Editor.CurrentSelection.Clear();
+                foreach (Drawable item in Editor.PickedSelection)
+                {
+                    Editor.CurrentSelection.Add(item);
+                }
                 Editor.PickedSelection.Clear();
-                args.Value = picked;
+                args.Value = Editor.CurrentSelection;
                 args.ContinueAsync = false;
             }
             else
