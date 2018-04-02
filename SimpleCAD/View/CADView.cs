@@ -239,7 +239,7 @@ namespace SimpleCAD
 
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
-                foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
+                foreach (ControlPoint pt in selected.GetControlPoints())
                 {
                     renderer.DrawRectangle(pt.Equals(activeCP) ? cpActiveStyle : cpStyle,
                         new Point2D(pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2),
@@ -503,7 +503,7 @@ namespace SimpleCAD
                     Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
                     Drawable item = find.Item1;
                     ControlPoint mouseUpCP = find.Item2;
-                    if (mouseUpCP != null && mouseDownCP.Equals(mouseUpCP))
+                    if (ReferenceEquals(item, mouseDownCPItem) && mouseDownCP.Index == mouseUpCP.Index)
                     {
                         activeCP = mouseDownCP;
                         ControlPoint cp = mouseDownCP;
@@ -513,11 +513,12 @@ namespace SimpleCAD
                         Matrix2D trans = Matrix2D.Identity;
                         if (cp.Type == ControlPoint.ControlPointType.Point)
                         {
-                            var res = await Document.Editor.GetPoint("New point: ", cp.BasePoint,
+                            var res = await Document.Editor.GetPoint(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
+                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
                                     trans = Matrix2D.Translation(p - cp.BasePoint);
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoint(cp.Index, trans);
                                 });
                             trans = Matrix2D.Translation(res.Value - cp.BasePoint);
                             result = res.Result;
@@ -525,11 +526,12 @@ namespace SimpleCAD
                         else if (cp.Type == ControlPoint.ControlPointType.Angle)
                         {
                             float orjVal = (cp.Location - cp.BasePoint).Angle;
-                            var res = await Document.Editor.GetAngle("New angle: ", cp.BasePoint,
+                            var res = await Document.Editor.GetAngle(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
+                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
                                     trans = Matrix2D.Rotation(cp.BasePoint, p - orjVal);
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoint(cp.Index, trans);
                                 });
                             trans = Matrix2D.Rotation(cp.BasePoint, res.Value - orjVal);
                             result = res.Result;
@@ -538,20 +540,21 @@ namespace SimpleCAD
                         {
                             Vector2D dir = (cp.Location - cp.BasePoint).Normal;
                             float orjVal = (cp.Location - cp.BasePoint).Length;
-                            var res = await Document.Editor.GetDistance("New distance: ", cp.BasePoint,
+                            var res = await Document.Editor.GetDistance(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
-                                    trans = Matrix2D.Translation(dir * (p - orjVal));
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
+                                    trans = Matrix2D.Scale(cp.BasePoint, p / orjVal);
+                                    consItem.TransformControlPoint(cp.Index, trans);
                                 });
-                            trans = Matrix2D.Translation(dir * (res.Value - orjVal));
+                            trans = Matrix2D.Scale(cp.BasePoint, res.Value / orjVal);
                             result = res.Result;
                         }
 
-                        // Transform the control point1
+                        // Transform the control point
                         if (result == ResultMode.OK)
                         {
-                            item.TransformControlPoint(cp, trans);
+                            item.TransformControlPoint(cp.Index, trans);
                         }
                         Document.Transients.Remove(consItem);
                         activeCP = null;
@@ -669,8 +672,11 @@ namespace SimpleCAD
         {
             foreach (Drawable item in Document.Editor.PickedSelection)
             {
-                foreach (ControlPoint cp in ControlPoint.FromDrawable(item))
+                int i = 0;
+                foreach (ControlPoint cp in item.GetControlPoints())
                 {
+                    cp.Index = i;
+                    i++;
                     if (pt.X >= cp.Location.X - controlPointSize / 2 && pt.X <= cp.Location.X + controlPointSize / 2 &&
                         pt.Y >= cp.Location.Y - controlPointSize / 2 && pt.Y <= cp.Location.Y + controlPointSize / 2)
                         return new Tuple<Drawable, ControlPoint>(item, cp);

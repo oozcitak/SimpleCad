@@ -100,11 +100,23 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
-                new ControlPoint("SemiMajorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("SemiMinorAxis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
+                new ControlPoint("Center point", Center),
+                new ControlPoint("Semi major axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Semi minor axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                Center = Center.Transform(transformation);
+            else if (index == 1)
+                SemiMajorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMajorAxis;
+            else if (index == 2)
+                SemiMinorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMinorAxis;
+            else if (index == 3)
+                Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
         }
 
         public Ellipse(BinaryReader reader) : base(reader)

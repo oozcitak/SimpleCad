@@ -80,10 +80,20 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Point1"),
-                new ControlPoint("Point2"),
-                new ControlPoint("Point3"),
+                new ControlPoint("First point", Point1),
+                new ControlPoint("Second point", Point2),
+                new ControlPoint("Third point", Point3),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                Point1 = Point1.Transform(transformation);
+            else if (index == 1)
+                Point2 = Point2.Transform(transformation);
+            else if (index == 2)
+                Point3 = Point3.Transform(transformation);
         }
 
         public Triangle(BinaryReader reader) : base(reader)

@@ -141,11 +141,23 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("StartPoint"),
-                new ControlPoint("EndPoint"),
-                new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, StartPoint, StartPoint + cpSize * Vector2D.FromAngle(StartAngle)),
-                new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, EndPoint, EndPoint + cpSize * Vector2D.FromAngle(EndAngle)),
+                new ControlPoint("Start point", StartPoint),
+                new ControlPoint("End point", EndPoint),
+                new ControlPoint("Start angle", ControlPoint.ControlPointType.Angle, StartPoint, StartPoint + cpSize * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("End angle", ControlPoint.ControlPointType.Angle, EndPoint, EndPoint + cpSize * Vector2D.FromAngle(EndAngle)),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                StartPoint = StartPoint.Transform(transformation);
+            else if (index == 1)
+                EndPoint = EndPoint.Transform(transformation);
+            else if (index == 2)
+                StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+            else if (index == 3)
+                EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
         }
 
         public Parabola(BinaryReader reader) : base(reader)

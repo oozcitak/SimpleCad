@@ -1,6 +1,7 @@
 ﻿using SimpleCAD.Geometry;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace SimpleCAD.Drawables
 {
@@ -94,9 +95,14 @@ namespace SimpleCAD.Drawables
             ControlPoint[] cp = new ControlPoint[Points.Count];
             for (int i = 0; i < Points.Count; i++)
             {
-                cp[i] = new ControlPoint("Points", i);
+                cp[i] = new ControlPoint("Vertex (" + (i + 1).ToString() + ")", Points[i]);
             }
             return cp;
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            Points[index] = Points[index].Transform(transformation);
         }
 
         public Polyline(BinaryReader reader) : base(reader)

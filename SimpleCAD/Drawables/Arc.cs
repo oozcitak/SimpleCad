@@ -70,11 +70,23 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
+                new ControlPoint("Center point", Center),
                 new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
-                new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
-                new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
+                new ControlPoint("Start angle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("End angle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+                if (index == 0)
+                    Center = Center.Transform(transformation);
+                else if (index == 1)
+                    Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
+                else if (index == 2)
+                    StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+                else if (index == 3)
+                    EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
         }
 
         public Arc(BinaryReader reader) : base(reader)

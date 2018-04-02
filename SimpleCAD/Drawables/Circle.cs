@@ -59,9 +59,17 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
+                new ControlPoint("Center point", Center),
                 new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.XAxis),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                Center = Center.Transform(transformation);
+            else if (index == 1)
+                Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
         }
 
         public Circle(BinaryReader reader) : base(reader)

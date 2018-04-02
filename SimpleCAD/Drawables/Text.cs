@@ -111,10 +111,20 @@ namespace SimpleCAD.Drawables
             Vector2D upDir = Vector2D.FromAngle(Rotation).Perpendicular;
             return new[]
             {
-                new ControlPoint("Location"),
+                new ControlPoint("Location", Location),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + cpSize * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("TextHeight", ControlPoint.ControlPointType.Distance, Location, Location + TextHeight * upDir),
+                new ControlPoint("Text height", ControlPoint.ControlPointType.Distance, Location, Location + TextHeight * upDir),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                Location = Location.Transform(transformation);
+            else if (index == 1)
+                Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+            else if (index == 2)
+                TextHeight = Vector2D.XAxis.Transform(transformation).Length * TextHeight;
         }
 
         public Text(BinaryReader reader) : base(reader)

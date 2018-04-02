@@ -146,9 +146,17 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("StartPoint"),
-                new ControlPoint("EndPoint"),
+                new ControlPoint("Start point", StartPoint),
+                new ControlPoint("End point", EndPoint),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                StartPoint = StartPoint.Transform(transformation);
+            else if (index == 1)
+                EndPoint = EndPoint.Transform(transformation);
         }
 
         public Dimension(BinaryReader reader) : base(reader)

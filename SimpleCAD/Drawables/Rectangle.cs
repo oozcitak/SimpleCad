@@ -99,10 +99,20 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
-                new ControlPoint("Corner"),
+                new ControlPoint("Center", Center),
+                new ControlPoint("Corner", Corner),
                 new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + Vector2D.FromAngle(Rotation) * Width / 2),
             };
+        }
+
+        public override void TransformControlPoint(int index, Matrix2D transformation)
+        {
+            if (index == 0)
+                Center = Center.Transform(transformation);
+            else if (index == 1)
+                Corner = Corner.Transform(transformation);
+            else if (index == 2)
+                Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
         }
 
         public Rectangle(BinaryReader reader) : base(reader)

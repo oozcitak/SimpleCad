@@ -23,39 +23,7 @@ namespace SimpleCAD
         public virtual bool Contains(Point2D pt, float pickBoxSize) { return GetExtents().Contains(pt); }
         public abstract void TransformBy(Matrix2D transformation);
         public virtual ControlPoint[] GetControlPoints() { return new ControlPoint[0]; }
-        public virtual void TransformControlPoint(ControlPoint cp, Matrix2D transformation)
-        {
-            PropertyInfo prop = GetType().GetProperty(cp.PropertyName);
-            Point2D point = cp.Location.Transform(transformation);
-
-            if (cp.PropertyIndex == -1)
-            {
-                if (cp.Type == ControlPoint.ControlPointType.Point)
-                    prop.SetValue(this, point);
-                else if (cp.Type == ControlPoint.ControlPointType.Angle)
-                    prop.SetValue(this, (point - cp.BasePoint).Angle);
-                else if (cp.Type == ControlPoint.ControlPointType.Distance)
-                    prop.SetValue(this, (point - cp.BasePoint).Length);
-            }
-            else
-            {
-                if (cp.Type == ControlPoint.ControlPointType.Point)
-                {
-                    IList<Point2D> items = (IList<Point2D>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = point;
-                }
-                else if (cp.Type == ControlPoint.ControlPointType.Angle)
-                {
-                    IList<float> items = (IList<float>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = (point - cp.BasePoint).Angle;
-                }
-                else if (cp.Type == ControlPoint.ControlPointType.Distance)
-                {
-                    IList<float> items = (IList<float>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = (point - cp.BasePoint).Length;
-                }
-            }
-        }
+        public virtual void TransformControlPoint(int index, Matrix2D transformation) { }
 
         public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
 
