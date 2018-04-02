@@ -2,10 +2,8 @@
 using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace SimpleCAD

@@ -1,6 +1,4 @@
 ﻿using SimpleCAD.Geometry;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace SimpleCAD.Drawables
 {
