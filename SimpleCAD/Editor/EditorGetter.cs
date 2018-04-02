@@ -8,7 +8,6 @@ namespace SimpleCAD
     internal abstract class EditorGetter<TOptions, TValue> : IDisposable where TOptions : InputOptions<TValue>
     {
         private Drawable jigged = null;
-        private string currentText = "";
 
         protected Editor Editor { get; private set; }
         protected TOptions Options { get; private set; }
@@ -24,6 +23,7 @@ namespace SimpleCAD
                     Editor.Document.Jigged.Add(jigged);
             }
         }
+        protected string CurrentText { get; private set; } = "";
         protected bool SpaceAccepts { get; set; } = true;
         protected TaskCompletionSource<InputResult<TValue>> Completion { get; private set; }
 
@@ -101,7 +101,7 @@ namespace SimpleCAD
                 }
                 else
                 {
-                    currentText = "";
+                    CurrentText = "";
                     Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                 }
             }
@@ -123,7 +123,7 @@ namespace SimpleCAD
             }
             else if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || (SpaceAccepts && e.KeyCode == Keys.Space))
             {
-                string keyword = Options.MatchKeyword(currentText);
+                string keyword = Options.MatchKeyword(CurrentText);
 
                 if (!string.IsNullOrEmpty(keyword))
                 {
@@ -131,9 +131,9 @@ namespace SimpleCAD
                     var result = InputResult<TValue>.KeywordResult(keyword);
                     Completion.SetResult(result);
                 }
-                else
+                else if (!string.IsNullOrEmpty(CurrentText))
                 {
-                    var args = new InputArgs<string, TValue>(currentText);
+                    var args = new InputArgs<string, TValue>(CurrentText);
                     AcceptTextInput(args);
                     if (args.InputValid)
                     {
@@ -144,9 +144,16 @@ namespace SimpleCAD
                     }
                     else
                     {
-                        currentText = "";
+                        CurrentText = "";
                         Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                     }
+                }
+                else
+                {
+                    Editor.DoPrompt("");
+                    CancelInput();
+                    var result = InputResult<TValue>.CancelResult();
+                    Completion.SetResult(result);
                 }
             }
         }
@@ -157,27 +164,27 @@ namespace SimpleCAD
 
             if (e.KeyChar == '\b') // backspace
             {
-                if (currentText.Length > 0)
+                if (CurrentText.Length > 0)
                 {
-                    currentText = currentText.Remove(currentText.Length - 1);
+                    CurrentText = CurrentText.Remove(CurrentText.Length - 1);
                     textChanged = true;
                 }
             }
             else if (e.KeyChar == ' ' && !SpaceAccepts)
             {
-                currentText += e.KeyChar;
+                CurrentText += e.KeyChar;
                 textChanged = true;
             }
             else if (!char.IsControl(e.KeyChar))
             {
-                currentText += e.KeyChar;
+                CurrentText += e.KeyChar;
                 textChanged = true;
             }
 
             if (textChanged)
             {
-                Editor.DoPrompt(Options.GetFullPrompt() + currentText);
-                TextChanged(currentText);
+                Editor.DoPrompt(Options.GetFullPrompt() + CurrentText);
+                TextChanged(CurrentText);
             }
         }
 
