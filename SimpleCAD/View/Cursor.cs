@@ -29,7 +29,9 @@ namespace SimpleCAD.View
             var doc = view.Document;
 
             Extents2D ex = view.GetViewport();
-            Style cursorStyle = new Style(doc.Settings.Get<Color>("CursorColor"));
+            Color c = doc.Settings.Get<Color>("BackColor");
+            var luma = (int)Math.Sqrt(c.R * c.R * .299 + c.G * c.G * .587 + c.B * c.B * .114);
+            Style cursorStyle = new Style(luma > 130 ? Color.Black : Color.White);
             float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize") + 4, 0)).X / 2;
             float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize"), 0)).X / 2;
             float pxSize = view.ScreenToWorld(new Vector2D(1, 0)).X / 2;
