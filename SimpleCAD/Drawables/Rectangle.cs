@@ -1,7 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using System;
 using System.ComponentModel;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -48,6 +47,8 @@ namespace SimpleCAD.Drawables
             UpdatePolyline();
         }
 
+        public Rectangle() { }
+
         public Rectangle(float x, float y, float width, float height, float rotation = 0)
             : this(new Point2D(x, y), width, height, rotation)
         {
@@ -74,7 +75,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            poly.Style = Style;
+            poly.Style = Style.ApplyLayer(Layer);
             renderer.Draw(poly);
         }
 
@@ -115,20 +116,21 @@ namespace SimpleCAD.Drawables
                 Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
         }
 
-        public Rectangle(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            Center = new Point2D(reader);
-            Rotation = reader.ReadSingle();
-            Corner = new Point2D(reader);
+            base.Load(reader);
+            Center = reader.ReadPoint2D();
+            Rotation = reader.ReadFloat();
+            Corner = reader.ReadPoint2D();
             UpdatePolyline();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Center.Save(writer);
+            writer.Write(Center);
             writer.Write(Rotation);
-            Corner.Save(writer);
+            writer.Write(Corner);
         }
     }
 }

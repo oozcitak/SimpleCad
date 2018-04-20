@@ -1,11 +1,9 @@
 ﻿using SimpleCAD.Geometry;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
-    public class Line : Drawable, IPersistable
+    public class Line : Drawable
     {
         private Point2D p1;
         private Point2D p2;
@@ -22,6 +20,8 @@ namespace SimpleCAD.Drawables
         [Browsable(false)]
         public float Y2 { get { return EndPoint.Y; } }
 
+        public Line() { }
+
         public Line(Point2D p1, Point2D p2)
         {
             StartPoint = p1;
@@ -36,7 +36,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            renderer.DrawLine(Style, StartPoint, EndPoint);
+            renderer.DrawLine(Style.ApplyLayer(Layer), StartPoint, EndPoint);
         }
 
         public override Extents2D GetExtents()
@@ -79,17 +79,18 @@ namespace SimpleCAD.Drawables
                 EndPoint = EndPoint.Transform(transformation);
         }
 
-        public Line(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            StartPoint = new Point2D(reader);
-            EndPoint = new Point2D(reader);
+            base.Load(reader);
+            StartPoint = reader.ReadPoint2D();
+            EndPoint = reader.ReadPoint2D();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            StartPoint.Save(writer);
-            EndPoint.Save(writer);
+            writer.Write(StartPoint);
+            writer.Write(EndPoint);
         }
     }
 }

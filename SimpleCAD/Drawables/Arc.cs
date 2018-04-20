@@ -1,8 +1,5 @@
 ﻿using SimpleCAD.Geometry;
-using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -23,6 +20,8 @@ namespace SimpleCAD.Drawables
         [Browsable(false)]
         public float Y { get { return Center.Y; } }
 
+        public Arc() { }
+
         public Arc(Point2D center, float radius, float startAngle, float endAngle)
         {
             Center = center;
@@ -39,7 +38,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            renderer.DrawArc(Style, Center, Radius, StartAngle, EndAngle);
+            renderer.DrawArc(Style.ApplyLayer(Layer), Center, Radius, StartAngle, EndAngle);
         }
 
         public override Extents2D GetExtents()
@@ -79,28 +78,29 @@ namespace SimpleCAD.Drawables
 
         public override void TransformControlPoint(int index, Matrix2D transformation)
         {
-                if (index == 0)
-                    Center = Center.Transform(transformation);
-                else if (index == 1)
-                    Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
-                else if (index == 2)
-                    StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
-                else if (index == 3)
-                    EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
+            if (index == 0)
+                Center = Center.Transform(transformation);
+            else if (index == 1)
+                Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
+            else if (index == 2)
+                StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+            else if (index == 3)
+                EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
         }
 
-        public Arc(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            Center = new Point2D(reader);
-            Radius = reader.ReadSingle();
-            StartAngle = reader.ReadSingle();
-            EndAngle = reader.ReadSingle();
+            base.Load(reader);
+            Center = reader.ReadPoint2D();
+            Radius = reader.ReadFloat();
+            StartAngle = reader.ReadFloat();
+            EndAngle = reader.ReadFloat();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Center.Save(writer);
+            writer.Write(Center);
             writer.Write(Radius);
             writer.Write(StartAngle);
             writer.Write(EndAngle);

@@ -1,7 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using System;
 using System.ComponentModel;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -27,6 +26,8 @@ namespace SimpleCAD.Drawables
         private Polyline poly;
         private float curveLength = 4;
         private float cpSize = 0;
+
+        public Ellipse() { }
 
         public Ellipse(Point2D center, float semiMajor, float semiMinor, float rotation = 0)
         {
@@ -74,7 +75,7 @@ namespace SimpleCAD.Drawables
                 UpdatePolyline();
             }
 
-            poly.Style = Style;
+            poly.Style = Style.ApplyLayer(Layer);
             renderer.Draw(poly);
         }
 
@@ -119,19 +120,20 @@ namespace SimpleCAD.Drawables
                 Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
         }
 
-        public Ellipse(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            Center = new Point2D(reader);
-            SemiMajorAxis = reader.ReadSingle();
-            SemiMinorAxis = reader.ReadSingle();
-            Rotation = reader.ReadSingle();
+            base.Load(reader);
+            Center = reader.ReadPoint2D();
+            SemiMajorAxis = reader.ReadFloat();
+            SemiMinorAxis = reader.ReadFloat();
+            Rotation = reader.ReadFloat();
             UpdatePolyline();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Center.Save(writer);
+            writer.Write(Center);
             writer.Write(SemiMajorAxis);
             writer.Write(SemiMinorAxis);
             writer.Write(Rotation);

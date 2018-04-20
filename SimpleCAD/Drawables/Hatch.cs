@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -37,16 +36,6 @@ namespace SimpleCAD.Drawables
             renderer.DrawPolygon(Style, Points);
             Style.Fill = false;
             renderer.DrawPolygon(Style, Points);
-        }
-
-        public Hatch(BinaryReader reader) : base(reader)
-        {
-            ;
-        }
-
-        public override void Save(BinaryWriter writer)
-        {
-            base.Save(writer);
         }
     }
 }

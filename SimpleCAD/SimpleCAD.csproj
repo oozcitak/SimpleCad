@@ -70,6 +70,12 @@
     <Compile Include="Commands\Command_Edit.cs" />
     <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="Document\DocumentWriter.cs" />
+    <Compile Include="Document\DocumentReader.cs" />
+    <Compile Include="Document\IDict.cs" />
+    <Compile Include="Document\LayerDictionary.cs" />
+    <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
+    <Compile Include="Document\PersistableDictionary.cs" />
     <Compile Include="Drawables\Polygon.cs" />
     <Compile Include="Editor\FloatGetter.cs" />
     <Compile Include="Editor\SelectionGetter.cs" />
@@ -85,6 +91,7 @@
     <Compile Include="Editor\AngleGetter.cs" />
     <Compile Include="Editor\PointGetter.cs" />
     <Compile Include="Editor\EditorGetter.cs" />
+    <Compile Include="Graphics\Layer.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />
@@ -110,7 +117,6 @@
     <Compile Include="Editor\EditorEvents.cs" />
     <Compile Include="Geometry\Vector2DConverter.cs" />
     <Compile Include="Geometry\Point2DConverter.cs" />
-    <Compile Include="Graphics\StyleConverter.cs" />
     <Compile Include="Geometry\Point2DCollection.cs" />
     <Compile Include="View\CADView.cs" />
     <Compile Include="CADWindow.cs">

@@ -1,6 +1,5 @@
 ﻿using SimpleCAD.Geometry;
 using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -12,6 +11,5 @@ namespace SimpleCAD.Drawables
         public Polygon(Point2DCollection pts) : base(pts) { }
         public Polygon(params Point2D[] pts) : base(pts) { }
         public Polygon(PointF[] pts) : base(pts) { }
-        public Polygon(BinaryReader reader) : base(reader) { }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using SimpleCAD.Drawables;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -19,6 +18,8 @@ namespace SimpleCAD
         public Settings Settings { get; private set; }
         public CADView ActiveView { get; internal set; }
 
+        public LayerDictionary Layers { get; private set; }
+
         public string FileName { get; private set; }
         public bool IsModified { get; private set; } = false;
 
@@ -28,12 +29,16 @@ namespace SimpleCAD
 
         public CADDocument()
         {
-            Model = new Composite();
+            Model = new Composite(this);
             Editor = new Editor(this);
+
             Settings = new Settings();
+            Layers = new LayerDictionary();
             Jigged = new Composite();
             Transients = new Composite();
+
             ActiveView = null;
+
             Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
             Model.CollectionChanged += Model_CollectionChanged;
             Jigged.CollectionChanged += Jigged_CollectionChanged;
@@ -44,13 +49,17 @@ namespace SimpleCAD
             Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
             Model.CollectionChanged -= Model_CollectionChanged;
             Jigged.CollectionChanged -= Jigged_CollectionChanged;
-            Model = new Composite();
+
             Settings = new Settings();
+            Layers = new LayerDictionary();
+            Model = new Composite(this);
             Jigged = new Composite();
             Transients = new Composite();
+
             Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
             Model.CollectionChanged += Model_CollectionChanged;
             Jigged.CollectionChanged += Jigged_CollectionChanged;
+
             OnDocumentChanged(new EventArgs());
             IsModified = false;
             FileName = "";
@@ -58,15 +67,19 @@ namespace SimpleCAD
 
         public void Open(Stream stream)
         {
-            using (BinaryReader reader = new BinaryReader(stream))
+            using (var reader = new DocumentReader(this, stream))
             {
                 Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
                 Model.CollectionChanged -= Model_CollectionChanged;
                 Jigged.CollectionChanged -= Jigged_CollectionChanged;
-                Model = new Composite(reader);
-                Settings = new Settings(reader);
+
+                Settings.Load(reader);
+                Layers.Load(reader);
+                Model.Load(reader);
+
                 Jigged = new Composite();
                 Transients = new Composite();
+
                 Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
                 Model.CollectionChanged += Model_CollectionChanged;
                 Jigged.CollectionChanged += Jigged_CollectionChanged;
@@ -88,10 +101,12 @@ namespace SimpleCAD
 
         public void Save(Stream stream)
         {
-            using (BinaryWriter writer = new BinaryWriter(stream))
+            using (var writer = new DocumentWriter(this, stream))
             {
-                Model.Save(writer);
                 Settings.Save(writer);
+                Layers.Save(writer);
+                Model.Save(writer);
+
                 FileName = "";
                 IsModified = false;
             }

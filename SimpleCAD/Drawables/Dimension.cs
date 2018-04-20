@@ -1,8 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -38,6 +36,8 @@ namespace SimpleCAD.Drawables
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Scale { get => scale; set { scale = value; NotifyPropertyChanged(); } }
         public int Precision { get => precision; set { precision = value; NotifyPropertyChanged(); } }
+
+        public Dimension() { }
 
         public Dimension(Point2D p1, Point2D p2, float textHeight)
         {
@@ -112,17 +112,17 @@ namespace SimpleCAD.Drawables
 
             // Dimension line
             Line dim = new Line(0, Offset, len, Offset);
-            dim.Style = Style;
+            dim.Style = Style.ApplyLayer(Layer);
             items.Add(dim);
 
             // Left tick
             Line tick1 = new Line(0, -tickSize + Offset, 0, tickSize + Offset);
-            tick1.Style = Style;
+            tick1.Style = Style.ApplyLayer(Layer);
             items.Add(tick1);
 
             // Right tick
             Line tick2 = new Line(len, -tickSize + Offset, len, tickSize + Offset);
-            tick2.Style = Style;
+            tick2.Style = Style.ApplyLayer(Layer);
             items.Add(tick2);
 
             // Text
@@ -133,7 +133,7 @@ namespace SimpleCAD.Drawables
             textObj.FontStyle = FontStyle;
             textObj.HorizontalAlignment = TextHorizontalAlignment.Center;
             textObj.VerticalAlignment = TextVerticalAlignment.Middle;
-            textObj.Style = Style;
+            textObj.Style = Style.ApplyLayer(Layer);
             items.Add(textObj);
 
             Matrix2D trans = Matrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);
@@ -159,24 +159,25 @@ namespace SimpleCAD.Drawables
                 EndPoint = EndPoint.Transform(transformation);
         }
 
-        public Dimension(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            StartPoint = new Point2D(reader);
-            EndPoint = new Point2D(reader);
-            TextHeight = reader.ReadSingle();
-            Offset = reader.ReadSingle();
+            base.Load(reader);
+            StartPoint = reader.ReadPoint2D();
+            EndPoint = reader.ReadPoint2D();
+            TextHeight = reader.ReadFloat();
+            Offset = reader.ReadFloat();
             String = reader.ReadString();
             FontFamily = reader.ReadString();
-            FontStyle = (FontStyle)reader.ReadInt32();
-            Scale = reader.ReadSingle();
-            Precision = reader.ReadInt32();
+            FontStyle = (FontStyle)reader.ReadInt();
+            Scale = reader.ReadFloat();
+            Precision = reader.ReadInt();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            StartPoint.Save(writer);
-            EndPoint.Save(writer);
+            writer.Write(StartPoint);
+            writer.Write(EndPoint);
             writer.Write(TextHeight);
             writer.Write(Offset);
             writer.Write(String);

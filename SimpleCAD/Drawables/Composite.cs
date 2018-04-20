@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
@@ -11,26 +10,32 @@ namespace SimpleCAD.Drawables
     {
         List<Drawable> items = new List<Drawable>();
 
+        public CADDocument Document { get; private set; }
+
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public Composite()
+        public Composite() { }
+
+        public Composite(CADDocument document)
         {
-            ;
+            Document = document;
         }
 
-        public Composite(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            int count = reader.ReadInt32();
+            base.Load(reader);
+            int count = reader.ReadInt();
             for (int i = 0; i < count; i++)
             {
                 string name = reader.ReadString();
                 Type itemType = Type.GetType(name);
-                Drawable item = (Drawable)Activator.CreateInstance(itemType, reader);
+                Drawable item = (Drawable)Activator.CreateInstance(itemType);
+                item.Load(reader);
                 items.Add(item);
             }
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
             writer.Write(items.Count);
@@ -45,7 +50,7 @@ namespace SimpleCAD.Drawables
         {
             foreach (Drawable item in items)
             {
-                if (item.Visible)
+                if (item.Visible && (item.Layer == null || item.Layer.Visible))
                 {
                     renderer.Draw(item);
                 }
@@ -57,7 +62,7 @@ namespace SimpleCAD.Drawables
             Extents2D extents = new Extents2D();
             foreach (Drawable item in items)
             {
-                if (item.Visible) extents.Add(item.GetExtents());
+                if (item.Visible && item.Layer.Visible) extents.Add(item.GetExtents());
             }
             return extents;
         }
@@ -66,7 +71,7 @@ namespace SimpleCAD.Drawables
         {
             foreach (Drawable d in items)
             {
-                if (d.Contains(pt, pickBoxSize)) return true;
+                if (d.Visible && d.Layer.Visible && d.Contains(pt, pickBoxSize)) return true;
             }
             return false;
         }
@@ -146,7 +151,16 @@ namespace SimpleCAD.Drawables
             if (e.NewItems != null)
             {
                 foreach (Drawable item in e.NewItems)
+                {
+                    if (Document != null)
+                    {
+                        if (item.Layer == null)
+                            item.Layer = Document.Layers.Default;
+                        if (!Document.Layers.ContainsKey(item.Layer.Name))
+                            Document.Layers.Add(item.Layer.Name, item.Layer);
+                    }
                     item.PropertyChanged += Drawable_PropertyChanged;
+                }
             }
             if (e.OldItems != null)
             {

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using SimpleCAD.Graphics;
+﻿using SimpleCAD.Graphics;
+using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 
 namespace SimpleCAD
 {
@@ -14,27 +13,29 @@ namespace SimpleCAD
             public string Name { get; protected set; }
             public object Value { get; set; }
 
+            public Setting() { }
+
             public Setting(string name, object value)
             {
                 Name = name;
                 Value = value;
             }
 
-            public Setting(BinaryReader reader)
+            public void Load(DocumentReader reader)
             {
                 Name = reader.ReadString();
                 string valueType = reader.ReadString();
                 if (valueType == "int")
                 {
-                    Value = reader.ReadInt32();
+                    Value = reader.ReadInt();
                 }
                 else if (valueType == "color")
                 {
-                    Value = Color.FromArgb(reader.ReadUInt32());
+                    Value = reader.ReadColor();
                 }
             }
 
-            public void Save(BinaryWriter writer)
+            public void Save(DocumentWriter writer)
             {
                 writer.Write(Name);
                 if (Value is int)
@@ -45,7 +46,7 @@ namespace SimpleCAD
                 else if (Value is Color)
                 {
                     writer.Write("color");
-                    writer.Write(((Color)Value).Argb);
+                    writer.Write((Color)Value);
                 }
             }
         }
@@ -103,19 +104,21 @@ namespace SimpleCAD
             UpdateSettings();
         }
 
-        public Settings(BinaryReader reader)
+        public void Load(DocumentReader reader)
         {
-            int count = reader.ReadInt32();
+            items = new Dictionary<string, Setting>();
+            int count = reader.ReadInt();
             for (int i = 0; i < count; i++)
             {
-                Setting s = new Setting(reader);
+                Setting s = new Setting();
+                s.Load(reader);
                 items.Add(s.Name, s);
             }
 
             UpdateSettings();
         }
 
-        public void Save(BinaryWriter writer)
+        public void Save(DocumentWriter writer)
         {
             writer.Write(items.Count);
             foreach (Setting s in items.Values)

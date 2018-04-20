@@ -1,10 +1,8 @@
-﻿using System.IO;
-
-namespace SimpleCAD
+﻿namespace SimpleCAD
 {
     public interface IPersistable
     {
-        // Constructor(BinaryReader reader);
-        void Save(BinaryWriter writer);
+        void Load(DocumentReader reader);
+        void Save(DocumentWriter writer);
     }
 }

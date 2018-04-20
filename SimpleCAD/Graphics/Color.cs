@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -164,7 +165,7 @@ namespace SimpleCAD.Graphics
         private readonly byte _g;
         private readonly byte _b;
 
-        private bool IsByLayer { get { return _byLayer; } }
+        public bool IsByLayer { get { return _byLayer; } }
 
         public uint Argb { get { return _argb; } }
         public byte A { get { return _a; } }
@@ -311,6 +312,12 @@ namespace SimpleCAD.Graphics
         public static Color FromKnownColor(KnownColor colorName)
         {
             return new Color(colorName);
+        }
+
+        public static Color Random()
+        {
+            Random rnd = new Random();
+            return new Color((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
         }
         #endregion
 
