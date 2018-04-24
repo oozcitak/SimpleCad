@@ -159,11 +159,11 @@ namespace SimpleCAD
 
         public void Detach()
         {
+            Width = 1;
+            Height = 1;
+
             if (control != null)
             {
-                Width = 1;
-                Height = 1;
-
                 control.Resize -= CadView_Resize;
                 control.MouseDown -= CadView_MouseDown;
                 control.MouseUp -= CadView_MouseUp;
