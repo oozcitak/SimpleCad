@@ -29,11 +29,11 @@ namespace SimpleCAD
 
         public CADDocument()
         {
-            Model = new Composite(this);
             Editor = new Editor(this);
 
             Settings = new Settings();
             Layers = new LayerDictionary();
+            Model = new Composite(this);
             Jigged = new Composite();
             Transients = new Composite();
 

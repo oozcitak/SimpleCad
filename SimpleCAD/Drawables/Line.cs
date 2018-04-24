@@ -1,5 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace SimpleCAD.Drawables
 {
@@ -47,6 +48,7 @@ namespace SimpleCAD.Drawables
             return extents;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void TransformBy(Matrix2D transformation)
         {
             StartPoint = StartPoint.Transform(transformation);

@@ -63,7 +63,17 @@ namespace SimpleCAD
 
         public Color ReadColor()
         {
-            return new Color(ReadUInt());
+            bool isByLayer = ReadBoolean();
+            return new Color(ReadUInt(), isByLayer);
+        }
+
+        public T ReadPersistable<T>() where T : IPersistable
+        {
+            string typeName = ReadString();
+            Type itemType = Type.GetType(typeName);
+            T item = (T)Activator.CreateInstance(itemType);
+            item.Load(this);
+            return item;
         }
 
         public void Dispose()

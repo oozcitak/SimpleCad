@@ -156,58 +156,61 @@ namespace SimpleCAD.Graphics
     [TypeConverter(typeof(ColorConverter))]
     public struct Color
     {
+
         #region Properties
-        private readonly bool _byLayer;
+        public bool IsByLayer { get; }
 
-        private readonly uint _argb;
-        private readonly byte _a;
-        private readonly byte _r;
-        private readonly byte _g;
-        private readonly byte _b;
-
-        public bool IsByLayer { get { return _byLayer; } }
-
-        public uint Argb { get { return _argb; } }
-        public byte A { get { return _a; } }
-        public byte R { get { return _r; } }
-        public byte G { get { return _g; } }
-        public byte B { get { return _b; } }
+        public uint Argb { get; }
+        public byte A { get; }
+        public byte R { get; }
+        public byte G { get; }
+        public byte B { get; }
         #endregion
 
         #region Constructors
         private Color(bool byLayer)
         {
-            _byLayer = byLayer;
-            _argb = 0;
-            _a = _r = _g = _b = 0;
+            IsByLayer = byLayer;
+            Argb = 0;
+            A = R = G = B = 0;
         }
 
         private Color(KnownColor colorName)
         {
             if (colorName == KnownColor.ByLayer)
             {
-                _byLayer = true;
-                _argb = 0;
-                _a = _r = _g = _b = 0;
+                IsByLayer = true;
+                Argb = 0;
+                A = R = G = B = 0;
             }
             else
             {
-                _byLayer = false;
-                _argb = knownColorLookup[colorName];
-                _a = (byte)((_argb >> 24) & 255);
-                _r = (byte)((_argb >> 16) & 255);
-                _g = (byte)((_argb >> 8) & 255);
-                _b = (byte)(_argb & 255);
+                IsByLayer = false;
+                Argb = knownColorLookup[colorName];
+                A = (byte)((Argb >> 24) & 255);
+                R = (byte)((Argb >> 16) & 255);
+                G = (byte)((Argb >> 8) & 255);
+                B = (byte)(Argb & 255);
             }
         }
 
-        public Color(uint color) : this(false)
+        public Color(uint color, bool isByLayer)
         {
-            _argb = color;
-            _a = (byte)((color >> 24) & 255);
-            _r = (byte)((color >> 16) & 255);
-            _g = (byte)((color >> 8) & 255);
-            _b = (byte)(color & 255);
+            if (isByLayer)
+            {
+                IsByLayer = true;
+                Argb = 0;
+                A = R = G = B = 0;
+            }
+            else
+            {
+                IsByLayer = false;
+                Argb = color;
+                A = (byte)((color >> 24) & 255);
+                R = (byte)((color >> 16) & 255);
+                G = (byte)((color >> 8) & 255);
+                B = (byte)(color & 255);
+            }
         }
 
         public Color(byte r, byte g, byte b) : this(255, r, g, b)
@@ -217,11 +220,11 @@ namespace SimpleCAD.Graphics
 
         public Color(byte a, byte r, byte g, byte b) : this(false)
         {
-            _argb = ((uint)a << 24) + ((uint)r << 16) + ((uint)g << 8) + (uint)b;
-            _a = a;
-            _r = r;
-            _g = g;
-            _b = b;
+            Argb = ((uint)a << 24) + ((uint)r << 16) + ((uint)g << 8) + (uint)b;
+            A = a;
+            R = r;
+            G = g;
+            B = b;
         }
 
         public Color(byte alpha, Color color) : this(alpha, color.R, color.G, color.B)
@@ -246,12 +249,12 @@ namespace SimpleCAD.Graphics
 
         public override int GetHashCode()
         {
-            return (int)_argb;
+            return (int)Argb;
         }
 
         public string ToHex()
         {
-            return "#" + _argb.ToString("X8");
+            return "#" + Argb.ToString("X8");
         }
 
         public bool IsKnownColor()
@@ -286,12 +289,12 @@ namespace SimpleCAD.Graphics
         public static Color FromHex(string hex)
         {
             uint argb = uint.Parse(hex.Replace("#", ""), NumberStyles.HexNumber);
-            return new Color(argb);
+            return new Color(argb, false);
         }
 
         public static Color FromArgb(uint argb)
         {
-            return new Color(argb);
+            return new Color(argb, false);
         }
 
         public static Color FromArgb(byte a, byte r, byte g, byte b)

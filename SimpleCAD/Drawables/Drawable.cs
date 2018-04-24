@@ -34,16 +34,23 @@ namespace SimpleCAD
         {
             string layerName = reader.ReadString();
             Layer = reader.Document.Layers[layerName];
-            Style = new Style();
-            Style.Load(reader);
+            Style = reader.ReadPersistable<Style>();
             Visible = reader.ReadBoolean();
         }
 
         public virtual void Save(DocumentWriter writer)
         {
             writer.Write(Layer.Name);
-            Style.Save(writer);
+            writer.Write(Style);
             writer.Write(Visible);
+        }
+
+        public void SetDefaults(CADDocument document)
+        {
+            if (Layer == null)
+                Layer = document.Layers.Default;
+            if (Style == null)
+                Style = Style.Default;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using SimpleCAD.Geometry;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -19,6 +18,7 @@ namespace SimpleCAD.Drawables
         public Composite(CADDocument document)
         {
             Document = document;
+            SetDefaults(document);
         }
 
         public override void Load(DocumentReader reader)
@@ -27,22 +27,20 @@ namespace SimpleCAD.Drawables
             int count = reader.ReadInt();
             for (int i = 0; i < count; i++)
             {
-                string name = reader.ReadString();
-                Type itemType = Type.GetType(name);
-                Drawable item = (Drawable)Activator.CreateInstance(itemType);
-                item.Load(reader);
+                Drawable item = reader.ReadPersistable<Drawable>();
                 items.Add(item);
             }
         }
 
         public override void Save(DocumentWriter writer)
         {
+            SetDefaults(Document);
             base.Save(writer);
             writer.Write(items.Count);
-            foreach (Drawable item in items)
+            foreach (var item in items)
             {
-                writer.Write(item.GetType().FullName);
-                item.Save(writer);
+                item.SetDefaults(Document);
+                writer.Write(item);
             }
         }
 

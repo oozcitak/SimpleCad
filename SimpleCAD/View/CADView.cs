@@ -114,38 +114,17 @@ namespace SimpleCAD
             Document.TransientsChanged += Document_TransientsChanged;
             Document.SelectionChanged += Document_SelectionChanged;
             Document.Editor.Prompt += Editor_Prompt;
+            Document.Editor.Error += Editor_Error;
         }
 
         public void Attach(Control ctrl)
         {
-            if (control != null)
-            {
-                Width = 1;
-                Height = 1;
-
-                Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-
-                control.Resize -= CadView_Resize;
-                control.MouseDown -= CadView_MouseDown;
-                control.MouseUp -= CadView_MouseUp;
-                control.MouseMove -= CadView_MouseMove;
-                control.MouseClick -= CadView_MouseClick;
-                control.MouseDoubleClick -= CadView_MouseDoubleClick;
-                control.MouseWheel -= CadView_MouseWheel;
-                control.KeyDown -= CadView_KeyDown;
-                control.KeyPress -= CadView_KeyPress;
-                control.Paint -= CadView_Paint;
-                control.MouseEnter -= CadView_MouseEnter;
-                control.MouseLeave -= CadView_MouseLeave;
-                control.GotFocus -= Control_GotFocus;
-                control.LostFocus -= Control_LostFocus;
-            }
-
             if (renderer != null)
-            {
                 rendererType = renderer.GetType();
-                renderer.Dispose();
-            }
+
+            Detach();
+
+            Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
 
             control = ctrl;
 
@@ -176,6 +155,33 @@ namespace SimpleCAD
             control.LostFocus += Control_LostFocus;
 
             control.Invalidate();
+        }
+
+        public void Detach()
+        {
+            if (control != null)
+            {
+                Width = 1;
+                Height = 1;
+
+                control.Resize -= CadView_Resize;
+                control.MouseDown -= CadView_MouseDown;
+                control.MouseUp -= CadView_MouseUp;
+                control.MouseMove -= CadView_MouseMove;
+                control.MouseClick -= CadView_MouseClick;
+                control.MouseDoubleClick -= CadView_MouseDoubleClick;
+                control.MouseWheel -= CadView_MouseWheel;
+                control.KeyDown -= CadView_KeyDown;
+                control.KeyPress -= CadView_KeyPress;
+                control.Paint -= CadView_Paint;
+                control.MouseEnter -= CadView_MouseEnter;
+                control.MouseLeave -= CadView_MouseLeave;
+                control.GotFocus -= Control_GotFocus;
+                control.LostFocus -= Control_LostFocus;
+            }
+
+            if (renderer != null)
+                renderer.Dispose();
         }
 
         private void Control_LostFocus(object sender, EventArgs e)
@@ -420,6 +426,12 @@ namespace SimpleCAD
             control.Invalidate();
         }
 
+        private void Editor_Error(object sender, EditorErrorEventArgs e)
+        {
+            ViewItems.Cursor.Message = e.Error.Message;
+            control.Invalidate();
+        }
+
         void CadView_Resize(object sender, EventArgs e)
         {
             Resize(control.ClientRectangle.Width, control.ClientRectangle.Height);
@@ -642,6 +654,7 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.PickedSelection.Clear();
+                ViewItems.Cursor.Message = "";
             }
         }
 
@@ -693,6 +706,12 @@ namespace SimpleCAD
 
         protected virtual void Dispose(bool disposing)
         {
+            Document.DocumentChanged -= Document_Changed;
+            Document.TransientsChanged -= Document_TransientsChanged;
+            Document.SelectionChanged -= Document_SelectionChanged;
+            Document.Editor.Prompt -= Editor_Prompt;
+            Document.Editor.Error -= Editor_Error;
+
             if (renderer != null)
                 renderer.Dispose();
             renderer = null;

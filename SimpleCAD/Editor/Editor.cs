@@ -15,6 +15,7 @@ namespace SimpleCAD
         internal bool InputMode { get; set; } = false;
 
         public event EditorPromptEventHandler Prompt;
+        public event EditorErrorEventHandler Error;
 
         internal event CursorEventHandler CursorMove;
         internal event CursorEventHandler CursorClick;
@@ -62,12 +63,19 @@ namespace SimpleCAD
             {
                 Command com = commands[registeredName];
                 Command clearSelection = new Commands.SelectionClear();
-                Task runTask = com.Apply(Document, args);
-                runTask.ContinueWith(a => clearSelection.Apply(Document, args));
+                Task runTask = com.Apply(Document, args).ContinueWith(
+                    (t) =>
+                    {
+                        if (t.IsFaulted)
+                            OnError(new EditorErrorEventArgs(t.Exception));
+                        else if (t.IsCompleted)
+                            clearSelection.Apply(Document, args);
+                    }
+                );
             }
             else
             {
-                throw new InvalidOperationException("Unknown command name: " + registeredName);
+                OnError(new EditorErrorEventArgs(new InvalidOperationException("Unknown command name: " + registeredName)));
             }
         }
 
@@ -259,6 +267,11 @@ namespace SimpleCAD
         protected void OnPrompt(EditorPromptEventArgs e)
         {
             Prompt?.Invoke(this, e);
+        }
+
+        protected void OnError(EditorErrorEventArgs e)
+        {
+            Error?.Invoke(this, e);
         }
     }
 }
