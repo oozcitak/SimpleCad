@@ -255,30 +255,19 @@ namespace SimpleCAD.Graphics
 
         private System.Drawing.Pen CreatePen(Style style)
         {
-            if (StyleOverride != null)
-            {
-                var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb((int)StyleOverride.Color.Argb), GetScaledLineWeight(StyleOverride.LineWeight));
-                pen.DashStyle = (System.Drawing.Drawing2D.DashStyle)StyleOverride.DashStyle;
-                return pen;
-            }
-            else
-            {
-                var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb((int)style.Color.Argb), GetScaledLineWeight(style.LineWeight));
-                pen.DashStyle = (System.Drawing.Drawing2D.DashStyle)style.DashStyle;
-                return pen;
-            }
+            Style appliedStyle = (StyleOverride == null ? style : StyleOverride);
+
+            var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb((int)(appliedStyle.Color.IsByLayer ? Color.White : appliedStyle.Color).Argb));
+            pen.Width = GetScaledLineWeight(appliedStyle.LineWeight == Style.ByLayer ? 1 : appliedStyle.LineWeight);
+            pen.DashStyle = appliedStyle.DashStyle == DashStyle.ByLayer ? System.Drawing.Drawing2D.DashStyle.Solid : (System.Drawing.Drawing2D.DashStyle)appliedStyle.DashStyle;
+            return pen;
         }
 
         private System.Drawing.Brush CreateBrush(Style style)
         {
-            if (StyleOverride != null)
-            {
-                return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)StyleOverride.Color.Argb));
-            }
-            else
-            {
-                return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)style.Color.Argb));
-            }
+            Style appliedStyle = (StyleOverride == null ? style : StyleOverride);
+
+            return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)(appliedStyle.Color.IsByLayer ? Color.White : appliedStyle.Color).Argb));
         }
     }
 }
