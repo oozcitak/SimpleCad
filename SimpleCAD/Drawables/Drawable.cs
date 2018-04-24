@@ -1,13 +1,11 @@
 ﻿using SimpleCAD.Drawables;
 using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace SimpleCAD
 {
-    [Serializable]
     public abstract class Drawable : INotifyPropertyChanged, IPersistable
     {
         public Style Style { get; set; } = Style.Default;

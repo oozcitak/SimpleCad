@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace SimpleCAD.Graphics
 {
@@ -13,7 +12,6 @@ namespace SimpleCAD.Graphics
         DashDotDot = 4,
     }
 
-    [Serializable]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Style : IPersistable
     {

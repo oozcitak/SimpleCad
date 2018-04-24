@@ -113,7 +113,6 @@ namespace SimpleCADTest
 
         private void btnDrawLine_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Layers.Default.Style.Color = SimpleCAD.Graphics.Color.Random();
             cadWindow1.Document.Editor.RunCommand("Primitives.Line");
         }
 
