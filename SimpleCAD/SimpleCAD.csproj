@@ -100,7 +100,6 @@
     <Compile Include="View\Camera.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\Color.cs" />
-    <Compile Include="Graphics\SafeNativeMethods.cs" />
     <Compile Include="Graphics\DirectXRenderer.cs" />
     <Compile Include="Graphics\OpenGLRenderer.cs" />
     <Compile Include="Graphics\GDIRenderer.cs" />

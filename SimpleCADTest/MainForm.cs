@@ -22,10 +22,12 @@ namespace SimpleCADTest
             {
                 if (type.BaseType == typeof(Renderer))
                 {
-                    Renderer renderer = (Renderer)Activator.CreateInstance(type, cadWindow1.View);
-                    btnRenderer.Items.Add(renderer);
-                    if (renderer.GetType() == cadWindow1.View.Renderer.GetType())
-                        selectedObject = renderer;
+                    using (Renderer renderer = (Renderer)Activator.CreateInstance(type, cadWindow1.View))
+                    {
+                        btnRenderer.Items.Add(renderer.Name);
+                        if (renderer.GetType() == cadWindow1.View.Renderer.GetType())
+                            selectedObject = renderer.Name;
+                    }
                 }
             }
             btnRenderer.SelectedItem = selectedObject;
@@ -198,8 +200,18 @@ namespace SimpleCADTest
 
         private void btnRenderer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Renderer renderer = (Renderer)btnRenderer.SelectedItem;
-            cadWindow1.View.Renderer = renderer;
+            Assembly assembly = Assembly.GetAssembly(typeof(CADDocument));
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.BaseType == typeof(Renderer))
+                {
+                    Renderer renderer = (Renderer)Activator.CreateInstance(type, cadWindow1.View);
+                    if (renderer.Name == (string)btnRenderer.SelectedItem)
+                        cadWindow1.View.Renderer = renderer;
+                    else
+                        renderer.Dispose();
+                }
+            }
         }
 
         private void btnShowGrid_Click(object sender, EventArgs e)
