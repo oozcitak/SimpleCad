@@ -17,15 +17,35 @@ namespace SimpleCAD.Commands
             var p1 = await ed.GetPoint("First point: ");
             if (p1.Result != ResultMode.OK) return;
             Point2D lastPt = p1.Value;
+
+            int i = 0;
             while (true)
             {
-                var p2 = await ed.GetPoint("Next point: ", lastPt);
-                if (p2.Result != ResultMode.OK) return;
+                var opts = new PointOptions("Next point: ", lastPt);
+                if (i > 1)
+                    opts.AddKeyword("Close");
+                var p3 = await ed.GetPoint(opts);
 
-                Drawable newItem = new Line(lastPt, p2.Value);
-                doc.Model.Add(newItem);
+                if (p3.Result == ResultMode.OK)
+                {
+                    Drawable nextLine = new Line(lastPt, p3.Value);
+                    doc.Model.Add(nextLine);
 
-                lastPt = p2.Value;
+                    lastPt = p3.Value;
+                }
+                else if (p3.Result == ResultMode.Keyword && p3.Keyword == "Close")
+                {
+                    Drawable nextLine = new Line(lastPt, p1.Value);
+                    doc.Model.Add(nextLine);
+
+                    lastPt = p3.Value;
+                    return;
+                }
+                else
+                {
+                    return;
+                }
+                i++;
             }
         }
     }
