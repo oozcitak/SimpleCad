@@ -1,6 +1,4 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SimpleCAD.Commands

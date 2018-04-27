@@ -1,10 +1,4 @@
-﻿using SimpleCAD.Geometry;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace SimpleCAD
+﻿namespace SimpleCAD
 {
     public enum ResultMode
     {
