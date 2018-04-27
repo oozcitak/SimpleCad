@@ -59,28 +59,6 @@ namespace SimpleCAD
         }
 
         [Browsable(false)]
-        public Renderer Renderer
-        {
-            get
-            {
-                return renderer;
-            }
-            set
-            {
-                if (renderer != null)
-                    renderer.Dispose();
-
-                renderer = value;
-                
-                if (control != null)
-                {
-                    renderer.Init(control);
-                    control.Invalidate();
-                }
-            }
-        }
-
-        [Browsable(false)]
         public int Width { get; private set; }
         [Browsable(false)]
         public int Height { get; private set; }
@@ -99,7 +77,7 @@ namespace SimpleCAD
             Height = 1;
 
             Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-            Renderer = new GDIRenderer(this);
+            renderer = new Renderer(this);
 
             panning = false;
 
@@ -686,12 +664,6 @@ namespace SimpleCAD
         }
 
         public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
         {
             Document.DocumentChanged -= Document_Changed;
             Document.TransientsChanged -= Document_TransientsChanged;

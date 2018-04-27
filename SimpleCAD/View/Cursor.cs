@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 
 namespace SimpleCAD.View
 {
@@ -84,8 +80,8 @@ namespace SimpleCAD.View
                 renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 back.Fill = false;
                 renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                renderer.DrawString(fore, new Point2D(x, y), Message, FontFamily, height,
-                    hAlign: TextHorizontalAlignment.Left, vAlign: TextVerticalAlignment.Top);
+                renderer.DrawString(fore, new Point2D(x, y), Message, FontFamily, height, FontStyle.Regular, 0,
+                    TextHorizontalAlignment.Left, TextVerticalAlignment.Top);
             }
         }
 

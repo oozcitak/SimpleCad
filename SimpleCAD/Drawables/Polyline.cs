@@ -1,4 +1,5 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System.Drawing;
 
 namespace SimpleCAD.Drawables
