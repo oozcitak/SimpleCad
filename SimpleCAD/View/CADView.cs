@@ -85,8 +85,7 @@ namespace SimpleCAD
 
             panning = false;
 
-            Color backColor = Document.Settings.Get<Color>("BackColor");
-            Control.BackColor = System.Drawing.Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B);
+            Control.BackColor = (System.Drawing.Color)Document.Settings.Get<Color>("BackColor");
             Width = ctrl.ClientRectangle.Width;
             Height = ctrl.ClientRectangle.Height;
 
