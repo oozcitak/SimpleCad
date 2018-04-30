@@ -215,58 +215,43 @@ namespace SimpleCAD.Graphics
 
         public Vector2D MeasureString(string text, string fontFamily, FontStyle fontStyle, float textHeight)
         {
-            // Revert transformation to identity while drawing text
-            var oldMatrix = gdi.Transform;
-            gdi.ResetTransform();
-
-            // Calculate alignment in pixel coordinates
-            float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            Vector2D szWorld;
-            using (var font = new System.Drawing.Font(fontFamily, height, System.Drawing.GraphicsUnit.Pixel))
+            using (var font = new System.Drawing.Font(fontFamily, textHeight, System.Drawing.GraphicsUnit.Pixel))
             {
                 var sz = gdi.MeasureString(text, font);
-                szWorld = View.ScreenToWorld(new Vector2D(Math.Abs(sz.Width), Math.Abs(sz.Height)));
+                return new Vector2D(sz.Width, sz.Height);
             }
-
-            // Restore old transformation
-            gdi.Transform = oldMatrix;
-
-            return new Vector2D(Math.Abs(szWorld.X), Math.Abs(szWorld.Y));
         }
 
         public void DrawString(Style style, Point2D pt, string text,
             string fontFamily, float textHeight, FontStyle fontStyle,
             float rotation, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
         {
-            float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            using (var font = new System.Drawing.Font(fontFamily, height, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.Pixel))
+            //float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
+            using (var font = new System.Drawing.Font(fontFamily, textHeight, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.Pixel))
             using (var brush = CreateBrush(style))
             {
-                // Convert the text alignment point (x, y) to pixel coordinates
-                var pts = View.WorldToScreen(pt);
-
-                // Revert transformation to identity while drawing text
+                // Keep old transform
                 var oldTrans = gdi.Transform;
-                gdi.ResetTransform();
 
-                // Calculate alignment in pixel coordinates
+                // Calculate alignment offset
                 float dx = 0;
                 float dy = 0;
-                var sz = gdi.MeasureString(text, font);
+                var sz = MeasureString(text, fontFamily, fontStyle,textHeight);
 
                 if (hAlign == TextHorizontalAlignment.Right)
-                    dx = -sz.Width;
+                    dx = -sz.X;
                 else if (hAlign == TextHorizontalAlignment.Center)
-                    dx = -sz.Width / 2;
+                    dx = -sz.X / 2;
 
                 if (vAlign == TextVerticalAlignment.Bottom)
-                    dy = -sz.Height;
+                    dy = -sz.Y;
                 else if (vAlign == TextVerticalAlignment.Middle)
-                    dy = -sz.Height / 2;
+                    dy = -sz.Y / 2;
 
-                gdi.TranslateTransform(dx, dy, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gdi.RotateTransform(-rotation * 180 / MathF.PI, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gdi.TranslateTransform(pts.X, pts.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
+                gdi.TranslateTransform(pt.X, pt.Y, System.Drawing.Drawing2D.MatrixOrder.Prepend);
+                gdi.RotateTransform(rotation * 180 / MathF.PI, System.Drawing.Drawing2D.MatrixOrder.Prepend);
+                gdi.ScaleTransform(1, -1, System.Drawing.Drawing2D.MatrixOrder.Prepend);
+                gdi.TranslateTransform(dx, dy, System.Drawing.Drawing2D.MatrixOrder.Prepend);
 
                 gdi.DrawString(text, font, brush, 0, 0);
 
