@@ -12,11 +12,11 @@ namespace SimpleCAD.Geometry
         public float Ymin { get; private set; }
         public float Xmax { get; private set; }
         public float Ymax { get; private set; }
-        public float Width { get { return Math.Abs(Xmax - Xmin); } }
-        public float Height { get { return Math.Abs(Ymax - Ymin); } }
-        public Point2D Center { get { return IsEmpty ? Point2D.Zero : new Point2D((Xmin + Xmax) / 2, (Ymin + Ymax) / 2); } }
-        public Point2D Ptmin { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmin, Ymin); } }
-        public Point2D Ptmax { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmax, Ymax); } }
+        public float Width { get => Math.Abs(Xmax - Xmin); }
+        public float Height { get => Math.Abs(Ymax - Ymin); }
+        public Point2D Center { get => IsEmpty ? Point2D.Zero : new Point2D((Xmin + Xmax) / 2, (Ymin + Ymax) / 2); }
+        public Point2D Ptmin { get => IsEmpty ? Point2D.Zero : new Point2D(Xmin, Ymin); }
+        public Point2D Ptmax { get => IsEmpty ? Point2D.Zero : new Point2D(Xmax, Ymax); }
 
         public static Extents2D Empty { get { return new Extents2D(); } }
 

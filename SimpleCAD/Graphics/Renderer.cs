@@ -236,7 +236,7 @@ namespace SimpleCAD.Graphics
                 // Calculate alignment offset
                 float dx = 0;
                 float dy = 0;
-                var sz = MeasureString(text, fontFamily, fontStyle,textHeight);
+                var sz = MeasureString(text, fontFamily, fontStyle, textHeight);
 
                 if (hAlign == TextHorizontalAlignment.Right)
                     dx = -sz.X;

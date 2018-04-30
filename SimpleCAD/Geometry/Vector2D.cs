@@ -9,14 +9,14 @@ namespace SimpleCAD.Geometry
     {
         public float X { get; }
         public float Y { get; }
-        public float Length { get { return MathF.Sqrt(X * X + Y * Y); } }
-        public float Angle { get { return AngleTo(XAxis); } }
-        public Vector2D Normal { get { float len = Length; return new Vector2D(X / len, Y / len); } }
-        public Vector2D Perpendicular { get { return new Vector2D(-Y, X); } }
+        public float Length { get => MathF.Sqrt(X * X + Y * Y); }
+        public float Angle { get => AngleTo(XAxis); }
+        public Vector2D Normal { get => new Vector2D(X, Y) / Length; }
+        public Vector2D Perpendicular { get => new Vector2D(-Y, X); }
 
-        public static Vector2D Zero { get { return new Vector2D(0, 0); } }
-        public static Vector2D XAxis { get { return new Vector2D(1, 0); } }
-        public static Vector2D YAxis { get { return new Vector2D(0, 1); } }
+        public static Vector2D Zero { get => new Vector2D(0, 0); }
+        public static Vector2D XAxis { get => new Vector2D(1, 0); }
+        public static Vector2D YAxis { get => new Vector2D(0, 1); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector2D(float x, float y)
