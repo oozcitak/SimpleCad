@@ -28,14 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SimpleCAD.CADDocument cadDocument1 = new SimpleCAD.CADDocument();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsTransform = new System.Windows.Forms.ToolStrip();
             this.btnMove = new System.Windows.Forms.ToolStripButton();
@@ -69,6 +67,7 @@
             this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
             this.tsEdit = new System.Windows.Forms.ToolStrip();
             this.btnDelete = new System.Windows.Forms.ToolStripButton();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -106,12 +105,12 @@
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsEdit);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             // 
             // statusStrip1
             // 
@@ -155,18 +154,6 @@
             this.splitContainer1.Size = new System.Drawing.Size(1008, 369);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Document = cadDocument1;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 369);
-            this.cadWindow1.TabIndex = 0;
-            this.cadWindow1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cadWindow1_MouseMove);
             // 
             // propertyGrid1
             // 
@@ -524,6 +511,15 @@
             this.btnDelete.Text = "Delete";
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 369);
+            this.cadWindow1.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -564,8 +560,6 @@
         }
 
         #endregion
-
-        private SimpleCAD.CADWindow cadWindow1;
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStrip tsPrimitives;
         private System.Windows.Forms.ToolStripButton btnDrawLine;
@@ -604,6 +598,7 @@
         private System.Windows.Forms.ToolStripButton btnPan;
         private System.Windows.Forms.ToolStrip tsEdit;
         private System.Windows.Forms.ToolStripButton btnDelete;
+        private SimpleCAD.CADWindow cadWindow1;
     }
 }
 
