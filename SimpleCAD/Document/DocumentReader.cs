@@ -67,6 +67,13 @@ namespace SimpleCAD
             return new Color(ReadUInt(), isByLayer);
         }
 
+        public Camera ReadCamera()
+        {
+            Point2D position = ReadPoint2D();
+            float zoom = ReadFloat();
+            return new Camera(position, zoom);
+        }
+
         public T ReadPersistable<T>() where T : IPersistable
         {
             string typeName = ReadString();

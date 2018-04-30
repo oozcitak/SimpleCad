@@ -46,44 +46,29 @@ namespace SimpleCAD
 
         public void New()
         {
-            Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
-            Model.CollectionChanged -= Model_CollectionChanged;
-            Jigged.CollectionChanged -= Jigged_CollectionChanged;
+            Settings.LoadDefaults();
+            Layers.Clear();
+            Model.Clear();
+            Jigged.Clear();
+            Transients.Clear();
 
-            Settings = new Settings();
-            Layers = new LayerDictionary();
-            Model = new Composite(this);
-            Jigged = new Composite();
-            Transients = new Composite();
-
-            Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
-            Model.CollectionChanged += Model_CollectionChanged;
-            Jigged.CollectionChanged += Jigged_CollectionChanged;
-
-            OnDocumentChanged(new EventArgs());
-            IsModified = false;
             FileName = "";
+            IsModified = false;
         }
 
         public void Open(Stream stream)
         {
             using (var reader = new DocumentReader(this, stream))
             {
-                Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
-                Model.CollectionChanged -= Model_CollectionChanged;
-                Jigged.CollectionChanged -= Jigged_CollectionChanged;
+                Editor.PickedSelection.Clear();
+                Jigged.Clear();
+                Transients.Clear();
 
                 Settings.Load(reader);
                 Layers.Load(reader);
                 Model.Load(reader);
+                ActiveView.Load(reader);
 
-                Jigged = new Composite();
-                Transients = new Composite();
-
-                Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
-                Model.CollectionChanged += Model_CollectionChanged;
-                Jigged.CollectionChanged += Jigged_CollectionChanged;
-                OnDocumentChanged(new EventArgs());
                 FileName = "";
                 IsModified = false;
             }
@@ -95,7 +80,6 @@ namespace SimpleCAD
             {
                 Open(stream);
                 FileName = filename;
-                IsModified = false;
             }
         }
 
@@ -106,6 +90,7 @@ namespace SimpleCAD
                 Settings.Save(writer);
                 Layers.Save(writer);
                 Model.Save(writer);
+                ActiveView.Save(writer);
 
                 FileName = "";
                 IsModified = false;
@@ -118,7 +103,6 @@ namespace SimpleCAD
             {
                 Save(stream);
                 FileName = filename;
-                IsModified = false;
             }
         }
 

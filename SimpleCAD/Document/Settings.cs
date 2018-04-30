@@ -77,6 +77,11 @@ namespace SimpleCAD
 
         public Settings()
         {
+            LoadDefaults();
+        }
+
+        public void LoadDefaults()
+        {
             Set("DisplayPrecision", 2);
 
             Set("BackColor", Color.FromArgb(33, 40, 48));
