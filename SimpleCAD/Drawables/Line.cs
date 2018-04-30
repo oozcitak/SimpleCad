@@ -50,7 +50,6 @@ namespace SimpleCAD.Drawables
             return extents;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void TransformBy(Matrix2D transformation)
         {
             Point2D pt1 = p1.Value;
