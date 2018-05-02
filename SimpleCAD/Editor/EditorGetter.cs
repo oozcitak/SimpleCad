@@ -72,17 +72,7 @@ namespace SimpleCAD
                     getter.Editor.KeyPress += getter.Editor_KeyPress;
                 }
 
-                var task = await getter.Completion.Task;
-
-                if (initArgs.ContinueAsync)
-                {
-                    getter.Editor.CursorMove -= getter.Editor_CursorMove;
-                    getter.Editor.CursorClick -= getter.Editor_CursorClick;
-                    getter.Editor.KeyDown -= getter.Editor_KeyDown;
-                    getter.Editor.KeyPress -= getter.Editor_KeyPress;
-                }
-
-                return task;
+                return await getter.Completion.Task;
             }
         }
 
