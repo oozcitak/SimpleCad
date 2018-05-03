@@ -677,6 +677,17 @@ namespace SimpleCAD
             }
         }
 
+        public System.Drawing.Image ToBitmap()
+        {
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            using (var g = System.Drawing.Graphics.FromImage(bmp))
+            {
+                Render(g);
+                g.Flush();
+            }
+            return bmp;
+        }
+
         public void Load(DocumentReader reader)
         {
             Camera = reader.ReadCamera();
