@@ -56,6 +56,21 @@ namespace SimpleCAD
             }
         }
 
+        [Category("Appearance"), DefaultValue(true), Description("Determines whether the cursor is shown.")]
+        public bool ShowCursor
+        {
+            get
+            {
+                return ViewItems.Cursor.Visible;
+            }
+            set
+            {
+                ViewItems.Cursor.Visible = value;
+                if (Control != null)
+                    Control.Invalidate();
+            }
+        }
+
         [Browsable(false)]
         public int Width { get; private set; }
         [Browsable(false)]
