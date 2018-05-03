@@ -61,7 +61,7 @@ namespace SimpleCAD.Drawables
             Extents2D extents = new Extents2D();
             foreach (Drawable item in items)
             {
-                if (item.Visible && item.Layer.Visible) extents.Add(item.GetExtents());
+                if (item.Visible && (item.Layer == null || item.Layer.Visible)) extents.Add(item.GetExtents());
             }
             return extents;
         }
@@ -70,7 +70,7 @@ namespace SimpleCAD.Drawables
         {
             foreach (Drawable d in items)
             {
-                if (d.Visible && d.Layer.Visible && d.Contains(pt, pickBoxSize)) return true;
+                if (d.Visible && (d.Layer == null || d.Layer.Visible) && d.Contains(pt, pickBoxSize)) return true;
             }
             return false;
         }
