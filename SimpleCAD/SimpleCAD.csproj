@@ -58,6 +58,7 @@
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
+    <Compile Include="Drawables\Point.cs" />
     <Compile Include="Drawables\Polygon.cs" />
     <Compile Include="Editor\FloatGetter.cs" />
     <Compile Include="Editor\SelectionGetter.cs" />
