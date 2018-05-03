@@ -583,7 +583,8 @@ namespace SimpleCAD
 
         private void CadView_MouseEnter(object sender, EventArgs e)
         {
-            ViewItems.Cursor.Visible = true;
+            if (ShowCursor)
+                ViewItems.Cursor.Visible = true;
             Cursor.Hide();
             Control.Invalidate();
         }
