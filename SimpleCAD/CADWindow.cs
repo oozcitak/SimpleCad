@@ -28,6 +28,8 @@ namespace SimpleCAD
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the X and Y axes are shown.")]
         public bool ShowAxes { get => View.ShowAxes; set => View.ShowAxes = value; }
 
+        [Category("Appearance"), DefaultValue(true), Description("Determines whether the cursor is shown.")]
+        public bool ShowCursor { get => View.ShowCursor; set => View.ShowCursor = value; }
 
         public CADWindow()
         {
