@@ -127,7 +127,6 @@
     <Compile Include="View\Axes.cs" />
     <Compile Include="View\Grid.cs" />
     <Compile Include="View\Cursor.cs" />
-    <Compile Include="View\ViewItems.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CADWindow.resx">

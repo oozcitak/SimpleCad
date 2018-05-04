@@ -17,7 +17,9 @@ namespace SimpleCAD
         private ControlPoint activeCP;
         private Renderer renderer;
 
-        private View.ViewItems ViewItems { get; set; } = new View.ViewItems();
+        private View.Grid viewGrid = new View.Grid();
+        private View.Axes viewAxes = new View.Axes();
+        private View.Cursor viewCursor = new View.Cursor();
         private bool showGrid = true;
         private bool showAxes = true;
         private bool showCursor = true;
@@ -138,7 +140,8 @@ namespace SimpleCAD
             renderer.Clear(Document.Settings.Get<Color>("BackColor"));
 
             // Grid and axes
-            renderer.Draw(ViewItems.Background);
+            renderer.Draw(viewGrid);
+            renderer.Draw(viewAxes);
 
             // Render drawing objects
             renderer.Draw(Document.Model);
@@ -153,7 +156,7 @@ namespace SimpleCAD
             renderer.Draw(Document.Transients);
 
             // Render cursor
-            renderer.Draw(ViewItems.Foreground);
+            renderer.Draw(viewCursor);
 
             // End drawing view
             renderer.EndFrame(graphics);
@@ -359,13 +362,13 @@ namespace SimpleCAD
 
         private void Editor_Prompt(object sender, EditorPromptEventArgs e)
         {
-            ViewItems.Cursor.Message = e.Status;
+            viewCursor.Message = e.Status;
             Control.Invalidate();
         }
 
         private void Editor_Error(object sender, EditorErrorEventArgs e)
         {
-            ViewItems.Cursor.Message = e.Error.Message;
+            viewCursor.Message = e.Error.Message;
             Control.Invalidate();
         }
 
@@ -518,7 +521,7 @@ namespace SimpleCAD
         void CadView_CursorMove(object sender, CursorEventArgs e)
         {
             CursorLocation = e.Location;
-            ViewItems.Cursor.Location = CursorLocation;
+            viewCursor.Location = CursorLocation;
             Control.Invalidate();
 
             if (e.Button == MouseButtons.Middle && panning)
@@ -570,7 +573,7 @@ namespace SimpleCAD
 
         private void CadView_MouseLeave(object sender, EventArgs e)
         {
-            ViewItems.Cursor.Visible = false;
+            viewCursor.Visible = false;
             Cursor.Show();
             Control.Invalidate();
         }
@@ -578,7 +581,7 @@ namespace SimpleCAD
         private void CadView_MouseEnter(object sender, EventArgs e)
         {
             if (ShowCursor)
-                ViewItems.Cursor.Visible = true;
+                viewCursor.Visible = true;
             Cursor.Hide();
             Control.Invalidate();
         }
@@ -592,7 +595,7 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.PickedSelection.Clear();
-                ViewItems.Cursor.Message = "";
+                viewCursor.Message = "";
             }
         }
 
