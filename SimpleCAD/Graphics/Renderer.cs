@@ -33,6 +33,8 @@ namespace SimpleCAD.Graphics
 
     public class Renderer : IDisposable
     {
+        Control control;
+        private System.Drawing.BufferedGraphics gdiBuffer;
         private System.Drawing.Graphics gdi;
 
         public CADView View { get; private set; }
@@ -48,22 +50,15 @@ namespace SimpleCAD.Graphics
         #region Life-time functions
         public void Init(Control control)
         {
-            try
-            {
-                // Enable double buffering
-                Type type = control.GetType();
-                MethodInfo method = type.GetMethod("SetStyle", BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(control, new object[] { ControlStyles.DoubleBuffer, true });
-            }
-            catch (System.Security.SecurityException)
-            {
-                ;
-            }
+            this.control = control;
         }
 
         public void InitFrame(System.Drawing.Graphics graphics)
         {
-            gdi = graphics;
+            if (gdiBuffer == null)
+                CreateGraphicsBuffer(graphics);
+
+            gdi = gdiBuffer.Graphics;
 
             gdi.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             gdi.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
@@ -75,14 +70,36 @@ namespace SimpleCAD.Graphics
             gdi.TranslateTransform(View.Width / 2, View.Height / 2, System.Drawing.Drawing2D.MatrixOrder.Append);
         }
 
-        public void EndFrame()
+        public void EndFrame(System.Drawing.Graphics graphics)
         {
-            ;
+            if (gdiBuffer != null)
+                gdiBuffer.Render(graphics);
         }
 
         public void Resize(int width, int height)
         {
-            ;
+            ResetGraphicsBuffer();
+        }
+
+        private void ResetGraphicsBuffer()
+        {
+            if (gdiBuffer != null)
+                gdiBuffer.Dispose();
+            gdiBuffer = null;
+        }
+
+        private void CreateGraphicsBuffer(System.Drawing.Graphics graphics)
+        {
+            var bufferContext = System.Drawing.BufferedGraphicsManager.Current;
+
+            int width = Math.Max(control.Width, 1);
+            int height = Math.Max(control.Height, 1);
+
+            bufferContext.MaximumBuffer = new System.Drawing.Size(width, height);
+
+            ResetGraphicsBuffer();
+
+            gdiBuffer = bufferContext.Allocate(graphics, new System.Drawing.Rectangle(0, 0, width, height));
         }
         #endregion
 

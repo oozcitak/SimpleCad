@@ -162,7 +162,7 @@ namespace SimpleCAD
             renderer.Draw(ViewItems.Foreground);
 
             // End drawing view
-            renderer.EndFrame();
+            renderer.EndFrame(graphics);
         }
 
         private void DrawSelection(Renderer renderer)
