@@ -18,6 +18,9 @@ namespace SimpleCAD
         private Renderer renderer;
 
         private View.ViewItems ViewItems { get; set; } = new View.ViewItems();
+        private bool showGrid = true;
+        private bool showAxes = true;
+        private bool showCursor = true;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
@@ -29,13 +32,10 @@ namespace SimpleCAD
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cartesian grid is shown.")]
         public bool ShowGrid
         {
-            get
-            {
-                return ViewItems.Grid.Visible;
-            }
+            get => showGrid;
             set
             {
-                ViewItems.Grid.Visible = value;
+                showGrid = value;
                 if (Control != null)
                     Control.Invalidate();
             }
@@ -44,13 +44,10 @@ namespace SimpleCAD
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the X and Y axes are shown.")]
         public bool ShowAxes
         {
-            get
-            {
-                return ViewItems.Axes.Visible;
-            }
+            get => ShowAxes;
             set
             {
-                ViewItems.Axes.Visible = value;
+                showAxes = value;
                 if (Control != null)
                     Control.Invalidate();
             }
@@ -59,13 +56,10 @@ namespace SimpleCAD
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cursor is shown.")]
         public bool ShowCursor
         {
-            get
-            {
-                return ViewItems.Cursor.Visible;
-            }
+            get => showCursor;
             set
             {
-                ViewItems.Cursor.Visible = value;
+                showCursor = value;
                 if (Control != null)
                     Control.Invalidate();
             }
