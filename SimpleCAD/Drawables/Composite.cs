@@ -10,17 +10,9 @@ namespace SimpleCAD.Drawables
     {
         List<Drawable> items = new List<Drawable>();
 
-        public CADDocument Document { get; private set; }
-
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public Composite() { }
-
-        public Composite(CADDocument document)
-        {
-            Document = document;
-            SetDefaults(document);
-        }
 
         public override void Load(DocumentReader reader)
         {
@@ -35,12 +27,10 @@ namespace SimpleCAD.Drawables
 
         public override void Save(DocumentWriter writer)
         {
-            SetDefaults(Document);
             base.Save(writer);
             writer.Write(items.Count);
             foreach (var item in items)
             {
-                item.SetDefaults(Document);
                 writer.Write(item);
             }
         }
@@ -151,13 +141,6 @@ namespace SimpleCAD.Drawables
             {
                 foreach (Drawable item in e.NewItems)
                 {
-                    if (Document != null)
-                    {
-                        if (item.Layer == null)
-                            item.Layer = Document.Layers.Default;
-                        if (!Document.Layers.ContainsKey(item.Layer.Name))
-                            Document.Layers.Add(item.Layer.Name, item.Layer);
-                    }
                     item.PropertyChanged += Drawable_PropertyChanged;
                 }
             }

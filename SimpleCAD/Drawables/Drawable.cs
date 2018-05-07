@@ -9,7 +9,7 @@ namespace SimpleCAD
     public abstract class Drawable : INotifyPropertyChanged, IPersistable
     {
         public Style Style { get; set; } = Style.Default;
-        public Layer Layer { get; set; }
+        public Layer Layer { get; set; } = Layer.Default;
         public bool Visible { get; set; } = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -43,14 +43,6 @@ namespace SimpleCAD
             writer.Write(Layer.Name);
             writer.Write(Style);
             writer.Write(Visible);
-        }
-
-        public void SetDefaults(CADDocument document)
-        {
-            if (Layer == null)
-                Layer = document.Layers.Default;
-            if (Style == null)
-                Style = Style.Default;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace SimpleCAD
 
             Settings = new Settings();
             Layers = new LayerDictionary();
-            Model = new Composite(this);
+            Model = new Composite();
             Jigged = new Composite();
             Transients = new Composite();
 
