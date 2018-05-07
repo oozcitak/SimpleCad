@@ -230,21 +230,27 @@ namespace SimpleCAD.Graphics
             }
         }
 
-        public Vector2D MeasureString(string text, string fontFamily, FontStyle fontStyle, float textHeight)
+        public Vector2D MeasureString(string text, TextStyle textStyle, float textHeight)
         {
-            using (var font = new System.Drawing.Font(fontFamily, textHeight, System.Drawing.GraphicsUnit.Pixel))
+            using (var font = CreateFont(textStyle, textHeight))
+            using (var format = new System.Drawing.StringFormat(System.Drawing.StringFormatFlags.FitBlackBox))
             {
-                var sz = gdi.MeasureString(text, font);
-                return new Vector2D(sz.Width, sz.Height);
+                return MeasureString(text, font, format);
             }
         }
 
+        public Vector2D MeasureString(string text, System.Drawing.Font font, System.Drawing.StringFormat format)
+        {
+            var sz = gdi.MeasureString(text, font);
+            return new Vector2D(sz.Width, sz.Height);
+        }
+
         public void DrawString(Style style, Point2D pt, string text,
-            string fontFamily, float textHeight, FontStyle fontStyle,
+            TextStyle textStyle, float textHeight,
             float rotation, TextHorizontalAlignment hAlign, TextVerticalAlignment vAlign)
         {
-            //float height = Math.Abs(View.WorldToScreen(new Vector2D(0, textHeight)).Y);
-            using (var font = new System.Drawing.Font(fontFamily, textHeight, (System.Drawing.FontStyle)fontStyle, System.Drawing.GraphicsUnit.Pixel))
+            using (var font = CreateFont(textStyle, textHeight))
+            using (var format = new System.Drawing.StringFormat(System.Drawing.StringFormatFlags.FitBlackBox))
             using (var brush = CreateBrush(style))
             {
                 // Keep old transform
@@ -253,7 +259,7 @@ namespace SimpleCAD.Graphics
                 // Calculate alignment offset
                 float dx = 0;
                 float dy = 0;
-                var sz = MeasureString(text, fontFamily, fontStyle, textHeight);
+                var sz = MeasureString(text, font, format);
 
                 if (hAlign == TextHorizontalAlignment.Right)
                     dx = -sz.X;
@@ -297,6 +303,11 @@ namespace SimpleCAD.Graphics
             Style appliedStyle = (StyleOverride == null ? style : StyleOverride);
 
             return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)(appliedStyle.Color.IsByLayer ? Color.White : appliedStyle.Color).Argb));
+        }
+
+        private System.Drawing.Font CreateFont(TextStyle style, float height)
+        {
+            return new System.Drawing.Font(style.FontFamily, height, (System.Drawing.FontStyle)style.FontStyle, System.Drawing.GraphicsUnit.Pixel);
         }
 
         public float GetScaledLineWeight(float lineWeight)

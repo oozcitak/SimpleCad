@@ -55,6 +55,7 @@
     <Compile Include="Document\DocumentWriter.cs" />
     <Compile Include="Document\DocumentReader.cs" />
     <Compile Include="Document\IDict.cs" />
+    <Compile Include="Document\TextStyleDictionary.cs" />
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Editor\AngleGetter.cs" />
     <Compile Include="Editor\PointGetter.cs" />
     <Compile Include="Editor\EditorGetter.cs" />
+    <Compile Include="Graphics\TextStyle.cs" />
     <Compile Include="Graphics\Layer.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />

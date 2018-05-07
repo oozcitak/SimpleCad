@@ -7,14 +7,14 @@ namespace SimpleCAD.View
     internal class Cursor : Drawable
     {
         public Point2D Location { get; set; }
-        public string FontFamily { get; set; }
+        public TextStyle TextStyle { get; set; }
         public float TextHeight { get; set; }
         public string Message { get; set; }
 
         public Cursor()
         {
             // Assign the default system font by default
-            FontFamily = System.Drawing.SystemFonts.MessageBoxFont.FontFamily.Name;
+            TextStyle = new TextStyle("_Cursor", System.Drawing.SystemFonts.MessageBoxFont.FontFamily.Name, FontStyle.Regular);
             // Default text height in pixels
             TextHeight = 12;
         }
@@ -60,7 +60,7 @@ namespace SimpleCAD.View
                 // position cursor prompt to lower-right of cursor by default
                 float x = Location.X + margin + offset;
                 float y = Location.Y - margin - offset;
-                Vector2D sz = renderer.MeasureString(Message, FontFamily, FontStyle.Regular, height);
+                Vector2D sz = renderer.MeasureString(Message, TextStyle, height);
                 Point2D lowerRight = new Point2D(ex.Xmax, ex.Ymin);
                 // check if the prompt text fits into the window horizontally
                 if (x + sz.X + offset > lowerRight.X)
@@ -80,7 +80,7 @@ namespace SimpleCAD.View
                 renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 back.Fill = false;
                 renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                renderer.DrawString(fore, new Point2D(x, y), Message, FontFamily, height, FontStyle.Regular, 0,
+                renderer.DrawString(fore, new Point2D(x, y), Message, TextStyle, height, 0,
                     TextHorizontalAlignment.Left, TextVerticalAlignment.Top);
             }
         }

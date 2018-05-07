@@ -6,9 +6,9 @@ namespace SimpleCAD.Drawables
 {
     public class Text : Drawable
     {
-        private Point2D p;
+        private Point2D location;
 
-        public Point2D Location { get => p; set { p = value; NotifyPropertyChanged(); } }
+        public Point2D Location { get => location; set { location = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return Location.X; } }
@@ -16,16 +16,13 @@ namespace SimpleCAD.Drawables
         public float Y { get { return Location.Y; } }
 
         private string str;
-        private string fontFamily;
-        private FontStyle fontStyle;
         private float textHeight;
         private float rotation;
         private TextHorizontalAlignment horizontalAlignment;
         private TextVerticalAlignment verticalAlignment;
 
+        public TextStyle TextStyle { get; set; } = TextStyle.Default;
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
-        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
-        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
         public float Rotation { get => rotation; set { rotation = value; NotifyPropertyChanged(); } }
@@ -36,17 +33,15 @@ namespace SimpleCAD.Drawables
 
         public Text() { }
 
-        public Text(Point2D p, string text, float height)
+        public Text(Point2D loc, string text, float height)
         {
-            Location = p;
+            Location = loc;
             TextHeight = height;
             Width = height;
             String = text;
             Rotation = 0;
             HorizontalAlignment = TextHorizontalAlignment.Left;
             VerticalAlignment = TextVerticalAlignment.Bottom;
-            FontFamily = "Arial";
-            FontStyle = FontStyle.Regular;
         }
 
         public Text(float x, float y, string text, float height)
@@ -58,8 +53,8 @@ namespace SimpleCAD.Drawables
         public override void Draw(Renderer renderer)
         {
             cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.Get<int>("ControlPointSize"), 0)).X;
-            Width = renderer.MeasureString(String, FontFamily, FontStyle, TextHeight).X;
-            renderer.DrawString(Style.ApplyLayer(Layer), Location, String, FontFamily, TextHeight, FontStyle.Regular, Rotation, HorizontalAlignment, VerticalAlignment);
+            Width = renderer.MeasureString(String, TextStyle, TextHeight).X;
+            renderer.DrawString(Style.ApplyLayer(Layer), Location, String, TextStyle, TextHeight, Rotation, HorizontalAlignment, VerticalAlignment);
         }
 
         public override Extents2D GetExtents()
@@ -113,7 +108,7 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Location", Location),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + cpSize * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + System.Math.Max(Width, cpSize) * Vector2D.FromAngle(Rotation)),
                 new ControlPoint("Text height", ControlPoint.ControlPointType.Distance, Location, Location + TextHeight * upDir),
             };
         }
@@ -134,8 +129,7 @@ namespace SimpleCAD.Drawables
             Location = reader.ReadPoint2D();
             TextHeight = reader.ReadFloat();
             String = reader.ReadString();
-            FontFamily = reader.ReadString();
-            FontStyle = (FontStyle)reader.ReadInt();
+            TextStyle = reader.ReadPersistable<TextStyle>();
             Rotation = reader.ReadFloat();
             HorizontalAlignment = (TextHorizontalAlignment)reader.ReadInt();
             VerticalAlignment = (TextVerticalAlignment)reader.ReadInt();
@@ -147,8 +141,7 @@ namespace SimpleCAD.Drawables
             writer.Write(Location);
             writer.Write(TextHeight);
             writer.Write(String);
-            writer.Write(FontFamily);
-            writer.Write((int)FontStyle);
+            writer.Write(TextStyle);
             writer.Write(Rotation);
             writer.Write((int)HorizontalAlignment);
             writer.Write((int)VerticalAlignment);

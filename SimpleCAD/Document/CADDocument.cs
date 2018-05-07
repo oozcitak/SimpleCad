@@ -19,6 +19,7 @@ namespace SimpleCAD
         public CADView ActiveView { get; internal set; }
 
         public LayerDictionary Layers { get; private set; }
+        public TextStyleDictionary TextStyles { get; private set; }
 
         public string FileName { get; private set; }
         public bool IsModified { get; private set; } = false;
@@ -33,6 +34,7 @@ namespace SimpleCAD
 
             Settings = new Settings();
             Layers = new LayerDictionary();
+            TextStyles = new TextStyleDictionary();
             Model = new Composite();
             Jigged = new Composite();
             Transients = new Composite();
@@ -48,6 +50,7 @@ namespace SimpleCAD
         {
             Settings.LoadDefaults();
             Layers.Clear();
+            TextStyles.Clear();
             Model.Clear();
             Jigged.Clear();
             Transients.Clear();
@@ -66,6 +69,7 @@ namespace SimpleCAD
 
                 Settings.Load(reader);
                 Layers.Load(reader);
+                TextStyles.Load(reader);
                 Model.Load(reader);
                 ActiveView.Load(reader);
 
@@ -89,6 +93,7 @@ namespace SimpleCAD
             {
                 Settings.Save(writer);
                 Layers.Save(writer);
+                TextStyles.Save(writer);
                 Model.Save(writer);
                 ActiveView.Save(writer);
 
