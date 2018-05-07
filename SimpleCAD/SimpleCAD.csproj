@@ -55,6 +55,7 @@
     <Compile Include="Document\DocumentWriter.cs" />
     <Compile Include="Document\DocumentReader.cs" />
     <Compile Include="Document\IDict.cs" />
+    <Compile Include="Document\Model.cs" />
     <Compile Include="Document\TextStyleDictionary.cs" />
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />

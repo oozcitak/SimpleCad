@@ -135,7 +135,7 @@ namespace SimpleCAD.Drawables
             return GetEnumerator();
         }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

@@ -11,7 +11,7 @@ namespace SimpleCAD
         public delegate void TransientsChangedEventHandler(object sender, EventArgs e);
         public delegate void SelectionChangedEventHandler(object sender, EventArgs e);
 
-        public Composite Model { get; private set; }
+        public Model Model { get; private set; }
         public Composite Jigged { get; private set; }
         public Composite Transients { get; private set; }
         public Editor Editor { get; private set; }
@@ -35,7 +35,7 @@ namespace SimpleCAD
             Settings = new Settings();
             Layers = new LayerDictionary();
             TextStyles = new TextStyleDictionary();
-            Model = new Composite();
+            Model = new Model(this);
             Jigged = new Composite();
             Transients = new Composite();
 
