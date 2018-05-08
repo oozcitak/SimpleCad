@@ -88,6 +88,9 @@ namespace SimpleCAD.Drawables
         public override void TransformBy(Matrix2D transformation)
         {
             Center = Center.Transform(transformation);
+            var size = new Vector2D(Width, Height).Transform(transformation);
+            Width = size.X;
+            Height = size.Y;
             Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
             UpdatePolyline();
         }
@@ -114,7 +117,6 @@ namespace SimpleCAD.Drawables
 
             return new[]
             {
-                new SnapPoint("Center point", Center),
                 new SnapPoint("Corner point 1", Center + w2 + h2),
                 new SnapPoint("Corner point 2", Center - w2 + h2),
                 new SnapPoint("Corner point 3", Center - w2 - h2),

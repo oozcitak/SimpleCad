@@ -139,15 +139,19 @@ namespace SimpleCAD.Commands
             var p1 = await ed.GetPoint("Base point: ");
             if (p1.Result != ResultMode.OK) return;
             Composite consItems = new Composite();
+            var ext = new Extents2D();
             foreach (Drawable item in s.Value)
             {
+                ext.Add(item.GetExtents());
                 consItems.Add(item.Clone());
             }
             doc.Transients.Add(consItems);
+            float size = System.Math.Max(ext.Width, ext.Height);
             float lastScale = 1;
             var d1 = await ed.GetDistance("Scale: ", p1.Value,
                 (p) =>
                 {
+                    p /= size;
                     consItems.TransformBy(Matrix2D.Scale(p1.Value, p / lastScale));
                     lastScale = p;
                 });
