@@ -37,6 +37,7 @@
             this.cadWindow1 = new SimpleCAD.CADWindow();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsPrimitives = new System.Windows.Forms.ToolStrip();
+            this.btnDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
             this.btnDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawEllipse = new System.Windows.Forms.ToolStripButton();
@@ -68,7 +69,13 @@
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawPoint = new System.Windows.Forms.ToolStripButton();
+            this.tsSnap = new System.Windows.Forms.ToolStrip();
+            this.btnSnap = new System.Windows.Forms.ToolStripButton();
+            this.btnSnapEnd = new System.Windows.Forms.ToolStripButton();
+            this.btnSnapMiddle = new System.Windows.Forms.ToolStripButton();
+            this.btnSnapCenter = new System.Windows.Forms.ToolStripButton();
+            this.btnSnapQuadrant = new System.Windows.Forms.ToolStripButton();
+            this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -84,6 +91,7 @@
             this.toolStrip1.SuspendLayout();
             this.tsGraphics.SuspendLayout();
             this.tsTransform.SuspendLayout();
+            this.tsSnap.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -96,7 +104,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 369);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 344);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -112,6 +120,7 @@
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsSnap);
             // 
             // statusStrip1
             // 
@@ -152,7 +161,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 369);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 344);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -162,7 +171,7 @@
             this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cadWindow1.Location = new System.Drawing.Point(0, 0);
             this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 369);
+            this.cadWindow1.Size = new System.Drawing.Size(759, 344);
             this.cadWindow1.TabIndex = 0;
             // 
             // propertyGrid1
@@ -170,7 +179,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 369);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 344);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -193,8 +202,18 @@
             this.btnDrawHatch});
             this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
             this.tsPrimitives.Name = "tsPrimitives";
-            this.tsPrimitives.Size = new System.Drawing.Size(665, 25);
+            this.tsPrimitives.Size = new System.Drawing.Size(634, 25);
             this.tsPrimitives.TabIndex = 0;
+            // 
+            // btnDrawPoint
+            // 
+            this.btnDrawPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawPoint.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawPoint.Image")));
+            this.btnDrawPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawPoint.Name = "btnDrawPoint";
+            this.btnDrawPoint.Size = new System.Drawing.Size(39, 22);
+            this.btnDrawPoint.Text = "Point";
+            this.btnDrawPoint.Click += new System.EventHandler(this.btnDrawPoint_Click);
             // 
             // btnDrawLine
             // 
@@ -522,15 +541,86 @@
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
             // 
-            // btnDrawPoint
+            // tsSnap
             // 
-            this.btnDrawPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawPoint.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawPoint.Image")));
-            this.btnDrawPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawPoint.Name = "btnDrawPoint";
-            this.btnDrawPoint.Size = new System.Drawing.Size(39, 22);
-            this.btnDrawPoint.Text = "Point";
-            this.btnDrawPoint.Click += new System.EventHandler(this.btnDrawPoint_Click);
+            this.tsSnap.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsSnap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnSnap,
+            this.btnSnapEnd,
+            this.btnSnapMiddle,
+            this.btnSnapCenter,
+            this.btnSnapQuadrant,
+            this.btnSnapPoint});
+            this.tsSnap.Location = new System.Drawing.Point(3, 125);
+            this.tsSnap.Name = "tsSnap";
+            this.tsSnap.Size = new System.Drawing.Size(305, 25);
+            this.tsSnap.TabIndex = 6;
+            // 
+            // btnSnap
+            // 
+            this.btnSnap.CheckOnClick = true;
+            this.btnSnap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnap.Image = ((System.Drawing.Image)(resources.GetObject("btnSnap.Image")));
+            this.btnSnap.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnap.Name = "btnSnap";
+            this.btnSnap.Size = new System.Drawing.Size(37, 22);
+            this.btnSnap.Text = "Snap";
+            this.btnSnap.Click += new System.EventHandler(this.btnSnap_Click);
+            // 
+            // btnSnapEnd
+            // 
+            this.btnSnapEnd.CheckOnClick = true;
+            this.btnSnapEnd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnapEnd.Image = ((System.Drawing.Image)(resources.GetObject("btnSnapEnd.Image")));
+            this.btnSnapEnd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnapEnd.Name = "btnSnapEnd";
+            this.btnSnapEnd.Size = new System.Drawing.Size(31, 22);
+            this.btnSnapEnd.Text = "End";
+            this.btnSnapEnd.Click += new System.EventHandler(this.btnSnapEnd_Click);
+            // 
+            // btnSnapMiddle
+            // 
+            this.btnSnapMiddle.CheckOnClick = true;
+            this.btnSnapMiddle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnapMiddle.Image = ((System.Drawing.Image)(resources.GetObject("btnSnapMiddle.Image")));
+            this.btnSnapMiddle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnapMiddle.Name = "btnSnapMiddle";
+            this.btnSnapMiddle.Size = new System.Drawing.Size(48, 22);
+            this.btnSnapMiddle.Text = "Middle";
+            this.btnSnapMiddle.Click += new System.EventHandler(this.btnSnapMiddle_Click);
+            // 
+            // btnSnapCenter
+            // 
+            this.btnSnapCenter.CheckOnClick = true;
+            this.btnSnapCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnapCenter.Image = ((System.Drawing.Image)(resources.GetObject("btnSnapCenter.Image")));
+            this.btnSnapCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnapCenter.Name = "btnSnapCenter";
+            this.btnSnapCenter.Size = new System.Drawing.Size(46, 22);
+            this.btnSnapCenter.Text = "Center";
+            this.btnSnapCenter.Click += new System.EventHandler(this.btnSnapCenter_Click);
+            // 
+            // btnSnapQuadrant
+            // 
+            this.btnSnapQuadrant.CheckOnClick = true;
+            this.btnSnapQuadrant.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnapQuadrant.Image = ((System.Drawing.Image)(resources.GetObject("btnSnapQuadrant.Image")));
+            this.btnSnapQuadrant.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnapQuadrant.Name = "btnSnapQuadrant";
+            this.btnSnapQuadrant.Size = new System.Drawing.Size(61, 22);
+            this.btnSnapQuadrant.Text = "Quadrant";
+            this.btnSnapQuadrant.Click += new System.EventHandler(this.btnSnapQuadrant_Click);
+            // 
+            // btnSnapPoint
+            // 
+            this.btnSnapPoint.CheckOnClick = true;
+            this.btnSnapPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSnapPoint.Image = ((System.Drawing.Image)(resources.GetObject("btnSnapPoint.Image")));
+            this.btnSnapPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSnapPoint.Name = "btnSnapPoint";
+            this.btnSnapPoint.Size = new System.Drawing.Size(39, 22);
+            this.btnSnapPoint.Text = "Point";
+            this.btnSnapPoint.Click += new System.EventHandler(this.btnSnapPoint_Click);
             // 
             // MainForm
             // 
@@ -567,6 +657,8 @@
             this.tsGraphics.PerformLayout();
             this.tsTransform.ResumeLayout(false);
             this.tsTransform.PerformLayout();
+            this.tsSnap.ResumeLayout(false);
+            this.tsSnap.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -612,6 +704,13 @@
         private System.Windows.Forms.ToolStripButton btnDelete;
         private SimpleCAD.CADWindow cadWindow1;
         private System.Windows.Forms.ToolStripButton btnDrawPoint;
+        private System.Windows.Forms.ToolStrip tsSnap;
+        private System.Windows.Forms.ToolStripButton btnSnapEnd;
+        private System.Windows.Forms.ToolStripButton btnSnapMiddle;
+        private System.Windows.Forms.ToolStripButton btnSnapCenter;
+        private System.Windows.Forms.ToolStripButton btnSnapQuadrant;
+        private System.Windows.Forms.ToolStripButton btnSnapPoint;
+        private System.Windows.Forms.ToolStripButton btnSnap;
     }
 }
 
