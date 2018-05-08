@@ -83,8 +83,8 @@
     <Compile Include="Editor\AngleGetter.cs" />
     <Compile Include="Editor\PointGetter.cs" />
     <Compile Include="Editor\EditorGetter.cs" />
-    <Compile Include="Graphics\TextStyle.cs" />
-    <Compile Include="Graphics\Layer.cs" />
+    <Compile Include="Document\TextStyle.cs" />
+    <Compile Include="Document\Layer.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />

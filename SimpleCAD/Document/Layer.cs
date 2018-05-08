@@ -1,6 +1,7 @@
-﻿using System.ComponentModel;
+﻿using SimpleCAD.Graphics;
+using System.ComponentModel;
 
-namespace SimpleCAD.Graphics
+namespace SimpleCAD
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Layer : IPersistable
