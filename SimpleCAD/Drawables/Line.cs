@@ -7,11 +7,11 @@ namespace SimpleCAD.Drawables
 {
     public class Line : Drawable
     {
-        private Lazy<Point2D> p1;
-        private Lazy<Point2D> p2;
+        private Point2D p1;
+        private Point2D p2;
 
-        public Point2D StartPoint { get => p1.Value; set { p1 = new Lazy<Point2D>(() => value); NotifyPropertyChanged(); } }
-        public Point2D EndPoint { get => p2.Value; set { p2 = new Lazy<Point2D>(() => value); NotifyPropertyChanged(); } }
+        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return StartPoint.X; } }
@@ -51,10 +51,8 @@ namespace SimpleCAD.Drawables
 
         public override void TransformBy(Matrix2D transformation)
         {
-            Point2D pt1 = p1.Value;
-            Point2D pt2 = p2.Value;
-            p1 = new Lazy<Point2D>(() => pt1.Transform(transformation));
-            p2 = new Lazy<Point2D>(() => pt2.Transform(transformation));
+            StartPoint = StartPoint.Transform(transformation);
+            EndPoint = EndPoint.Transform(transformation);
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
