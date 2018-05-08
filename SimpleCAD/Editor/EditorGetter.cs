@@ -80,13 +80,16 @@ namespace SimpleCAD
         private void Editor_CursorMove(object sender, CursorEventArgs e)
         {
             // check snap mode
-            SnapPointType snapMode = Editor.SnapMode;
-            float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.Get<int>("SnapDistance"), 0)).X;
             Editor.SnapPoints.Clear();
-            foreach (Drawable item in Editor.Document.Model)
+            if (Editor.Document.Settings.Get<bool>("Snap"))
             {
-                if (item.Visible && (item.Layer == null || item.Layer.Visible))
-                    Editor.SnapPoints.AddFromDrawable(item, e.Location, snapMode, snapDist);
+                SnapPointType snapMode = Editor.SnapMode;
+                float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.Get<int>("SnapDistance"), 0)).X;
+                foreach (Drawable item in Editor.Document.Model)
+                {
+                    if (item.Visible && (item.Layer == null || item.Layer.Visible))
+                        Editor.SnapPoints.AddFromDrawable(item, e.Location, snapMode, snapDist);
+                }
             }
 
             CoordsChanged(e.Location);
