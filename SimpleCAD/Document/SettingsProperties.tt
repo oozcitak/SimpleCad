@@ -1,0 +1,25 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="$(TargetPath)" #>
+<#@ import namespace="SimpleCAD" #>
+
+namespace SimpleCAD
+{
+    public partial class Settings
+    {
+<# 
+        foreach(var pair in SimpleCAD.Settings.Defaults)
+        {
+            string name = pair.Key;
+            string type = pair.Value.GetType().FullName;
+#>
+        public <#= type #> <#= name #> 
+        {
+            get => Get<<#= type #>>("<#= name#>");
+            set => Set("<#= name #>", value);
+        }
+<#
+        }
+#>
+    }
+}

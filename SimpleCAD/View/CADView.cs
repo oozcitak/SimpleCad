@@ -128,8 +128,8 @@ namespace SimpleCAD
             renderer.Clear(Document.Settings.Get<Color>("BackColor"));
 
             // Grid and axes
-            renderer.Draw(viewGrid);
-            renderer.Draw(viewAxes);
+            if (showGrid) renderer.Draw(viewGrid);
+            if (showAxes) renderer.Draw(viewAxes);
 
             // Render drawing objects
             renderer.Draw(Document.Model);
@@ -144,7 +144,7 @@ namespace SimpleCAD
             renderer.Draw(Document.Transients);
 
             // Render cursor
-            renderer.Draw(viewCursor);
+            if (showCursor) renderer.Draw(viewCursor);
 
             // Render snap point
             DrawSnapPoint(renderer);

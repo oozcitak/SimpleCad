@@ -48,7 +48,7 @@ namespace SimpleCAD
 
         public void New()
         {
-            Settings.LoadDefaults();
+            Settings.Reset();
             Layers.Clear();
             TextStyles.Clear();
             Model.Clear();

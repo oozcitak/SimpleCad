@@ -56,6 +56,11 @@
     <Compile Include="Document\DocumentReader.cs" />
     <Compile Include="Document\IDict.cs" />
     <Compile Include="Document\Model.cs" />
+    <Compile Include="Document\SettingsProperties.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingsProperties.tt</DependentUpon>
+    </Compile>
     <Compile Include="Document\TextStyleDictionary.cs" />
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
@@ -140,6 +145,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Document\SettingsProperties.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SettingsProperties.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

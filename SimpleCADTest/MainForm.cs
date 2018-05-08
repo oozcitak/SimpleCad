@@ -7,12 +7,18 @@ namespace SimpleCADTest
 {
     public partial class MainForm : Form
     {
+        private SimpleCAD.CADDocument doc;
+        private SimpleCAD.Editor ed;
+
         public MainForm()
         {
             InitializeComponent();
 
-            cadWindow1.Document.DocumentChanged += Document_DocumentChanged;
-            cadWindow1.Document.SelectionChanged += CadWindow1_SelectionChanged;
+            doc = cadWindow1.Document;
+            ed = doc.Editor;
+
+            doc.DocumentChanged += Document_DocumentChanged;
+            doc.SelectionChanged += CadWindow1_SelectionChanged;
             cadWindow1.MouseMove += cadWindow1_MouseMove;
 
             UpdateUI();
@@ -20,12 +26,12 @@ namespace SimpleCADTest
 
         private void Document_DocumentChanged(object sender, EventArgs e)
         {
-            propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.PickedSelection.ToArray();
+            propertyGrid1.SelectedObjects = ed.PickedSelection.ToArray();
         }
 
         private void CadWindow1_SelectionChanged(object sender, EventArgs e)
         {
-            propertyGrid1.SelectedObjects = cadWindow1.Document.Editor.PickedSelection.ToArray();
+            propertyGrid1.SelectedObjects = ed.PickedSelection.ToArray();
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -35,7 +41,7 @@ namespace SimpleCADTest
 
         private void cadWindow1_MouseMove(object sender, MouseEventArgs e)
         {
-            statusCoords.Text = cadWindow1.View.CursorLocation.ToString(cadWindow1.Document.Settings.NumberFormat);
+            statusCoords.Text = cadWindow1.View.CursorLocation.ToString(doc.Settings.NumberFormat);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -46,7 +52,7 @@ namespace SimpleCADTest
 
         private bool EnsureDocumentSaved()
         {
-            if (!cadWindow1.Document.IsModified)
+            if (!doc.IsModified)
                 return true;
 
             DialogResult res = MessageBox.Show(
@@ -59,37 +65,37 @@ namespace SimpleCADTest
                 return true;
             else
             {
-                cadWindow1.Document.Editor.RunCommand("Document.Save");
-                return !cadWindow1.Document.IsModified;
+                ed.RunCommand("Document.Save");
+                return !doc.IsModified;
             }
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
             if (EnsureDocumentSaved())
-                cadWindow1.Document.Editor.RunCommand("Document.New");
+                ed.RunCommand("Document.New");
             UpdateUI();
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
             if (EnsureDocumentSaved())
-                cadWindow1.Document.Editor.RunCommand("Document.Open", SaveFileName);
+                ed.RunCommand("Document.Open", SaveFileName);
             UpdateUI();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(cadWindow1.Document.FileName))
-                cadWindow1.Document.Editor.RunCommand("Document.SaveAs", SaveFileName);
+            if (string.IsNullOrEmpty(doc.FileName))
+                ed.RunCommand("Document.SaveAs", SaveFileName);
             else
-                cadWindow1.Document.Editor.RunCommand("Document.Save");
+                ed.RunCommand("Document.Save");
             UpdateUI();
         }
 
         private void btnSaveAs_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Document.SaveAs", cadWindow1.Document.FileName ?? SaveFileName);
+            ed.RunCommand("Document.SaveAs", doc.FileName ?? SaveFileName);
             UpdateUI();
         }
 
@@ -104,102 +110,102 @@ namespace SimpleCADTest
 
         private void UpdateUI()
         {
-            btnSnap.Checked = cadWindow1.Document.Settings.Get<bool>("Snap");
-            btnSnapEnd.Checked = (cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.End) != SimpleCAD.SnapPointType.None;
-            btnSnapMiddle.Checked = (cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Middle) != SimpleCAD.SnapPointType.None;
-            btnSnapCenter.Checked = (cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Center) != SimpleCAD.SnapPointType.None;
-            btnSnapQuadrant.Checked = (cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None;
-            btnSnapPoint.Checked = (cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None;
+            btnSnap.Checked = doc.Settings.Get<bool>("Snap");
+            btnSnapEnd.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.End) != SimpleCAD.SnapPointType.None;
+            btnSnapMiddle.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Middle) != SimpleCAD.SnapPointType.None;
+            btnSnapCenter.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Center) != SimpleCAD.SnapPointType.None;
+            btnSnapQuadrant.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None;
+            btnSnapPoint.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None;
         }
 
         private void btnDrawPoint_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Point");
+            ed.RunCommand("Primitives.Point");
         }
 
         private void btnDrawLine_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Line");
+            ed.RunCommand("Primitives.Line");
         }
 
         private void btnDrawArc_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Arc");
+            ed.RunCommand("Primitives.Arc");
         }
 
         private void btnDrawCircle_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Circle");
+            ed.RunCommand("Primitives.Circle");
         }
 
         private void btnDrawEllipse_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Ellipse");
+            ed.RunCommand("Primitives.Ellipse");
         }
 
         private void btnDrawEllipticArc_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Elliptic_Arc");
+            ed.RunCommand("Primitives.Elliptic_Arc");
         }
 
         private void btnDrawText_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Text");
+            ed.RunCommand("Primitives.Text");
         }
 
         private void btnDrawDimension_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Dimension");
+            ed.RunCommand("Primitives.Dimension");
         }
 
         private void btnDrawParabola_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Parabola");
+            ed.RunCommand("Primitives.Parabola");
         }
 
         private void btnDrawPolyline_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Polyline");
+            ed.RunCommand("Primitives.Polyline");
         }
 
         private void btnDrawHatch_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Hatch");
+            ed.RunCommand("Primitives.Hatch");
         }
 
         private void btnDrawRectangle_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Rectangle");
+            ed.RunCommand("Primitives.Rectangle");
         }
 
         private void btnDrawTriangle_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Primitives.Triangle");
+            ed.RunCommand("Primitives.Triangle");
         }
 
         private void btnMove_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Transform.Move");
+            ed.RunCommand("Transform.Move");
         }
 
         private void btnCopy_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Transform.Copy");
+            ed.RunCommand("Transform.Copy");
         }
 
         private void btnRotate_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Transform.Rotate");
+            ed.RunCommand("Transform.Rotate");
         }
 
         private void btnScale_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Transform.Scale");
+            ed.RunCommand("Transform.Scale");
         }
 
         private void btnMirror_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Transform.Mirror");
+            ed.RunCommand("Transform.Mirror");
         }
 
         private void btnShowGrid_Click(object sender, EventArgs e)
@@ -214,62 +220,62 @@ namespace SimpleCADTest
 
         private void btnZoom_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("View.Zoom");
+            ed.RunCommand("View.Zoom");
         }
 
         private void btnPan_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("View.Pan");
+            ed.RunCommand("View.Pan");
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Editor.RunCommand("Edit.Delete");
+            ed.RunCommand("Edit.Delete");
         }
 
         private void btnSnap_Click(object sender, EventArgs e)
         {
-            cadWindow1.Document.Settings.Set("Snap", btnSnap.Checked);
+            doc.Settings.Snap = btnSnap.Checked;
         }
 
         private void btnSnapEnd_Click(object sender, EventArgs e)
         {
             if (btnSnapEnd.Checked)
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") | SimpleCAD.SnapPointType.End);
+                doc.Settings.SnapMode |= SimpleCAD.SnapPointType.End;
             else
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & ~SimpleCAD.SnapPointType.End);
+                doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.End;
         }
 
         private void btnSnapMiddle_Click(object sender, EventArgs e)
         {
             if (btnSnapMiddle.Checked)
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") | SimpleCAD.SnapPointType.Middle);
+                doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Middle;
             else
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & ~SimpleCAD.SnapPointType.Middle);
+                doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Middle;
         }
 
         private void btnSnapCenter_Click(object sender, EventArgs e)
         {
             if (btnSnapCenter.Checked)
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") | SimpleCAD.SnapPointType.Center);
+                doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Center;
             else
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & ~SimpleCAD.SnapPointType.Center);
+                doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Center;
         }
 
         private void btnSnapQuadrant_Click(object sender, EventArgs e)
         {
             if (btnSnapQuadrant.Checked)
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") | SimpleCAD.SnapPointType.Quadrant);
+                doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Quadrant;
             else
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & ~SimpleCAD.SnapPointType.Quadrant);
+                doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Quadrant;
         }
 
         private void btnSnapPoint_Click(object sender, EventArgs e)
         {
             if (btnSnapPoint.Checked)
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") | SimpleCAD.SnapPointType.Point);
+                doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Point;
             else
-                cadWindow1.Document.Settings.Set("SnapMode", cadWindow1.Document.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & ~SimpleCAD.SnapPointType.Point);
+                doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Point;
         }
     }
 }

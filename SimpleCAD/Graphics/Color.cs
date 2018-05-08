@@ -283,6 +283,11 @@ namespace SimpleCAD.Graphics
 
             return KnownColor.Transparent;
         }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
         #endregion
 
         #region Static Color Constructor Methods
