@@ -1,16 +1,16 @@
 ﻿using SimpleCAD.Geometry;
 
-namespace SimpleCAD.Drawables
+namespace SimpleCAD
 {
+    public enum ControlPointType
+    {
+        Point,
+        Angle,
+        Distance
+    }
+
     public class ControlPoint
     {
-        public enum ControlPointType
-        {
-            Point,
-            Angle,
-            Distance
-        }
-
         public string Name { get; private set; }
         public ControlPointType Type { get; private set; }
         public Point2D BasePoint { get; private set; }

@@ -71,9 +71,19 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Center point", Center),
-                new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
-                new ControlPoint("Start angle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
-                new ControlPoint("End angle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
+                new ControlPoint("Radius", ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
+                new ControlPoint("Start angle", ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("End angle", ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
+            };
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            return new[]
+            {
+                new SnapPoint("Center point", SnapPointType.Center, Center),
+                new SnapPoint("Start point", Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new SnapPoint("End point", Center + Radius * Vector2D.FromAngle(EndAngle)),
             };
         }
 

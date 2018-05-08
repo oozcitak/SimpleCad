@@ -99,6 +99,16 @@ namespace SimpleCAD.Drawables
             return cp;
         }
 
+        public override SnapPoint[] GetSnapPoints()
+        {
+            SnapPoint[] cp = new SnapPoint[Points.Count];
+            for (int i = 0; i < Points.Count; i++)
+            {
+                cp[i] = new SnapPoint("Vertex (" + (i + 1).ToString() + ")", Points[i]);
+            }
+            return cp;
+        }
+
         public override void TransformControlPoint(int index, Matrix2D transformation)
         {
             Points[index] = Points[index].Transform(transformation);

@@ -1,4 +1,5 @@
-﻿using SimpleCAD.Geometry;
+﻿using SimpleCAD.Drawables;
+using SimpleCAD.Geometry;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,6 +39,7 @@ namespace SimpleCAD
             Editor.KeyDown -= Editor_KeyDown;
             Editor.KeyPress -= Editor_KeyPress;
 
+            Editor.SnapPoints.Clear();
             Editor.InputMode = false;
         }
 
@@ -78,6 +80,15 @@ namespace SimpleCAD
 
         private void Editor_CursorMove(object sender, CursorEventArgs e)
         {
+            // check snap mode
+            SnapPointType snapMode = Editor.SnapMode;
+            float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.Get<int>("SnapDistance"), 0)).X;
+            Editor.SnapPoints.Clear();
+            foreach (Drawable item in Editor.Document.Model)
+            {
+                Editor.SnapPoints.AddFromDrawable(item, e.Location, snapMode, snapDist);
+            }
+
             CoordsChanged(e.Location);
         }
 
@@ -90,7 +101,7 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Left)
             {
-                var args = new InputArgs<Point2D, TValue>(e.Location);
+                var args = new InputArgs<Point2D, TValue>(Editor.SnapPoints.IsEmpty ? e.Location : Editor.SnapPoints.Current().Location);
                 AcceptCoordsInput(args);
                 if (args.InputValid)
                 {
@@ -155,6 +166,13 @@ namespace SimpleCAD
                     var result = InputResult<TValue>.CancelResult();
                     Completion.SetResult(result);
                 }
+            }
+            else if (e.KeyCode == Keys.Tab)
+            {
+                if (e.Shift)
+                    Editor.SnapPoints.Next();
+                else
+                    Editor.SnapPoints.Previous();
             }
         }
 

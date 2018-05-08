@@ -98,6 +98,7 @@ namespace SimpleCAD
             Set("JigColor", Color.Orange);
             Set("ControlPointColor", Color.FromArgb(46, 116, 251));
             Set("ActiveControlPointColor", Color.FromArgb(251, 116, 46));
+            Set("SnapPointColor", Color.FromArgb(251, 251, 116));
 
             Set("MinorGridColor", Color.FromArgb(64, 64, 64));
             Set("MajorGridColor", Color.FromArgb(96, 96, 96));
@@ -106,6 +107,9 @@ namespace SimpleCAD
             Set("PickBoxSize", 6);
             Set("ControlPointSize", 7);
             Set("PointSize", 6);
+            Set("SnapPointSize", 11);
+            Set("SnapDistance", 25);
+            Set("SnapMode", (int)SnapPointType.All);
 
             UpdateSettings();
         }

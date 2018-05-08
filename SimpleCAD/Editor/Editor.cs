@@ -1,4 +1,5 @@
-﻿using SimpleCAD.Geometry;
+﻿using SimpleCAD.Drawables;
+using SimpleCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,16 +15,11 @@ namespace SimpleCAD
         public CADDocument Document { get; private set; }
         internal bool InputMode { get; set; } = false;
 
-        public event EditorPromptEventHandler Prompt;
-        public event EditorErrorEventHandler Error;
-
-        internal event CursorEventHandler CursorMove;
-        internal event CursorEventHandler CursorClick;
-        internal event KeyEventHandler KeyDown;
-        internal event KeyPressEventHandler KeyPress;
-
         internal SelectionSet CurrentSelection { get; private set; } = new SelectionSet();
         public SelectionSet PickedSelection { get; private set; } = new SelectionSet();
+
+        public SnapPointType SnapMode { get => Document.Settings.Get<SnapPointType>("SnapMode"); }
+        internal SnapPointCollection SnapPoints { get; set; } = new SnapPointCollection();
 
         static Editor()
         {
@@ -246,6 +242,12 @@ namespace SimpleCAD
         }
         #endregion
 
+        #region View Events
+        internal event CursorEventHandler CursorMove;
+        internal event CursorEventHandler CursorClick;
+        internal event KeyEventHandler KeyDown;
+        internal event KeyPressEventHandler KeyPress;
+
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
             CursorMove?.Invoke(sender, e);
@@ -265,6 +267,11 @@ namespace SimpleCAD
         {
             KeyPress?.Invoke(sender, e);
         }
+        #endregion
+
+        #region Events
+        public event EditorPromptEventHandler Prompt;
+        public event EditorErrorEventHandler Error;
 
         protected void OnPrompt(EditorPromptEventArgs e)
         {
@@ -275,5 +282,6 @@ namespace SimpleCAD
         {
             Error?.Invoke(this, e);
         }
+        #endregion
     }
 }

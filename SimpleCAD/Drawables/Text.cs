@@ -108,8 +108,16 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Location", Location),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + System.Math.Max(Width, cpSize) * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("Text height", ControlPoint.ControlPointType.Distance, Location, Location + TextHeight * upDir),
+                new ControlPoint("Rotation", ControlPointType.Angle, Location, Location + System.Math.Max(Width, cpSize) * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Text height", ControlPointType.Distance, Location, Location + TextHeight * upDir),
+            };
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            return new[]
+            {
+                new SnapPoint("Location", SnapPointType.Point, Location),
             };
         }
 

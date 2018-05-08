@@ -118,9 +118,26 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Center point", Center),
-                new ControlPoint("Semi major axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("Semi minor axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Semi major axis", ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Semi minor axis", ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
+                new ControlPoint("Rotation", ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
+            };
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            float ts = MathF.Atan2(MathF.Sin(StartAngle) * SemiMajorAxis, MathF.Cos(StartAngle) * SemiMinorAxis);
+            float xs = SemiMajorAxis * MathF.Cos(ts);
+            float ys = SemiMinorAxis * MathF.Sin(ts);
+            float te = MathF.Atan2(MathF.Sin(EndAngle) * SemiMajorAxis, MathF.Cos(EndAngle) * SemiMinorAxis);
+            float xe = SemiMajorAxis * MathF.Cos(ts);
+            float ye = SemiMinorAxis * MathF.Sin(ts);
+
+            return new[]
+            {
+                new SnapPoint("Center point", SnapPointType.Center, Center),
+                new SnapPoint("Start point", new Point2D(xs, ys)),
+                new SnapPoint("End point", new Point2D(xe, ye)),
             };
         }
 

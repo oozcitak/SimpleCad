@@ -65,6 +65,16 @@ namespace SimpleCAD.Drawables
             return false;
         }
 
+        public override SnapPoint[] GetSnapPoints()
+        {
+            List<SnapPoint> points = new List<SnapPoint>();
+            foreach (Drawable d in items)
+            {
+                if (d.Visible && (d.Layer == null || d.Layer.Visible)) points.AddRange(d.GetSnapPoints());
+            }
+            return points.ToArray();
+        }
+
         public override void TransformBy(Matrix2D transformation)
         {
             foreach (Drawable item in items)

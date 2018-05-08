@@ -60,6 +60,14 @@ namespace SimpleCAD.Drawables
             };
         }
 
+        public override SnapPoint[] GetSnapPoints()
+        {
+            return new[]
+            {
+                new SnapPoint("Start point", SnapPointType.Point, Location),
+            };
+        }
+
         public override void TransformControlPoint(int index, Matrix2D transformation)
         {
             if (index == 0)

@@ -61,7 +61,19 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Center point", Center),
-                new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.XAxis),
+                new ControlPoint("Radius", ControlPointType.Distance, Center, Center + Radius * Vector2D.XAxis),
+            };
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            return new[]
+            {
+                new SnapPoint("Center point", SnapPointType.Center, Center),
+                new SnapPoint("East quadrant", SnapPointType.Quadrant, Center + Radius * Vector2D.XAxis),
+                new SnapPoint("North quadrant", SnapPointType.Quadrant, Center + Radius * Vector2D.YAxis),
+                new SnapPoint("West quadrant", SnapPointType.Quadrant, Center - Radius * Vector2D.XAxis),
+                new SnapPoint("South quadrant", SnapPointType.Quadrant, Center - Radius * Vector2D.YAxis),
             };
         }
 

@@ -60,6 +60,7 @@
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
+    <Compile Include="Editor\SnapPoint.cs" />
     <Compile Include="Drawables\Point.cs" />
     <Compile Include="Drawables\Polygon.cs" />
     <Compile Include="Editor\FloatGetter.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Editor\InitArgs.cs" />
     <Compile Include="Editor\IntGetter.cs" />
     <Compile Include="Editor\OpenFilenameGetter.cs" />
+    <Compile Include="Editor\SnapPointCollection.cs" />
     <Compile Include="Editor\TextGetter.cs" />
     <Compile Include="Editor\DistanceGetter.cs" />
     <Compile Include="Editor\CornerGetter.cs" />
@@ -90,7 +92,7 @@
     <Compile Include="Commands\Command_Document.cs" />
     <Compile Include="Commands\Command_Transform.cs" />
     <Compile Include="Commands\Command_Primitives.cs" />
-    <Compile Include="Drawables\ControlPoint.cs" />
+    <Compile Include="Editor\ControlPoint.cs" />
     <Compile Include="Editor\InputArgs.cs" />
     <Compile Include="Drawables\Hatch.cs" />
     <Compile Include="Document\IPersistable.cs" />

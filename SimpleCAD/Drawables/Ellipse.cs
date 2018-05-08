@@ -103,9 +103,21 @@ namespace SimpleCAD.Drawables
             return new[]
             {
                 new ControlPoint("Center point", Center),
-                new ControlPoint("Semi major axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("Semi minor axis", ControlPoint.ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Semi major axis", ControlPointType.Distance, Center, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Semi minor axis", ControlPointType.Distance, Center, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
+                new ControlPoint("Rotation", ControlPointType.Angle, Center, Center + (SemiMajorAxis + cpSize) * Vector2D.FromAngle(Rotation)),
+            };
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            return new[]
+            {
+                new SnapPoint("Center point", SnapPointType.Center, Center),
+                new SnapPoint("East quadrant", SnapPointType.Quadrant, Center + SemiMajorAxis * Vector2D.FromAngle(Rotation)),
+                new SnapPoint("North quadrant", SnapPointType.Quadrant, Center + SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
+                new SnapPoint("West quadrant", SnapPointType.Quadrant, Center - SemiMajorAxis * Vector2D.FromAngle(Rotation)),
+                new SnapPoint("South quadrant", SnapPointType.Quadrant, Center - SemiMinorAxis * Vector2D.FromAngle(Rotation).Perpendicular),
             };
         }
 
