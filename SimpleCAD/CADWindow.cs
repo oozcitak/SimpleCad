@@ -53,5 +53,19 @@ namespace SimpleCAD
             if (View != null)
                 View.Dispose();
         }
+
+        protected override bool IsInputKey(Keys keyData)
+        {
+            if ((keyData & Keys.Tab) == Keys.Tab)
+                return true;
+            else if ((keyData & Keys.Escape) == Keys.Escape)
+                return true;
+            else if ((keyData & Keys.Return) == Keys.Return)
+                return true;
+            else if ((keyData & Keys.Enter) == Keys.Enter)
+                return true;
+            else
+                return base.IsInputKey(keyData);
+        }
     }
 }

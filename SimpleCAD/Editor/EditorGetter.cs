@@ -173,6 +173,7 @@ namespace SimpleCAD
                     Editor.SnapPoints.Next();
                 else
                     Editor.SnapPoints.Previous();
+                Editor.Document.ActiveView.Redraw();
             }
         }
 

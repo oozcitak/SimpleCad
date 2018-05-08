@@ -38,8 +38,7 @@ namespace SimpleCAD
             set
             {
                 showGrid = value;
-                if (Control != null)
-                    Control.Invalidate();
+                Redraw();
             }
         }
 
@@ -50,8 +49,7 @@ namespace SimpleCAD
             set
             {
                 showAxes = value;
-                if (Control != null)
-                    Control.Invalidate();
+                Redraw();
             }
         }
 
@@ -62,8 +60,7 @@ namespace SimpleCAD
             set
             {
                 showCursor = value;
-                if (Control != null)
-                    Control.Invalidate();
+                Redraw();
             }
         }
 
@@ -92,7 +89,7 @@ namespace SimpleCAD
             Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
             renderer = new Renderer(this);
             renderer.Init(Control);
-            Control.Invalidate();
+            Redraw();
 
             panning = false;
 
@@ -112,8 +109,6 @@ namespace SimpleCAD
             Control.Paint += CadView_Paint;
             Control.MouseEnter += CadView_MouseEnter;
             Control.MouseLeave += CadView_MouseLeave;
-            Control.GotFocus += Control_GotFocus;
-            Control.LostFocus += Control_LostFocus;
 
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
@@ -122,15 +117,9 @@ namespace SimpleCAD
             Document.Editor.Error += Editor_Error;
         }
 
-        private void Control_LostFocus(object sender, EventArgs e)
+        public void Redraw()
         {
-            if (ReferenceEquals(Document.ActiveView, this))
-                Document.ActiveView = null;
-        }
-
-        private void Control_GotFocus(object sender, EventArgs e)
-        {
-            Document.ActiveView = this;
+            Control.Invalidate();
         }
 
         public void Render(System.Drawing.Graphics graphics)
@@ -411,35 +400,35 @@ namespace SimpleCAD
 
         private void Document_SelectionChanged(object sender, EventArgs e)
         {
-            Control.Invalidate();
+            Redraw();
         }
 
         private void Document_Changed(object sender, EventArgs e)
         {
-            Control.Invalidate();
+            Redraw();
         }
 
         private void Document_TransientsChanged(object sender, EventArgs e)
         {
-            Control.Invalidate();
+            Redraw();
         }
 
         private void Editor_Prompt(object sender, EditorPromptEventArgs e)
         {
             viewCursor.Message = e.Status;
-            Control.Invalidate();
+            Redraw();
         }
 
         private void Editor_Error(object sender, EditorErrorEventArgs e)
         {
             viewCursor.Message = e.Error.Message;
-            Control.Invalidate();
+            Redraw();
         }
 
         void CadView_Resize(object sender, EventArgs e)
         {
             Resize(Control.ClientRectangle.Width, Control.ClientRectangle.Height);
-            Control.Invalidate();
+            Redraw();
         }
 
         void CadView_MouseDown(object sender, MouseEventArgs e)
@@ -493,7 +482,7 @@ namespace SimpleCAD
             if (e.Button == MouseButtons.Middle && Interactive && panning)
             {
                 panning = false;
-                Control.Invalidate();
+                Redraw();
             }
             else if (e.Button == MouseButtons.Left && Interactive && !Document.Editor.InputMode)
             {
@@ -586,7 +575,7 @@ namespace SimpleCAD
         {
             CursorLocation = e.Location;
             viewCursor.Location = CursorLocation;
-            Control.Invalidate();
+            Redraw();
 
             if (e.Button == MouseButtons.Middle && panning)
             {
@@ -594,7 +583,7 @@ namespace SimpleCAD
                 Point2D scrPt = WorldToScreen(e.Location);
                 Pan(lastMouseLocationWorld - CursorLocation);
                 lastMouseLocationWorld = ScreenToWorld(scrPt);
-                Control.Invalidate();
+                Redraw();
             }
 
             if (Document.Editor.InputMode)
@@ -623,7 +612,7 @@ namespace SimpleCAD
                 {
                     ZoomOut();
                 }
-                Control.Invalidate();
+                Redraw();
             }
         }
 
@@ -639,7 +628,11 @@ namespace SimpleCAD
         {
             viewCursor.Visible = false;
             Cursor.Show();
-            Control.Invalidate();
+
+            if (ReferenceEquals(Document.ActiveView, this))
+                Document.ActiveView = null;
+
+            Redraw();
         }
 
         private void CadView_MouseEnter(object sender, EventArgs e)
@@ -647,7 +640,10 @@ namespace SimpleCAD
             if (ShowCursor)
                 viewCursor.Visible = true;
             Cursor.Hide();
-            Control.Invalidate();
+
+            Document.ActiveView = this;
+
+            Redraw();
         }
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)
@@ -728,8 +724,6 @@ namespace SimpleCAD
                 Control.Paint -= CadView_Paint;
                 Control.MouseEnter -= CadView_MouseEnter;
                 Control.MouseLeave -= CadView_MouseLeave;
-                Control.GotFocus -= Control_GotFocus;
-                Control.LostFocus -= Control_LostFocus;
             }
 
             if (renderer != null)
