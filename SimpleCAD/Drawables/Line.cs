@@ -2,7 +2,6 @@
 using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace SimpleCAD.Drawables
 {

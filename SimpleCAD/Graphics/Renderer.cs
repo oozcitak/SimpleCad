@@ -1,6 +1,5 @@
 ﻿using SimpleCAD.Geometry;
 using System;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace SimpleCAD.Graphics

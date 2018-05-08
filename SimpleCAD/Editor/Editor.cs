@@ -1,5 +1,4 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

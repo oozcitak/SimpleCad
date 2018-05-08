@@ -1,5 +1,4 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
