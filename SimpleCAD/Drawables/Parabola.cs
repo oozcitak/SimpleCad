@@ -66,7 +66,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.Get<int>("ControlPointSize"), 0)).X;
+            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.ControlPointSize, 0)).X;
             poly.Style = Style.ApplyLayer(Layer);
             renderer.Draw(poly);
         }

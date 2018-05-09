@@ -30,7 +30,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            float size = renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.Get<int>("PointSize"), 0)).X / 2;
+            float size = renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.PointSize, 0)).X / 2;
             renderer.DrawCircle(Style.ApplyLayer(Layer), Location, size);
         }
 

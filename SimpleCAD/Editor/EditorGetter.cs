@@ -81,10 +81,10 @@ namespace SimpleCAD
         {
             // check snap mode
             Editor.SnapPoints.Clear();
-            if (Editor.Document.Settings.Get<bool>("Snap"))
+            if (Editor.Document.Settings.Snap)
             {
                 SnapPointType snapMode = Editor.SnapMode;
-                float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.Get<int>("SnapDistance"), 0)).X;
+                float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.SnapDistance, 0)).X;
                 foreach (Drawable item in Editor.Document.Model)
                 {
                     if (item.Visible && (item.Layer == null || item.Layer.Visible))

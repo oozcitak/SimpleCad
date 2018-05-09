@@ -25,11 +25,11 @@ namespace SimpleCAD.View
             var doc = view.Document;
 
             Extents2D ex = view.GetViewport();
-            Color c = doc.Settings.Get<Color>("BackColor");
+            Color c = doc.Settings.BackColor;
             var luma = (int)Math.Sqrt(c.R * c.R * .299 + c.G * c.G * .587 + c.B * c.B * .114);
             Style cursorStyle = new Style(luma > 130 ? Color.Black : Color.White);
-            float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize") + 4, 0)).X / 2;
-            float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize"), 0)).X / 2;
+            float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.PickBoxSize + 4, 0)).X / 2;
+            float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.PickBoxSize, 0)).X / 2;
             float pxSize = view.ScreenToWorld(new Vector2D(1, 0)).X / 2;
 
             // Draw cursor
@@ -74,8 +74,8 @@ namespace SimpleCAD.View
                 }
 
                 // Draw cursor prompt
-                Style fore = new Style(doc.Settings.Get<Color>("CursorPromptForeColor"));
-                Style back = new Style(doc.Settings.Get<Color>("CursorPromptBackColor"));
+                Style fore = new Style(doc.Settings.CursorPromptForeColor);
+                Style back = new Style(doc.Settings.CursorPromptBackColor);
                 renderer.FillRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 renderer.DrawString(fore, new Point2D(x, y), Message, TextStyle, height, 0,

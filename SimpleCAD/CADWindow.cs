@@ -15,8 +15,8 @@ namespace SimpleCAD
 
         public override System.Drawing.Color BackColor
         {
-            get => System.Drawing.Color.FromArgb((int)Document.Settings.Get<Color>("BackColor").Argb);
-            set => Document.Settings.Set("BackColor", Color.FromArgb((uint)value.ToArgb()));
+            get => System.Drawing.Color.FromArgb((int)Document.Settings.BackColor.Argb);
+            set => Document.Settings.BackColor = Color.FromArgb((uint)value.ToArgb());
         }
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]

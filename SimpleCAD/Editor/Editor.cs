@@ -17,7 +17,7 @@ namespace SimpleCAD
         internal SelectionSet CurrentSelection { get; private set; } = new SelectionSet();
         public SelectionSet PickedSelection { get; private set; } = new SelectionSet();
 
-        public SnapPointType SnapMode { get => Document.Settings.Get<SnapPointType>("SnapMode"); }
+        public SnapPointType SnapMode { get => Document.Settings.SnapMode; }
         internal SnapPointCollection SnapPoints { get; set; } = new SnapPointCollection();
 
         static Editor()

@@ -52,13 +52,13 @@ namespace SimpleCAD
                 consHatch.Points[3] = p4;
                 if (pt.X > p1.X)
                 {
-                    consHatch.Style = new Style(Editor.Document.Settings.Get<Color>("SelectionWindowColor"));
-                    consLine.Style = new Style(Editor.Document.Settings.Get<Color>("SelectionWindowBorderColor"));
+                    consHatch.Style = new Style(Editor.Document.Settings.SelectionWindowColor);
+                    consLine.Style = new Style(Editor.Document.Settings.SelectionWindowBorderColor);
                 }
                 else
                 {
-                    consHatch.Style = new Style(Editor.Document.Settings.Get<Color>("ReverseSelectionWindowColor"));
-                    consLine.Style = new Style(Editor.Document.Settings.Get<Color>("SelectionWindowBorderColor"), 0, DashStyle.Dash);
+                    consHatch.Style = new Style(Editor.Document.Settings.ReverseSelectionWindowColor);
+                    consLine.Style = new Style(Editor.Document.Settings.SelectionWindowBorderColor, 0, DashStyle.Dash);
                 }
             }
         }

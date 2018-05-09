@@ -110,12 +110,12 @@ namespace SimpleCADTest
 
         private void UpdateUI()
         {
-            btnSnap.Checked = doc.Settings.Get<bool>("Snap");
-            btnSnapEnd.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.End) != SimpleCAD.SnapPointType.None;
-            btnSnapMiddle.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Middle) != SimpleCAD.SnapPointType.None;
-            btnSnapCenter.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Center) != SimpleCAD.SnapPointType.None;
-            btnSnapQuadrant.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None;
-            btnSnapPoint.Checked = (doc.Settings.Get<SimpleCAD.SnapPointType>("SnapMode") & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None;
+            btnSnap.Checked = doc.Settings.Snap;
+            btnSnapEnd.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.End) != SimpleCAD.SnapPointType.None;
+            btnSnapMiddle.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Middle) != SimpleCAD.SnapPointType.None;
+            btnSnapCenter.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Center) != SimpleCAD.SnapPointType.None;
+            btnSnapQuadrant.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None;
+            btnSnapPoint.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None;
         }
 
         private void btnDrawPoint_Click(object sender, EventArgs e)
