@@ -466,7 +466,7 @@ namespace SimpleCAD
                 panning = true;
                 lastMouseLocationWorld = e.Location;
             }
-            else if (e.Button == MouseButtons.Left && Interactive)
+            else if (e.Button == MouseButtons.Left && Interactive && !Document.Editor.InputMode)
             {
                 mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("PickBoxSize"), 0)).X);
                 Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
