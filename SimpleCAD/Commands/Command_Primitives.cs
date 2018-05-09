@@ -396,16 +396,13 @@ namespace SimpleCAD.Commands
             Editor ed = doc.Editor;
             ed.PickedSelection.Clear();
 
-            var p1 = await ed.GetPoint("Center point: ");
+            var p1 = await ed.GetPoint("First corner point: ");
             if (p1.Result != ResultMode.OK) return;
-            Rectangle consRec = new Rectangle(p1.Value, 0, 0);
-            doc.Jigged.Add(consRec);
-            var p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
-            if (p2.Result != ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
-            doc.Jigged.Remove(consRec);
+            var p2 = await ed.GetCorner("Second corner point: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
 
-            Drawable newItem = new Rectangle(p1.Value, p2.Value);
-            doc.Model.Add(newItem);
+            Polygon consRec = new Polygon(p1.Value, new Point2D(p2.Value.X, p1.Value.Y), p2.Value, new Point2D(p1.Value.X, p2.Value.Y));
+            doc.Model.Add(consRec);
         }
     }
 
@@ -423,13 +420,13 @@ namespace SimpleCAD.Commands
             if (p1.Result != ResultMode.OK) return;
             var p2 = await ed.GetPoint("Second point: ", p1.Value);
             if (p2.Result != ResultMode.OK) return;
-            Triangle consTri = new Triangle(p1.Value, p2.Value, p2.Value);
+            Polygon consTri = new Polygon(p1.Value, p2.Value, p2.Value);
             doc.Jigged.Add(consTri);
-            var p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.Point3 = p);
+            var p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.Points[2] = p);
             doc.Jigged.Remove(consTri);
             if (p3.Result != ResultMode.OK) return;
 
-            Drawable newItem = new Triangle(p1.Value, p2.Value, p3.Value);
+            Drawable newItem = new Polygon(p1.Value, p2.Value, p3.Value);
             doc.Model.Add(newItem);
         }
     }
