@@ -118,7 +118,14 @@ namespace SimpleCAD
 
     public class SelectionOptions : InputOptions<SelectionSet>
     {
-        public SelectionOptions(string message) : base(message)
+        public bool UsePickedSelection { get; set; }
+
+        public SelectionOptions(string message, bool usePickedSelection) : base(message)
+        {
+            UsePickedSelection = usePickedSelection;
+        }
+
+        public SelectionOptions(string message) : this(message, true)
         {
             ;
         }

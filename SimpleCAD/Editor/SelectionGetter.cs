@@ -14,7 +14,7 @@ namespace SimpleCAD
         protected override void Init(InitArgs<SelectionSet> args)
         {
             // Immediately return existing picked-selection if any
-            if (Editor.PickedSelection.Count != 0)
+            if (Options.UsePickedSelection && Editor.PickedSelection.Count != 0)
             {
                 Editor.CurrentSelection.Clear();
                 foreach (Drawable item in Editor.PickedSelection)
