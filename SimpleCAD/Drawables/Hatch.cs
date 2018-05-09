@@ -33,10 +33,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            Style.Fill = true;
-            renderer.DrawPolygon(Style, Points);
-            Style.Fill = false;
-            renderer.DrawPolygon(Style, Points);
+            renderer.FillPolygon(Style, Points);
         }
     }
 }

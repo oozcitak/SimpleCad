@@ -118,39 +118,35 @@ namespace SimpleCAD.Graphics
 
         public void DrawRectangle(Style style, Point2D p1, Point2D p2)
         {
-            if (style.Fill)
+            using (var pen = CreatePen(style))
             {
-                using (var brush = CreateBrush(style))
-                {
-                    gdi.FillRectangle(brush, Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
-                        Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
-                }
+                gdi.DrawRectangle(pen, Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
+                    Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
             }
-            else
+        }
+
+        public void FillRectangle(Style style, Point2D p1, Point2D p2)
+        {
+            using (var brush = CreateBrush(style))
             {
-                using (var pen = CreatePen(style))
-                {
-                    gdi.DrawRectangle(pen, Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
-                        Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
-                }
+                gdi.FillRectangle(brush, Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
+                    Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y));
             }
         }
 
         public void DrawCircle(Style style, Point2D center, float radius)
         {
-            if (style.Fill)
+            using (var pen = CreatePen(style))
             {
-                using (var brush = CreateBrush(style))
-                {
-                    gdi.FillEllipse(brush, center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
-                }
+                gdi.DrawEllipse(pen, center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
             }
-            else
+        }
+
+        public void FillCircle(Style style, Point2D center, float radius)
+        {
+            using (var brush = CreateBrush(style))
             {
-                using (var pen = CreatePen(style))
-                {
-                    gdi.DrawEllipse(pen, center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
-                }
+                gdi.FillEllipse(brush, center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
             }
         }
 
@@ -173,6 +169,18 @@ namespace SimpleCAD.Graphics
                 gdi.TranslateTransform(center.X, center.Y);
                 gdi.RotateTransform(rotation * 180 / MathF.PI);
                 gdi.DrawEllipse(pen, -semiMajorAxis, -semiMinorAxis, 2 * semiMajorAxis, 2 * semiMinorAxis);
+                gdi.Transform = matrix;
+            }
+        }
+
+        public void FillEllipse(Style style, Point2D center, float semiMajorAxis, float semiMinorAxis, float rotation)
+        {
+            using (var brush = CreateBrush(style))
+            {
+                var matrix = gdi.Transform;
+                gdi.TranslateTransform(center.X, center.Y);
+                gdi.RotateTransform(rotation * 180 / MathF.PI);
+                gdi.FillEllipse(brush, -semiMajorAxis, -semiMinorAxis, 2 * semiMajorAxis, 2 * semiMinorAxis);
                 gdi.Transform = matrix;
             }
         }
@@ -212,19 +220,21 @@ namespace SimpleCAD.Graphics
             if (points.Count > 1)
             {
                 var pts = points.ToPointF();
-                if (style.Fill)
+                using (var pen = CreatePen(style))
                 {
-                    using (var brush = CreateBrush(style))
-                    {
-                        gdi.FillPolygon(brush, pts);
-                    }
+                    gdi.DrawPolygon(pen, pts);
                 }
-                else
+            }
+        }
+
+        public void FillPolygon(Style style, Point2DCollection points)
+        {
+            if (points.Count > 1)
+            {
+                var pts = points.ToPointF();
+                using (var brush = CreateBrush(style))
                 {
-                    using (var pen = CreatePen(style))
-                    {
-                        gdi.DrawPolygon(pen, pts);
-                    }
+                    gdi.FillPolygon(brush, pts);
                 }
             }
         }

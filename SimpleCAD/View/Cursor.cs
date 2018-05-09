@@ -76,9 +76,7 @@ namespace SimpleCAD.View
                 // Draw cursor prompt
                 Style fore = new Style(doc.Settings.Get<Color>("CursorPromptForeColor"));
                 Style back = new Style(doc.Settings.Get<Color>("CursorPromptBackColor"));
-                back.Fill = true;
-                renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                back.Fill = false;
+                renderer.FillRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 renderer.DrawString(fore, new Point2D(x, y), Message, TextStyle, height, 0,
                     TextHorizontalAlignment.Left, TextVerticalAlignment.Top);
