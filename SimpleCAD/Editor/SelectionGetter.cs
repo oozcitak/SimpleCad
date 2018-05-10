@@ -13,7 +13,22 @@ namespace SimpleCAD
 
         protected override void Init(InitArgs<SelectionSet> args)
         {
-            getFirstPoint = false;
+            // Immediately return existing picked-selection if any
+            if (Options.UsePickedSelection && Editor.PickedSelection.Count != 0)
+            {
+                SelectionSet ss = new SelectionSet();
+                foreach (Drawable item in Editor.PickedSelection)
+                {
+                    ss.Add(item);
+                }
+                Editor.PickedSelection.Clear();
+                args.Value = ss;
+                args.ContinueAsync = false;
+            }
+            else
+            {
+                getFirstPoint = false;
+            }
         }
 
         protected override void CoordsChanged(Point2D pt)

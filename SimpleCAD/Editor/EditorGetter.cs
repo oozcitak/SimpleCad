@@ -60,7 +60,7 @@ namespace SimpleCAD
                 if (!initArgs.ContinueAsync)
                 {
                     if (initArgs.InputValid)
-                        getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
+                        getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value, AcceptReason.Init));
                     else
                         getter.Completion.SetResult(InputResult<TValue>.CancelResult(CancelReason.Init));
                 }
@@ -109,7 +109,7 @@ namespace SimpleCAD
                 if (args.InputValid)
                 {
                     Editor.DoPrompt("");
-                    var result = InputResult<TValue>.AcceptResult(args.Value);
+                    var result = InputResult<TValue>.AcceptResult(args.Value, AcceptReason.Coords);
                     if (args.InputCompleted)
                         Completion.SetResult(result);
                 }
@@ -152,7 +152,7 @@ namespace SimpleCAD
                     if (args.InputValid)
                     {
                         Editor.DoPrompt("");
-                        var result = InputResult<TValue>.AcceptResult(args.Value);
+                        var result = InputResult<TValue>.AcceptResult(args.Value, AcceptReason.Text);
                         if (args.InputCompleted)
                             Completion.SetResult(result);
                     }

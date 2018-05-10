@@ -134,27 +134,18 @@ namespace SimpleCAD
         {
             CurrentSelection.Clear();
 
-            // Immediately return existing picked-selection if any
-            if (options.UsePickedSelection && PickedSelection.Count != 0)
-            {
-                SelectionSet ss = new SelectionSet();
-                foreach (Drawable item in PickedSelection)
-                {
-                    CurrentSelection.Add(item);
-                }
-                return InputResult<SelectionSet>.AcceptResult(CurrentSelection);
-            }
-
             while (true)
             {
-                SelectionSet ss = new SelectionSet();
                 var result = await SelectionGetter.Run<SelectionGetter>(this, options);
                 if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Escape || result.CancelReason == CancelReason.Init))
                     return result;
                 else if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Enter || result.CancelReason == CancelReason.Space))
-                    return InputResult<SelectionSet>.AcceptResult(CurrentSelection);
+                    return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Coords);
                 else if (result.Result == ResultMode.OK)
                     CurrentSelection.UnionWith(result.Value);
+
+                if (result.Result == ResultMode.OK && result.AcceptReason == AcceptReason.Init)
+                    return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Init);
             }
         }
 
