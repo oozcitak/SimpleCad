@@ -13,22 +13,7 @@ namespace SimpleCAD
 
         protected override void Init(InitArgs<SelectionSet> args)
         {
-            // Immediately return existing picked-selection if any
-            if (Options.UsePickedSelection && Editor.PickedSelection.Count != 0)
-            {
-                Editor.CurrentSelection.Clear();
-                foreach (Drawable item in Editor.PickedSelection)
-                {
-                    Editor.CurrentSelection.Add(item);
-                }
-                Editor.PickedSelection.Clear();
-                args.Value = Editor.CurrentSelection;
-                args.ContinueAsync = false;
-            }
-            else
-            {
-                getFirstPoint = false;
-            }
+            getFirstPoint = false;
         }
 
         protected override void CoordsChanged(Point2D pt)
@@ -121,16 +106,16 @@ namespace SimpleCAD
 
         private SelectionSet GetSelectionFromWindow()
         {
-            Editor.CurrentSelection.Clear();
             Extents2D ex = consHatch.GetExtents();
             bool windowSelection = (consHatch.Points[2].X > consHatch.Points[0].X);
+            SelectionSet ss = new SelectionSet();
             foreach (Drawable item in Editor.Document.Model)
             {
                 Extents2D exItem = item.GetExtents();
                 if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
-                    Editor.CurrentSelection.Add(item);
+                    ss.Add(item);
             }
-            return Editor.CurrentSelection;
+            return ss;
         }
     }
 }

@@ -62,7 +62,7 @@ namespace SimpleCAD
                     if (initArgs.InputValid)
                         getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
                     else
-                        getter.Completion.SetResult(InputResult<TValue>.CancelResult());
+                        getter.Completion.SetResult(InputResult<TValue>.CancelResult(CancelReason.Init));
                 }
 
                 if (initArgs.ContinueAsync)
@@ -132,7 +132,7 @@ namespace SimpleCAD
             {
                 Editor.DoPrompt("");
                 CancelInput();
-                var result = InputResult<TValue>.CancelResult();
+                var result = InputResult<TValue>.CancelResult(CancelReason.Escape);
                 Completion.SetResult(result);
             }
             else if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || (SpaceAccepts && e.KeyCode == Keys.Space))
@@ -166,7 +166,7 @@ namespace SimpleCAD
                 {
                     Editor.DoPrompt("");
                     CancelInput();
-                    var result = InputResult<TValue>.CancelResult();
+                    var result = InputResult<TValue>.CancelResult(e.KeyCode == Keys.Space ? CancelReason.Space : CancelReason.Enter);
                     Completion.SetResult(result);
                 }
             }

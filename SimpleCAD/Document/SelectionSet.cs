@@ -10,6 +10,8 @@ namespace SimpleCAD
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        public static SelectionSet Empty => new SelectionSet();
+
         public SelectionSet()
         {
             ;
@@ -70,12 +72,15 @@ namespace SimpleCAD
             CollectionChanged?.Invoke(this, e);
         }
 
-        #region Not Implemented
-        void ISet<Drawable>.UnionWith(IEnumerable<Drawable> other)
+        public void UnionWith(IEnumerable<Drawable> other)
         {
-            throw new NotImplementedException();
+            foreach(var item in other)
+            {
+                Add(item);
+            }
         }
 
+        #region Not Implemented
         void ISet<Drawable>.IntersectWith(IEnumerable<Drawable> other)
         {
             throw new NotImplementedException();
@@ -123,7 +128,7 @@ namespace SimpleCAD
 
         void ICollection<Drawable>.Add(Drawable item)
         {
-            throw new NotImplementedException();
+            ((ISet<Drawable>)this).Add(item);
         }
         #endregion
     }
