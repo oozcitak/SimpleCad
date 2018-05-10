@@ -67,6 +67,13 @@ namespace SimpleCAD.Drawables
         public override void Draw(Renderer renderer)
         {
             cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.ControlPointSize, 0)).X;
+            float p = poly.Length;
+            float newCurveLength = renderer.View.WorldToScreen(new Vector2D(p, 0)).X;
+            if (!MathF.IsEqual(newCurveLength, curveLength))
+            {
+                curveLength = newCurveLength;
+                UpdatePolyline();
+            }
             poly.Style = Style.ApplyLayer(Layer);
             renderer.Draw(poly);
         }
@@ -76,7 +83,6 @@ namespace SimpleCAD.Drawables
             poly = new Polyline();
             // Represent curved features by at most 4 pixels
             int n = (int)Math.Max(4, curveLength / 4);
-            float da = 2 * MathF.PI / n;
             float t = 0;
             float dt = 1f / n;
             for (int i = 0; i <= n; i++)
