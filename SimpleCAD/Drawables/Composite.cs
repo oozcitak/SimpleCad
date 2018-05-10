@@ -90,10 +90,13 @@ namespace SimpleCAD.Drawables
             return points.ToArray();
         }
 
-        public override void TransformControlPoint(int index, Matrix2D transformation)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
         {
-            if (index == 0)
-                TransformBy(transformation);
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    TransformBy(transformation);
+            }
         }
 
         public override void TransformBy(Matrix2D transformation)

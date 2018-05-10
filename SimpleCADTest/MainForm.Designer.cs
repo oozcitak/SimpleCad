@@ -76,6 +76,7 @@
             this.btnSnapCenter = new System.Windows.Forms.ToolStripButton();
             this.btnSnapQuadrant = new System.Windows.Forms.ToolStripButton();
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
+            this.btnStretch = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -485,10 +486,11 @@
             this.btnCopy,
             this.btnRotate,
             this.btnScale,
-            this.btnMirror});
+            this.btnMirror,
+            this.btnStretch});
             this.tsTransform.Location = new System.Drawing.Point(3, 100);
             this.tsTransform.Name = "tsTransform";
-            this.tsTransform.Size = new System.Drawing.Size(219, 25);
+            this.tsTransform.Size = new System.Drawing.Size(298, 25);
             this.tsTransform.TabIndex = 2;
             // 
             // btnMove
@@ -553,7 +555,7 @@
             this.btnSnapPoint});
             this.tsSnap.Location = new System.Drawing.Point(3, 125);
             this.tsSnap.Name = "tsSnap";
-            this.tsSnap.Size = new System.Drawing.Size(305, 25);
+            this.tsSnap.Size = new System.Drawing.Size(274, 25);
             this.tsSnap.TabIndex = 6;
             // 
             // btnSnap
@@ -621,6 +623,16 @@
             this.btnSnapPoint.Size = new System.Drawing.Size(39, 22);
             this.btnSnapPoint.Text = "Point";
             this.btnSnapPoint.Click += new System.EventHandler(this.btnSnapPoint_Click);
+            // 
+            // btnStretch
+            // 
+            this.btnStretch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnStretch.Image = ((System.Drawing.Image)(resources.GetObject("btnStretch.Image")));
+            this.btnStretch.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnStretch.Name = "btnStretch";
+            this.btnStretch.Size = new System.Drawing.Size(48, 22);
+            this.btnStretch.Text = "Stretch";
+            this.btnStretch.Click += new System.EventHandler(this.btnStretch_Click);
             // 
             // MainForm
             // 
@@ -711,6 +723,7 @@
         private System.Windows.Forms.ToolStripButton btnSnapQuadrant;
         private System.Windows.Forms.ToolStripButton btnSnapPoint;
         private System.Windows.Forms.ToolStripButton btnSnap;
+        private System.Windows.Forms.ToolStripButton btnStretch;
     }
 }
 

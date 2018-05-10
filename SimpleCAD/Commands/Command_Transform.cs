@@ -1,5 +1,6 @@
 ﻿using SimpleCAD.Drawables;
 using SimpleCAD.Geometry;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimpleCAD.Commands
@@ -201,6 +202,48 @@ namespace SimpleCAD.Commands
                 Drawable newItem = item.Clone();
                 newItem.TransformBy(Matrix2D.Mirror(p1.Value, p2.Value - p1.Value));
                 doc.Model.Add(newItem);
+            }
+        }
+    }
+
+    public class TransformMoveControlPoints : Command
+    {
+        public override string RegisteredName => "Transform.MoveControlPoints";
+        public override string Name => "MoveControlPoints";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+
+            var s = await ed.GetControlPoints("Select objects: ");
+            if (s.Result != ResultMode.OK || s.Value.Count == 0) return;
+            var p1 = await ed.GetPoint("Base point: ");
+            if (p1.Result != ResultMode.OK) return;
+            Composite consItems = new Composite();
+            CPSelectionSet consSet = new CPSelectionSet();
+            foreach (var pair in s.Value)
+            {
+                Drawable item = pair.Key.Clone();
+                consItems.Add(item);
+                consSet.Add(item, pair.Value);
+            }
+            doc.Transients.Add(consItems);
+            Point2D lastPt = p1.Value;
+            var p2 = await ed.GetPoint("Second point: ", p1.Value,
+                (p) =>
+                {
+                    foreach (Drawable item in consItems)
+                    {
+                        item.TransformControlPoints(consSet[item], Matrix2D.Translation(p - lastPt));
+                    }
+                    lastPt = p;
+                });
+            doc.Transients.Remove(consItems);
+            if (p2.Result != ResultMode.OK) return;
+
+            foreach (var pair in s.Value)
+            {
+                pair.Key.TransformControlPoints(pair.Value.ToArray(), Matrix2D.Translation(p2.Value - p1.Value));
             }
         }
     }

@@ -155,6 +155,36 @@ namespace SimpleCAD
             }
         }
 
+        public async Task<InputResult<CPSelectionSet>> GetControlPoints(string message)
+        {
+            return await GetControlPoints(new CPSelectionOptions(message));
+        }
+
+        public async Task<InputResult<CPSelectionSet>> GetControlPoints(CPSelectionOptions options)
+        {
+            CurrentSelection.Clear();
+
+            CPSelectionSet ss = new CPSelectionSet();
+            while (true)
+            {
+                var result = await CPSelectionGetter.Run<CPSelectionGetter>(this, options);
+                if (result.Result == ResultMode.Cancel && result.CancelReason == CancelReason.Escape)
+                {
+                    return result;
+                }
+                else if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Enter || result.CancelReason == CancelReason.Space))
+                {
+                    CurrentSelection = ss.ToSelectionSet();
+                    return InputResult<CPSelectionSet>.AcceptResult(ss, AcceptReason.Coords);
+                }
+                else if (result.Result == ResultMode.OK)
+                {
+                    ss.UnionWith(result.Value);
+                    CurrentSelection = ss.ToSelectionSet();
+                }
+            }
+        }
+
         public async Task<InputResult<Point2D>> GetPoint(string message)
         {
             return await GetPoint(new PointOptions(message));

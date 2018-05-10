@@ -134,6 +134,18 @@ namespace SimpleCAD
         }
     }
 
+    public class CPSelectionOptions : InputOptions<CPSelectionSet>
+    {
+        internal List<Type> AllowedClasses { get; } = new List<Type>();
+
+        public void AddAllowedClass(Type type) => AllowedClasses.Add(type);
+
+        public CPSelectionOptions(string message) : base(message)
+        {
+            ;
+        }
+    }
+
     public class PointOptions : InputOptions<Point2D>
     {
         public bool HasBasePoint { get; private set; }

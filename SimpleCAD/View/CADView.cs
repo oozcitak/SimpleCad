@@ -519,9 +519,9 @@ namespace SimpleCAD
                             var res = await Document.Editor.GetPoint(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
-                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
                                     trans = Matrix2D.Translation(p - cp.BasePoint);
-                                    consItem.TransformControlPoint(cp.Index, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
                             trans = Matrix2D.Translation(res.Value - cp.BasePoint);
                             result = res.Result;
@@ -532,9 +532,9 @@ namespace SimpleCAD
                             var res = await Document.Editor.GetAngle(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
-                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
                                     trans = Matrix2D.Rotation(cp.BasePoint, p - orjVal);
-                                    consItem.TransformControlPoint(cp.Index, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
                             trans = Matrix2D.Rotation(cp.BasePoint, res.Value - orjVal);
                             result = res.Result;
@@ -546,9 +546,9 @@ namespace SimpleCAD
                             var res = await Document.Editor.GetDistance(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
-                                    consItem.TransformControlPoint(cp.Index, trans.Inverse);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
                                     trans = Matrix2D.Scale(cp.BasePoint, p / orjVal);
-                                    consItem.TransformControlPoint(cp.Index, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
                             trans = Matrix2D.Scale(cp.BasePoint, res.Value / orjVal);
                             result = res.Result;
@@ -557,7 +557,7 @@ namespace SimpleCAD
                         // Transform the control point
                         if (result == ResultMode.OK)
                         {
-                            item.TransformControlPoint(cp.Index, trans);
+                            item.TransformControlPoints(new int[] { cp.Index }, trans);
                         }
                         Document.Transients.Remove(consItem);
                         activeCP = null;

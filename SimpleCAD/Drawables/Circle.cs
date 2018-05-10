@@ -77,12 +77,15 @@ namespace SimpleCAD.Drawables
             };
         }
 
-        public override void TransformControlPoint(int index, Matrix2D transformation)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
         {
-            if (index == 0)
-                Center = Center.Transform(transformation);
-            else if (index == 1)
-                Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    Center = Center.Transform(transformation);
+                else if (index == 1)
+                    Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
+            }
         }
 
         public override void Load(DocumentReader reader)

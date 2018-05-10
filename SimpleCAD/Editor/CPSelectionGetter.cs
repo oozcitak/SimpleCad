@@ -4,32 +4,17 @@ using SimpleCAD.Graphics;
 
 namespace SimpleCAD
 {
-    internal class SelectionGetter : EditorGetter<SelectionOptions, SelectionSet>
+    internal class CPSelectionGetter : EditorGetter<CPSelectionOptions, CPSelectionSet>
     {
         Point2D firstPoint;
         bool getFirstPoint;
         Hatch consHatch;
         Polygon consLine;
 
-        protected override void Init(InitArgs<SelectionSet> args)
+        protected override void Init(InitArgs<CPSelectionSet> args)
         {
-            // Immediately return existing picked-selection if any
-            if (Options.UsePickedSelection && Editor.PickedSelection.Count != 0)
-            {
-                SelectionSet ss = new SelectionSet();
-                foreach (Drawable item in Editor.PickedSelection)
-                {
-                    if (Options.AllowedClasses.Count == 0 || Options.AllowedClasses.Contains(item.GetType()))
-                        ss.Add(item);
-                }
-                Editor.PickedSelection.Clear();
-                args.Value = ss;
-                args.ContinueAsync = false;
-            }
-            else
-            {
-                getFirstPoint = false;
-            }
+            Editor.PickedSelection.Clear();
+            getFirstPoint = false;
         }
 
         protected override void CoordsChanged(Point2D pt)
@@ -64,7 +49,7 @@ namespace SimpleCAD
             }
         }
 
-        protected override void AcceptCoordsInput(InputArgs<Point2D, SelectionSet> args)
+        protected override void AcceptCoordsInput(InputArgs<Point2D, CPSelectionSet> args)
         {
             if (!getFirstPoint)
             {
@@ -87,7 +72,7 @@ namespace SimpleCAD
             }
         }
 
-        protected override void AcceptTextInput(InputArgs<string, SelectionSet> args)
+        protected override void AcceptTextInput(InputArgs<string, CPSelectionSet> args)
         {
             args.InputValid = Point2D.TryParse(args.Input, out Point2D pt);
             if (args.InputValid)
@@ -120,18 +105,26 @@ namespace SimpleCAD
             Editor.Document.Transients.Remove(consLine);
         }
 
-        private SelectionSet GetSelectionFromWindow()
+        private CPSelectionSet GetSelectionFromWindow()
         {
             Extents2D ex = consHatch.GetExtents();
             bool windowSelection = (consHatch.Points[2].X > consHatch.Points[0].X);
-            SelectionSet ss = new SelectionSet();
+            CPSelectionSet ss = new CPSelectionSet();
             foreach (Drawable item in Editor.Document.Model)
             {
                 Extents2D exItem = item.GetExtents();
                 if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
                 {
                     if (Options.AllowedClasses.Count == 0 || Options.AllowedClasses.Contains(item.GetType()))
-                        ss.Add(item);
+                    {
+                        int index = 0;
+                        foreach (ControlPoint pt in item.GetStretchPoints())
+                        {
+                            if (ex.Contains(pt.BasePoint))
+                                ss.Add(item, index);
+                            index++;
+                        }
+                    }
                 }
             }
             return ss;

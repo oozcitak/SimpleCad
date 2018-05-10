@@ -141,16 +141,19 @@ namespace SimpleCAD.Drawables
             };
         }
 
-        public override void TransformControlPoint(int index, Matrix2D transformation)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
         {
-            if (index == 0)
-                Center = Center.Transform(transformation);
-            else if (index == 1)
-                SemiMajorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMajorAxis;
-            else if (index == 2)
-                SemiMinorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMinorAxis;
-            else if (index == 3)
-                Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    Center = Center.Transform(transformation);
+                else if (index == 1)
+                    SemiMajorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMajorAxis;
+                else if (index == 2)
+                    SemiMinorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMinorAxis;
+                else if (index == 3)
+                    Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+            }
         }
 
         public override void Load(DocumentReader reader)

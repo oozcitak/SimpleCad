@@ -109,9 +109,12 @@ namespace SimpleCAD.Drawables
             return cp;
         }
 
-        public override void TransformControlPoint(int index, Matrix2D transformation)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
         {
-            Points[index] = Points[index].Transform(transformation);
+            foreach (int index in indices)
+            {
+                Points[index] = Points[index].Transform(transformation);
+            }
         }
 
         public override void Load(DocumentReader reader)
