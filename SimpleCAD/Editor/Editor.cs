@@ -138,11 +138,17 @@ namespace SimpleCAD
             {
                 var result = await SelectionGetter.Run<SelectionGetter>(this, options);
                 if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Escape || result.CancelReason == CancelReason.Init))
+                {
                     return result;
+                }
                 else if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Enter || result.CancelReason == CancelReason.Space))
+                {
                     return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Coords);
+                }
                 else if (result.Result == ResultMode.OK)
+                {
                     CurrentSelection.UnionWith(result.Value);
+                }
 
                 if (result.Result == ResultMode.OK && result.AcceptReason == AcceptReason.Init)
                     return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Init);

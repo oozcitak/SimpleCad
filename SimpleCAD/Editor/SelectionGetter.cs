@@ -19,7 +19,21 @@ namespace SimpleCAD
                 SelectionSet ss = new SelectionSet();
                 foreach (Drawable item in Editor.PickedSelection)
                 {
-                    ss.Add(item);
+                    if (Options.AllowedClasses.Count == 0)
+                    {
+                        ss.Add(item);
+                    }
+                    else
+                    {
+                        foreach (var type in Options.AllowedClasses)
+                        {
+                            if (item.GetType() == type)
+                            {
+                                ss.Add(item);
+                                break;
+                            }
+                        }
+                    }
                 }
                 Editor.PickedSelection.Clear();
                 args.Value = ss;
@@ -128,7 +142,21 @@ namespace SimpleCAD
             {
                 Extents2D exItem = item.GetExtents();
                 if (windowSelection && ex.Contains(exItem) || !windowSelection && ex.IntersectsWith(exItem))
-                    ss.Add(item);
+                {
+                    if (Options.AllowedClasses.Count == 0)
+                    {
+                        ss.Add(item);
+                    }
+                    foreach (var type in Options.AllowedClasses)
+                    {
+                        if (item.GetType() == type)
+                        {
+                            ss.Add(item);
+
+                            break;
+                        }
+                    }
+                }
             }
             return ss;
         }
