@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
-    public class Circle : Drawable
+    public class Circle : Curve
     {
         private Point2D center;
         private float radius;

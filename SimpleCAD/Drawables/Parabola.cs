@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
-    public class Parabola : Drawable
+    public class Parabola : Curve
     {
         private Point2D p1;
         private Point2D p2;
@@ -82,7 +82,7 @@ namespace SimpleCAD.Drawables
         {
             poly = new Polyline();
             // Represent curved features by at most 4 pixels
-            int n = (int)Math.Max(4, curveLength / 4);
+            int n = (int)Math.Min(MaxCurveSegments, Math.Max(MinCurveSegments, curveLength / 4));
             float t = 0;
             float dt = 1f / n;
             for (int i = 0; i <= n; i++)

@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
-    public class Arc : Drawable
+    public class Arc : Curve
     {
         private Point2D center;
         private float radius;

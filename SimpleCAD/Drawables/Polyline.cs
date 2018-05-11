@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace SimpleCAD.Drawables
 {
-    public class Polyline : Drawable
+    public class Polyline : Curve
     {
         private bool closed;
 

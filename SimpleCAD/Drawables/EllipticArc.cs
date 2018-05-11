@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
-    public class EllipticArc : Drawable
+    public class EllipticArc : Curve
     {
         private Point2D center;
 
@@ -60,7 +60,7 @@ namespace SimpleCAD.Drawables
             float sweep = EndAngle - StartAngle;
             while (sweep < 0) sweep += 2 * MathF.PI;
             while (sweep > 2 * MathF.PI) sweep -= 2 * MathF.PI;
-            int n = (int)Math.Max(4, curveLength / 4);
+            int n = (int)Math.Min(MaxCurveSegments, Math.Max(MinCurveSegments, curveLength / 4));
             float a = StartAngle;
             float da = sweep / n;
             for (int i = 0; i < n + 1; i++)

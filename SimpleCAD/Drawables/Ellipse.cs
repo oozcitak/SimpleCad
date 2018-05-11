@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
-    public class Ellipse : Drawable
+    public class Ellipse : Curve
     {
         private Point2D center;
 
@@ -49,7 +49,7 @@ namespace SimpleCAD.Drawables
         {
             poly = new Polyline();
             // Represent curved features by at most 4 pixels
-            int n = (int)Math.Max(4, curveLength / 4);
+            int n = (int)Math.Min(MaxCurveSegments, Math.Max(MinCurveSegments, curveLength / 4));
             float da = 2 * MathF.PI / n;
             float a = 0;
             for (int i = 0; i < n; i++)

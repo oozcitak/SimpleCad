@@ -65,6 +65,7 @@
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
+    <Compile Include="Drawables\Curve.cs" />
     <Compile Include="Drawables\DrawableList.cs" />
     <Compile Include="Editor\CPSelectionSet.cs" />
     <Compile Include="Editor\CPSelectionGetter.cs" />
