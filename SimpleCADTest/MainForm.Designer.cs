@@ -69,6 +69,7 @@
             this.btnRotate = new System.Windows.Forms.ToolStripButton();
             this.btnScale = new System.Windows.Forms.ToolStripButton();
             this.btnMirror = new System.Windows.Forms.ToolStripButton();
+            this.btnStretch = new System.Windows.Forms.ToolStripButton();
             this.tsSnap = new System.Windows.Forms.ToolStrip();
             this.btnSnap = new System.Windows.Forms.ToolStripButton();
             this.btnSnapEnd = new System.Windows.Forms.ToolStripButton();
@@ -76,7 +77,9 @@
             this.btnSnapCenter = new System.Windows.Forms.ToolStripButton();
             this.btnSnapQuadrant = new System.Windows.Forms.ToolStripButton();
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
-            this.btnStretch = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRotateCP = new System.Windows.Forms.ToolStripButton();
+            this.btnScaleCP = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -487,10 +490,13 @@
             this.btnRotate,
             this.btnScale,
             this.btnMirror,
-            this.btnStretch});
+            this.toolStripSeparator1,
+            this.btnStretch,
+            this.btnRotateCP,
+            this.btnScaleCP});
             this.tsTransform.Location = new System.Drawing.Point(3, 100);
             this.tsTransform.Name = "tsTransform";
-            this.tsTransform.Size = new System.Drawing.Size(298, 25);
+            this.tsTransform.Size = new System.Drawing.Size(545, 25);
             this.tsTransform.TabIndex = 2;
             // 
             // btnMove
@@ -542,6 +548,16 @@
             this.btnMirror.Size = new System.Drawing.Size(44, 22);
             this.btnMirror.Text = "Mirror";
             this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
+            // 
+            // btnStretch
+            // 
+            this.btnStretch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnStretch.Image = ((System.Drawing.Image)(resources.GetObject("btnStretch.Image")));
+            this.btnStretch.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnStretch.Name = "btnStretch";
+            this.btnStretch.Size = new System.Drawing.Size(48, 22);
+            this.btnStretch.Text = "Stretch";
+            this.btnStretch.Click += new System.EventHandler(this.btnStretch_Click);
             // 
             // tsSnap
             // 
@@ -624,15 +640,30 @@
             this.btnSnapPoint.Text = "Point";
             this.btnSnapPoint.Click += new System.EventHandler(this.btnSnapPoint_Click);
             // 
-            // btnStretch
+            // toolStripSeparator1
             // 
-            this.btnStretch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnStretch.Image = ((System.Drawing.Image)(resources.GetObject("btnStretch.Image")));
-            this.btnStretch.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnStretch.Name = "btnStretch";
-            this.btnStretch.Size = new System.Drawing.Size(48, 22);
-            this.btnStretch.Text = "Stretch";
-            this.btnStretch.Click += new System.EventHandler(this.btnStretch_Click);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnRotateCP
+            // 
+            this.btnRotateCP.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRotateCP.Image = ((System.Drawing.Image)(resources.GetObject("btnRotateCP.Image")));
+            this.btnRotateCP.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRotateCP.Name = "btnRotateCP";
+            this.btnRotateCP.Size = new System.Drawing.Size(124, 22);
+            this.btnRotateCP.Text = "Rotate Control Points";
+            this.btnRotateCP.Click += new System.EventHandler(this.btnRotateCP_Click);
+            // 
+            // btnScaleCP
+            // 
+            this.btnScaleCP.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnScaleCP.Image = ((System.Drawing.Image)(resources.GetObject("btnScaleCP.Image")));
+            this.btnScaleCP.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnScaleCP.Name = "btnScaleCP";
+            this.btnScaleCP.Size = new System.Drawing.Size(117, 22);
+            this.btnScaleCP.Text = "Scale Control Points";
+            this.btnScaleCP.Click += new System.EventHandler(this.btnScaleCP_Click);
             // 
             // MainForm
             // 
@@ -724,6 +755,9 @@
         private System.Windows.Forms.ToolStripButton btnSnapPoint;
         private System.Windows.Forms.ToolStripButton btnSnap;
         private System.Windows.Forms.ToolStripButton btnStretch;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton btnRotateCP;
+        private System.Windows.Forms.ToolStripButton btnScaleCP;
     }
 }
 

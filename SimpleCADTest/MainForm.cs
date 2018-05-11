@@ -213,6 +213,16 @@ namespace SimpleCADTest
             ed.RunCommand("Transform.MoveControlPoints");
         }
 
+        private void btnRotateCP_Click(object sender, EventArgs e)
+        {
+            ed.RunCommand("Transform.RotateControlPoints");
+        }
+
+        private void btnScaleCP_Click(object sender, EventArgs e)
+        {
+            ed.RunCommand("Transform.ScaleControlPoints");
+        }
+
         private void btnShowGrid_Click(object sender, EventArgs e)
         {
             cadWindow1.View.ShowGrid = btnShowGrid.Checked;

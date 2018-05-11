@@ -12,6 +12,12 @@ namespace SimpleCAD
             Document = doc;
         }
 
+        public override void Add(Drawable item)
+        {
+            item.InModel = true;
+            base.Add(item);
+        }
+
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnCollectionChanged(e);

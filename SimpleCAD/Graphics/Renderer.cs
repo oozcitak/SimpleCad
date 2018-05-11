@@ -294,7 +294,13 @@ namespace SimpleCAD.Graphics
 
         public void Draw(Drawable item)
         {
-            item.Draw(this);
+            if (View.GetViewport().IntersectsWith(item.GetExtents()))
+            {
+                item.Draw(this);
+
+                if (item.InModel)
+                    View.VisibleItems.Add(item);
+            }
         }
 
         private System.Drawing.Pen CreatePen(Style style)
