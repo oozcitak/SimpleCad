@@ -43,7 +43,7 @@ namespace SimpleCAD.Drawables
         [Browsable(false)]
         public float YI { get { return IntersectionPoint.Y; } }
 
-        private Polyline poly;
+        private QuadraticBezier poly;
         private float curveLength = 4;
         private float cpSize = 0;
 
@@ -80,19 +80,7 @@ namespace SimpleCAD.Drawables
 
         private void UpdatePolyline()
         {
-            poly = new Polyline();
-            // Represent curved features by at most 4 pixels
-            int n = (int)Math.Min(MaxCurveSegments, Math.Max(MinCurveSegments, curveLength / 4));
-            float t = 0;
-            float dt = 1f / n;
-            for (int i = 0; i <= n; i++)
-            {
-                float x = (1 - t) * (1 - t) * X1 + 2 * (1 - t) * t * XI + t * t * X2;
-                float y = (1 - t) * (1 - t) * Y1 + 2 * (1 - t) * t * YI + t * t * Y2;
-                poly.Points.Add(x, y);
-                t += dt;
-            }
-            poly.Closed = false;
+            poly = new QuadraticBezier(StartPoint, IntersectionPoint, EndPoint);
         }
 
         public override Extents2D GetExtents()
@@ -197,6 +185,43 @@ namespace SimpleCAD.Drawables
             writer.Write(EndPoint);
             writer.Write(StartAngle);
             writer.Write(EndAngle);
+        }
+
+        public override float StartParam => 0;
+        public override float EndParam => 1;
+
+        public override float GetDistAtParam(float z)
+        {
+            float C1 = 1;
+            float C2 = 1;
+            float t1 = -1 / MathF.Sqrt(3);
+            float t2 = 1 / MathF.Sqrt(3);
+
+            return z / 2 * (C1 * ArcLengthFunc(z / 2 * t1 + z / 2) + C2 * ArcLengthFunc(z / 2 * t2 + z / 2));
+        }
+
+        private float ArcLengthFunc(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float dx_dt = 2 * (1 - param) * (XI - X1) + 2 * param * (X2 - XI);
+            float dy_dt = 2 * (1 - param) * (YI - Y1) + 2 * param * (Y2 - YI);
+            return MathF.Sqrt(dx_dt * dx_dt + dy_dt * dy_dt);
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float x = (1 - param) * (1 - param) * X1 + 2 * (1 - param) * param * XI + param * param * X2;
+            float y = (1 - param) * (1 - param) * Y1 + 2 * (1 - param) * param * YI + param * param * Y2;
+            return new Point2D(x, y);
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float x = 2 * (1 - param) * (XI - X1) + 2 * param * (X2 - XI);
+            float y = 2 * (1 - param) * (YI - Y1) + 2 * param * (Y2 - YI);
+            return new Vector2D(x, y).Perpendicular;
         }
     }
 }

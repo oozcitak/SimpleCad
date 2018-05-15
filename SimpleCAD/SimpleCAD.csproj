@@ -67,6 +67,7 @@
     <Compile Include="Document\PersistableDictionary.cs" />
     <Compile Include="Drawables\Curve.cs" />
     <Compile Include="Drawables\DrawableList.cs" />
+    <Compile Include="Drawables\QuadraticBezier.cs" />
     <Compile Include="Editor\CPSelectionSet.cs" />
     <Compile Include="Editor\CPSelectionGetter.cs" />
     <Compile Include="Editor\SnapPoint.cs" />

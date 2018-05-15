@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SimpleCAD.Geometry;
+using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
@@ -10,5 +7,16 @@ namespace SimpleCAD.Drawables
     {
         public const int MinCurveSegments = 4;
         public const int MaxCurveSegments = 200;
+
+        [Browsable(false)]
+        public abstract float StartParam { get; }
+        [Browsable(false)]
+        public abstract float EndParam { get; }
+
+        public virtual float Length => GetDistAtParam(EndParam);
+
+        public abstract float GetDistAtParam(float param);
+        public abstract Point2D GetPointAtParam(float param);
+        public abstract Vector2D GetNormalAtParam(float param);
     }
 }

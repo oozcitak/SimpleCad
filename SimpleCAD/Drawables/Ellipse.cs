@@ -154,5 +154,39 @@ namespace SimpleCAD.Drawables
             writer.Write(SemiMinorAxis);
             writer.Write(Rotation);
         }
+
+        public override float StartParam => 0;
+        public override float EndParam => 2 * MathF.PI;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float dist = 0;
+            float dt = param / (float)MaxCurveSegments;
+            float t = dt;
+            Point2D lastPt = GetPointAtParam(StartParam);
+            for (int i = 1; i < MaxCurveSegments; i++)
+            {
+                Point2D pt = GetPointAtParam(t);
+                dist += (pt - lastPt).Length;
+                lastPt = pt;
+                t += dt;
+            }
+            return dist;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float x = SemiMajorAxis * MathF.Cos(param);
+            float y = SemiMinorAxis * MathF.Sin(param);
+            return Center + new Vector2D(x, y).Transform(Matrix2D.Rotation(Rotation));
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            Point2D pt = GetPointAtParam(param);
+            return new Vector2D(2 * pt.X / (SemiMajorAxis * SemiMajorAxis), 2 * pt.Y / (SemiMinorAxis * SemiMinorAxis)).Transform(Matrix2D.Rotation(Rotation));
+        }
     }
 }

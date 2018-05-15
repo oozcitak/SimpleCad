@@ -101,6 +101,18 @@ namespace SimpleCAD.Geometry
             return new Point2D(x, y);
         }
 
+        public static Point2D Sum(params Point2D[] points)
+        {
+            float x = 0;
+            float y = 0;
+            foreach (Point2D pt in points)
+            {
+                x += pt.X;
+                y += pt.Y;
+            }
+            return new Point2D(x, y);
+        }
+
         public string ToString(IFormatProvider provider)
         {
             return ToString("{0:F}, {1:F}", provider);

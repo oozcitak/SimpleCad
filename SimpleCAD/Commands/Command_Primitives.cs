@@ -243,6 +243,31 @@ namespace SimpleCAD.Commands
         }
     }
 
+    public class DrawQuadraticBezier : Command
+    {
+        public override string RegisteredName => "Primitives.Quadratic_Bezier";
+        public override string Name => "Quadratic Bezier";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            var p1 = await ed.GetPoint("Start point: ");
+            if (p1.Result != ResultMode.OK) return;
+            var p2 = await ed.GetPoint("End point: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
+            QuadraticBezier cons = new QuadraticBezier(p1.Value, Point2D.Average(p1.Value, p2.Value), p2.Value);
+            doc.Jigged.Add(cons);
+            var p3 = await ed.GetPoint("Control point: ", (p) => cons.P1 = p);
+            doc.Jigged.Remove(cons);
+            if (p3.Result != ResultMode.OK) return;
+
+            Drawable newItem = new QuadraticBezier(p1.Value, p3.Value, p2.Value);
+            doc.Model.Add(newItem);
+        }
+    }
+
     public class DrawParabola : Command
     {
         public override string RegisteredName => "Primitives.Parabola";

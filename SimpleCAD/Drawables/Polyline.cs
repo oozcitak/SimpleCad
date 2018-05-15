@@ -11,20 +11,6 @@ namespace SimpleCAD.Drawables
         public Point2DCollection Points { get; private set; }
         public virtual bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
 
-        public float Length
-        {
-            get
-            {
-                float len = 0;
-                for (int i = 0; i < (Closed ? Points.Count : Points.Count - 1); i++)
-                {
-                    int j = (i == Points.Count - 1 ? 0 : i + 1);
-                    len += (Points[j] - Points[i]).Length;
-                }
-                return len;
-            }
-        }
-
         public Polyline()
         {
             Points = new Point2DCollection();
@@ -128,6 +114,54 @@ namespace SimpleCAD.Drawables
         {
             base.Save(writer);
             writer.Write(Points);
+        }
+
+        public override float StartParam => 0;
+        public override float EndParam => Points.Count - 1;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            float dist = 0;
+            var lastPt = Points[0];
+            for (int i = 1; i < Points.Count; i++)
+            {
+                if (param >= i)
+                {
+                    dist += (Points[i] - lastPt).Length;
+                }
+                else
+                {
+                    dist += (param - (i - 1)) * (Points[i] - lastPt).Length;
+                    return dist;
+                }
+                lastPt = Points[i];
+            }
+            return dist;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            for (int i = 0; i < Points.Count; i++)
+            {
+                if (MathF.IsEqual(param, i))
+                    return Points[i];
+                else if (param < i)
+                    return Points[i] + (param - (i - 1)) * (Points[i] - Points[i - 1]);
+            }
+            return Points[Points.Count - 1];
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            for (int i = 1; i < Points.Count; i++)
+            {
+                if (param <= i)
+                    return (Points[i] - Points[i - 1]).Perpendicular;
+            }
+            return (Points[Points.Count - 1] - Points[Points.Count - 2]).Perpendicular;
         }
     }
 }

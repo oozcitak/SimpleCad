@@ -183,6 +183,11 @@ namespace SimpleCADTest
             ed.RunCommand("Primitives.Triangle");
         }
 
+        private void btnDrawQuadraticBezier_Click(object sender, EventArgs e)
+        {
+            ed.RunCommand("Primitives.Quadratic_Bezier");
+        }
+
         private void btnMove_Click(object sender, EventArgs e)
         {
             ed.RunCommand("Transform.Move");
@@ -291,6 +296,6 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Point;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Point;
-        }
+        }   
     }
 }

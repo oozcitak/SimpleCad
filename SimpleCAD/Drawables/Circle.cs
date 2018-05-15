@@ -101,5 +101,26 @@ namespace SimpleCAD.Drawables
             writer.Write(Center);
             writer.Write(Radius);
         }
+
+        public override float StartParam => 0;
+        public override float EndParam => 2 * MathF.PI;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return (param - StartParam) * Radius;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return Center + Vector2D.FromAngle(param) * Radius;
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return Vector2D.FromAngle(param);
+        }
     }
 }

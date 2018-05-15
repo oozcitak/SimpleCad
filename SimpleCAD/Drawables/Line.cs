@@ -107,5 +107,25 @@ namespace SimpleCAD.Drawables
             writer.Write(StartPoint);
             writer.Write(EndPoint);
         }
+
+        public override float StartParam => 0;
+        public override float EndParam => 1;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return (param - StartParam) * (EndPoint - StartPoint).Length;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return StartPoint + param * (EndPoint - StartPoint);
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            return (EndPoint - StartPoint).Perpendicular;
+        }
     }
 }
