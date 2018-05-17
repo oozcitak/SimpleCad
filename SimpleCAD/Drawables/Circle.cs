@@ -105,6 +105,11 @@ namespace SimpleCAD.Drawables
         public override float StartParam => 0;
         public override float EndParam => 2 * MathF.PI;
 
+        public override float Area => MathF.PI * Radius * Radius;
+
+        [Browsable(false)]
+        public override bool Closed => true;
+
         public override float GetDistAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
@@ -122,5 +127,19 @@ namespace SimpleCAD.Drawables
             param = MathF.Clamp(param, StartParam, EndParam);
             return Vector2D.FromAngle(param);
         }
+
+        public override float GetParamAtDist(float dist)
+        {
+            float param = dist / Radius + StartParam;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            float param = ((pt - Center) / Radius).Angle;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override void Reverse() { }
     }
 }

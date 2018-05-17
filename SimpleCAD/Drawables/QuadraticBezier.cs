@@ -163,6 +163,12 @@ namespace SimpleCAD.Drawables
         public override float StartParam => 0;
         public override float EndParam => 1;
 
+        [Browsable(false)]
+        public override float Area => 0;
+
+        [Browsable(false)]
+        public override bool Closed => false;
+
         public override float GetDistAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
@@ -196,6 +202,11 @@ namespace SimpleCAD.Drawables
             float x = 2 * (1 - param) * (X1 - X0) + 2 * param * (X2 - X1);
             float y = 2 * (1 - param) * (Y1 - Y0) + 2 * param * (Y2 - Y1);
             return new Vector2D(x, y).Perpendicular;
+        }
+
+        public override void Reverse()
+        {
+            MathF.Swap(ref p0, ref p2);
         }
     }
 }

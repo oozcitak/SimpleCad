@@ -90,6 +90,8 @@
     <Compile Include="Editor\EditorGetter.cs" />
     <Compile Include="Document\TextStyle.cs" />
     <Compile Include="Document\Layer.cs" />
+    <Compile Include="Geometry\Segment2DConverter.cs" />
+    <Compile Include="Geometry\Segment2D.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />

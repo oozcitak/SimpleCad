@@ -76,5 +76,12 @@ namespace SimpleCAD
         {
             return val < min ? min : (val > max ? max : val);
         }
+
+        public static void Swap<T>(ref T a, ref T b)
+        {
+            T temp = a;
+            a = b;
+            b = temp;
+        }
     }
 }

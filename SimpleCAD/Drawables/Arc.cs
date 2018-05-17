@@ -1,5 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -84,6 +85,7 @@ namespace SimpleCAD.Drawables
                 new SnapPoint("Center point", SnapPointType.Center, Center),
                 new SnapPoint("Start point", Center + Radius * Vector2D.FromAngle(StartAngle)),
                 new SnapPoint("End point", Center + Radius * Vector2D.FromAngle(EndAngle)),
+                new SnapPoint("Mid point", SnapPointType.Middle, Center + Radius * Vector2D.FromAngle(StartAngle + (EndAngle - StartAngle) / 2)),
             };
         }
 
@@ -123,6 +125,11 @@ namespace SimpleCAD.Drawables
         public override float StartParam => StartAngle;
         public override float EndParam => EndAngle;
 
+        public override float Area => (Math.Abs(EndAngle - StartAngle) - MathF.Sin(System.Math.Abs(EndAngle - StartAngle))) / 2 * Radius * Radius;
+
+        [Browsable(false)]
+        public override bool Closed => false;
+
         public override float GetDistAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
@@ -139,6 +146,23 @@ namespace SimpleCAD.Drawables
         {
             param = MathF.Clamp(param, StartParam, EndParam);
             return Vector2D.FromAngle(param);
+        }
+
+        public override float GetParamAtDist(float dist)
+        {
+            float param = dist / Radius + StartParam;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            float param = ((pt - Center) / Radius).Angle;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override void Reverse()
+        {
+            MathF.Swap(ref startAngle, ref endAngle);
         }
     }
 }

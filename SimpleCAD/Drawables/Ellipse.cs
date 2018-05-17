@@ -158,6 +158,11 @@ namespace SimpleCAD.Drawables
         public override float StartParam => 0;
         public override float EndParam => 2 * MathF.PI;
 
+        public override float Area => MathF.PI * SemiMajorAxis * SemiMinorAxis;
+
+        [Browsable(false)]
+        public override bool Closed => true;
+
         public override float GetDistAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
@@ -188,5 +193,14 @@ namespace SimpleCAD.Drawables
             Point2D pt = GetPointAtParam(param);
             return new Vector2D(2 * pt.X / (SemiMajorAxis * SemiMajorAxis), 2 * pt.Y / (SemiMinorAxis * SemiMinorAxis)).Transform(Matrix2D.Rotation(Rotation));
         }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            Vector2D dir = (pt - Center).Transform(Matrix2D.Rotation(-Rotation));
+            float param = MathF.Atan2(dir.Y / SemiMinorAxis, dir.X / SemiMajorAxis);
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override void Reverse() { }
     }
 }

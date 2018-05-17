@@ -1,15 +1,18 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 using System.Drawing;
 
 namespace SimpleCAD.Drawables
 {
     public class Polyline : Curve
     {
+        private const float PointOnLineTolerance = 1e-5f;
+
         private bool closed;
 
         public Point2DCollection Points { get; private set; }
-        public virtual bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
+        public new bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
 
         public Polyline()
         {
@@ -119,6 +122,29 @@ namespace SimpleCAD.Drawables
         public override float StartParam => 0;
         public override float EndParam => Points.Count - 1;
 
+        public override float Area
+        {
+            get
+            {
+                if (Points.Count < 3)
+                    return 0;
+
+                Segment2D[] segments = new Segment2D[Points.Count];
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    Point2D p1 = Points[i];
+                    Point2D p2 = (i == Points.Count - 1) ? Points[0] : Points[i + 1];
+                    segments[i] = new Segment2D(p1, p2);
+                }
+                float area = 0;
+                foreach (Segment2D s in segments)
+                {
+                    area += (s.X2 - s.X1) * (s.Y1 + s.Y2) / 2;
+                }
+                return Math.Abs(area);
+            }
+        }
+
         public override float GetDistAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
@@ -162,6 +188,65 @@ namespace SimpleCAD.Drawables
                     return (Points[i] - Points[i - 1]).Perpendicular;
             }
             return (Points[Points.Count - 1] - Points[Points.Count - 2]).Perpendicular;
+        }
+
+        public override float GetParamAtDist(float dist)
+        {
+            if (dist < 0) return StartParam;
+
+            for (int i = 1; i < Points.Count; i++)
+            {
+                float segmentLength = (Points[i] - Points[i - 1]).Length;
+
+                if (MathF.IsZero(dist))
+                    return i - 1;
+                else if (MathF.IsEqual(dist, segmentLength))
+                    return i;
+                else if (segmentLength > dist)
+                    return dist / segmentLength + (i - 1);
+
+                dist -= segmentLength;
+            }
+
+            return EndParam;
+        }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            for (int i = 1; i < Points.Count; i++)
+            {
+                float dist = (pt - Points[i - 1]).Length;
+                Segment2D seg = new Segment2D(Points[i - 1], Points[i]);
+
+                bool onSegment = seg.Contains(pt, PointOnLineTolerance, out float t);
+                if (!onSegment && t < 0 && i - 1 == 0)
+                    return StartParam;
+                else if (!onSegment && t > 1 && i == Points.Count - 1)
+                    return EndParam;
+                else if (!onSegment)
+                    continue;
+
+                float segmentLength = seg.Length;
+                if (MathF.IsZero(dist))
+                    return i - 1;
+                else if (MathF.IsEqual(dist, segmentLength))
+                    return i;
+                else if (segmentLength > dist)
+                    return dist / segmentLength + (i - 1);
+            }
+
+            return EndParam;
+        }
+
+        public override void Reverse()
+        {
+            for (int i = 0; i < Points.Count / 2; i++)
+            {
+                int j = Points.Count - 1 - i;
+                Point2D temp = Points[i];
+                Points[i] = Points[j];
+                Points[j] = temp;
+            }
         }
     }
 }

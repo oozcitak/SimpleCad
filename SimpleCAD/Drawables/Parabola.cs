@@ -10,8 +10,8 @@ namespace SimpleCAD.Drawables
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D StartPoint { get => p1; set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
-        public Point2D EndPoint { get => p2; set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public new Point2D StartPoint { get => p1; set { p1 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public new Point2D EndPoint { get => p2; set { p2 = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         public Point2D IntersectionPoint
         {
@@ -190,6 +190,12 @@ namespace SimpleCAD.Drawables
         public override float StartParam => 0;
         public override float EndParam => 1;
 
+        [Browsable(false)]
+        public override float Area => 0;
+
+        [Browsable(false)]
+        public override bool Closed => false;
+
         public override float GetDistAtParam(float z)
         {
             float C1 = 1;
@@ -222,6 +228,12 @@ namespace SimpleCAD.Drawables
             float x = 2 * (1 - param) * (XI - X1) + 2 * param * (X2 - XI);
             float y = 2 * (1 - param) * (YI - Y1) + 2 * param * (Y2 - YI);
             return new Vector2D(x, y).Perpendicular;
+        }
+
+        public override void Reverse()
+        {
+            MathF.Swap(ref p1, ref p2);
+            MathF.Swap(ref startAngle, ref endAngle);
         }
     }
 }
