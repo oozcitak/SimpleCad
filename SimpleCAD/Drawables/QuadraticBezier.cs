@@ -1,6 +1,7 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -62,22 +63,6 @@ namespace SimpleCAD.Drawables
             renderer.Draw(poly);
         }
 
-        private Point2D GetPoint(Point2D[] points, float t)
-        {
-            // de Casteljau's algorithm
-            if (points.Length == 1)
-            {
-                return points[0];
-            }
-            else
-            {
-                Point2D[] newpoints = new Point2D[points.Length - 1];
-                for (int i = 0; i < newpoints.Length; i++)
-                    newpoints[i] = Point2D.Sum((1 - t) * points[i], t * points[i + 1]);
-                return GetPoint(newpoints, t);
-            }
-        }
-
         private void UpdatePolyline()
         {
             poly = new Polyline();
@@ -92,6 +77,22 @@ namespace SimpleCAD.Drawables
                 t += dt;
             }
             poly.Closed = false;
+
+            // de Casteljau's algorithm
+            Point2D GetPoint(Point2D[] points, float tp)
+            {
+                if (points.Length == 1)
+                {
+                    return points[0];
+                }
+                else
+                {
+                    Point2D[] newpoints = new Point2D[points.Length - 1];
+                    for (int i = 0; i < newpoints.Length; i++)
+                        newpoints[i] = Point2D.Sum((1 - tp) * points[i], tp * points[i + 1]);
+                    return GetPoint(newpoints, tp);
+                }
+            }
         }
 
         public override Extents2D GetExtents()
@@ -207,6 +208,51 @@ namespace SimpleCAD.Drawables
         public override void Reverse()
         {
             MathF.Swap(ref p0, ref p2);
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (@params.Length == 0)
+            {
+                subCurves = new Curve[0];
+                return false;
+            }
+
+            QuadraticBezier toDivide = this;
+            subCurves = new Curve[@params.Length + 1];
+            for (int i = 0; i < @params.Length; i++)
+            {
+                if (i > 0)
+                {
+                    for (int j = i; j < @params.Length; j++)
+                    {
+                        @params[j] = (@params[j] - @params[i - 1]) / (1 - @params[i - 1]);
+                    }
+                }
+                toDivide.Split(@params[i], out var curves);
+                subCurves[i] = curves[0];
+                if (i == @params.Length - 1)
+                    subCurves[i + 1] = curves[1];
+                else
+                    toDivide = curves[1];
+            }
+
+            return true;
+        }
+
+        private bool Split(float param, out QuadraticBezier[] subCurves)
+        {
+            Point2D s1p0 = P0;
+            Point2D s1p1 = Point2D.Sum(param * P1, -(param - 1) * P0);
+            Point2D s1p2 = Point2D.Sum(param * param * P2, -(2 * param) * (param - 1) * P1, (param - 1) * (param - 1) * P0);
+
+            Point2D s2p0 = Point2D.Sum(param * param * P2, -(2 * param) * (param - 1) * P1, (param - 1) * (param - 1) * P0);
+            Point2D s2p1 = Point2D.Sum(param * P2, -(param - 1) * P1);
+            Point2D s2p2 = P2;
+
+            subCurves = new QuadraticBezier[] { new QuadraticBezier(s1p0, s1p1, s1p2), new QuadraticBezier(s2p0, s2p1, s2p2) };
+            return true;
         }
     }
 }

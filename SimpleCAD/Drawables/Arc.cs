@@ -1,6 +1,7 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -163,6 +164,26 @@ namespace SimpleCAD.Drawables
         public override void Reverse()
         {
             MathF.Swap(ref startAngle, ref endAngle);
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (@params.Length == 0)
+            {
+                subCurves = new Curve[0];
+                return false;
+            }
+
+            subCurves = new Curve[@params.Length + 1];
+            for (int i = 0; i < @params.Length + 1; i++)
+            {
+                float sp = (i == 0 ? StartParam : @params[i - 1]);
+                float ep = (i == @params.Length ? EndParam : @params[i]);
+                subCurves[i] = new Arc(Center, Radius, sp, ep);
+            }
+
+            return true;
         }
     }
 }

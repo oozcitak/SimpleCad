@@ -1,4 +1,6 @@
 ﻿using SimpleCAD.Geometry;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -95,5 +97,26 @@ namespace SimpleCAD.Drawables
         public virtual void GetDistAtPoint(Point2D pt) => GetDistAtParam(GetParamAtPoint(pt));
 
         public abstract void Reverse();
+        public virtual bool Split(float[] @params, out Curve[] subCurves)
+        {
+            subCurves = new Curve[0];
+            return false;
+        }
+
+        protected float[] ValidateParams(float[] @params)
+        {
+            Array.Sort(@params);
+            List<float> validParams = new List<float>();
+            for (int i = 0; i < @params.Length; i++)
+            {
+                if (MathF.IsBetween(@params[i], StartParam, EndParam, false))
+                {
+                    if (i != 0 && MathF.IsEqual(@params[i], @params[i - 1]))
+                        continue;
+                    validParams.Add(@params[i]);
+                }
+            }
+            return validParams.ToArray();
+        }
     }
 }

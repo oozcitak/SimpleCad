@@ -22,6 +22,18 @@ namespace SimpleCAD
             return IsEqual(a, b) ? 0 : (a < b ? -1 : 1);
         }
 
+        public static bool IsBetween(float v, float a, float b, bool includeEnds)
+        {
+            if (a > b) Swap(ref a, ref b);
+
+            if (includeEnds && (IsEqual(v, a) || IsEqual(v, b)))
+                return true;
+            if (!includeEnds && (IsEqual(v, a) || IsEqual(v, b)))
+                return false;
+
+            return v > a && v < b;
+        }
+
         public static float Sin(float a)
         {
             return (float)Math.Sin(a);

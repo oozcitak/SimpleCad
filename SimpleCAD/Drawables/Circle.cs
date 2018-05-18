@@ -1,5 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -141,5 +142,25 @@ namespace SimpleCAD.Drawables
         }
 
         public override void Reverse() { }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (@params.Length < 2)
+            {
+                subCurves = new Curve[0];
+                return false;
+            }
+
+            subCurves = new Curve[@params.Length];
+            for (int i = 0; i < @params.Length; i++)
+            {
+                float sp = @params[i];
+                float ep = (i == @params.Length - 1 ? @params[0] : @params[i + 1]);
+                subCurves[i] = new Arc(Center, Radius, sp, ep);
+            }
+
+            return true;
+        }
     }
 }

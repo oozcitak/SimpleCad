@@ -1,6 +1,7 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace SimpleCAD.Drawables
@@ -169,25 +170,17 @@ namespace SimpleCAD.Drawables
         public override Point2D GetPointAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
-            for (int i = 0; i < Points.Count; i++)
-            {
-                if (MathF.IsEqual(param, i))
-                    return Points[i];
-                else if (param < i)
-                    return Points[i] + (param - (i - 1)) * (Points[i] - Points[i - 1]);
-            }
-            return Points[Points.Count - 1];
+            int i = (int)Math.Floor(param);
+            if (i == Points.Count - 1) i--;
+            return Points[i] + (param - i) * (Points[i + 1] - Points[i]);
         }
 
         public override Vector2D GetNormalAtParam(float param)
         {
             param = MathF.Clamp(param, StartParam, EndParam);
-            for (int i = 1; i < Points.Count; i++)
-            {
-                if (param <= i)
-                    return (Points[i] - Points[i - 1]).Perpendicular;
-            }
-            return (Points[Points.Count - 1] - Points[Points.Count - 2]).Perpendicular;
+            int i = (int)Math.Floor(param);
+            if (i == Points.Count - 1) i--;
+            return (Points[i + 1] - Points[i]).Perpendicular;
         }
 
         public override float GetParamAtDist(float dist)
@@ -247,6 +240,78 @@ namespace SimpleCAD.Drawables
                 Points[i] = Points[j];
                 Points[j] = temp;
             }
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (!Closed)
+            {
+                if (@params.Length == 0)
+                {
+                    subCurves = new Curve[0];
+                    return false;
+                }
+
+                subCurves = new Curve[@params.Length + 1];
+                for (int i = 0; i < @params.Length + 1; i++)
+                {
+                    float ps = (i == 0 ? StartParam : @params[i - 1]);
+                    float pe = (i == @params.Length ? EndParam : @params[i]);
+
+                    Point2DCollection newPoints = new Point2DCollection();
+                    foreach (float p in ParamIterator(ps, pe))
+                    {
+                        newPoints.Add(GetPointAtParam(p));
+                    }
+                    subCurves[i] = new Polyline(newPoints);
+                }
+
+                return true;
+            }
+            else
+            {
+                if (@params.Length < 2)
+                {
+                    subCurves = new Curve[0];
+                    return false;
+                }
+
+                subCurves = new Curve[@params.Length];
+                for (int i = 0; i < @params.Length; i++)
+                {
+                    float ps = @params[i];
+                    float pe = (i == @params.Length - 1 ? @params[0] : @params[i + 1]);
+
+                    Point2DCollection newPoints = new Point2DCollection();
+                    foreach (float p in ParamIterator(ps, pe))
+                    {
+                        newPoints.Add(GetPointAtParam(p));
+                    }
+                    subCurves[i] = new Polyline(newPoints);
+                }
+
+                return true;
+            }
+        }
+
+        private IEnumerable<float> ParamIterator(float startParam, float endParam)
+        {
+            yield return startParam;
+            float p = (int)MathF.Floor(startParam) + 1;
+            bool flag = true;
+            while (flag)
+            {
+                yield return p;
+                p++;
+                if (p == Points.Count) p = 0;
+
+                if (endParam > startParam && p > endParam)
+                    flag = false;
+                else if (endParam < startParam && p < startParam && p > endParam)
+                    flag = false;
+            }
+            yield return endParam;
         }
     }
 }

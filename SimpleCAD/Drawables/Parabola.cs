@@ -64,6 +64,11 @@ namespace SimpleCAD.Drawables
             ;
         }
 
+        public Parabola(Point2D p1, Point2D intPoint, Point2D p2) : this(p1, p2, (intPoint - p1).Angle, (intPoint - p2).Angle)
+        {
+            ;
+        }
+
         public override void Draw(Renderer renderer)
         {
             cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.ControlPointSize, 0)).X;
@@ -234,6 +239,21 @@ namespace SimpleCAD.Drawables
         {
             MathF.Swap(ref p1, ref p2);
             MathF.Swap(ref startAngle, ref endAngle);
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            QuadraticBezier bezier = new QuadraticBezier(StartPoint, IntersectionPoint, EndPoint);
+            if (!bezier.Split(@params, out subCurves))
+                return false;
+
+            for (int i = 0; i < subCurves.Length; i++)
+            {
+                QuadraticBezier bezierpiece = (QuadraticBezier)subCurves[i];
+                subCurves[i] = new Parabola(bezierpiece.P0, bezierpiece.P1, bezierpiece.P2);
+            }
+
+            return true;
         }
     }
 }
