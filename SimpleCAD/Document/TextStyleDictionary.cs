@@ -1,6 +1,4 @@
-﻿using SimpleCAD.Graphics;
-
-namespace SimpleCAD
+﻿namespace SimpleCAD
 {
     public class TextStyleDictionary : PersistableDictionaryWithDefault<TextStyle>
     {

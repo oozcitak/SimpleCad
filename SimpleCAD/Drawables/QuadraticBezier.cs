@@ -1,7 +1,6 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
