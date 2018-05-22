@@ -26,6 +26,12 @@ namespace SimpleCAD.Geometry
             DX = dx; DY = dy;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Matrix2D(Matrix m) : this(m.Elements[0], m.Elements[1], m.Elements[2], m.Elements[3], m.Elements[4], m.Elements[5])
+        {
+
+        }
+
         public Matrix2D Inverse
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -12,29 +12,29 @@ namespace SimpleCAD
             {
                 return new Dictionary<string, object>()
                 {
-                    { "DisplayPrecision", 2 },
-                    { "BackColor", Color.FromArgb(33, 40, 48) },
-                    { "CursorPromptBackColor", Color.FromArgb(84, 58, 84) },
-                    { "CursorPromptForeColor", Color.FromArgb(128, Color.White) },
-                    { "SelectionWindowColor", Color.FromArgb(64, 46, 116, 251) },
-                    { "SelectionWindowBorderColor", Color.White },
-                    { "ReverseSelectionWindowColor", Color.FromArgb(64, 46, 251, 116) },
-                    { "ReverseSelectionWindowBorderColor", Color.White },
-                    { "SelectionHighlightColor", Color.FromArgb(64, 46, 116, 251) },
-                    { "JigColor", Color.Orange },
-                    { "ControlPointColor", Color.FromArgb(46, 116, 251) },
-                    { "ActiveControlPointColor", Color.FromArgb(251, 116, 46) },
-                    { "SnapPointColor", Color.FromArgb(251, 251, 116) },
-                    { "MinorGridColor", Color.FromArgb(64, 64, 64) },
-                    { "MajorGridColor", Color.FromArgb(96, 96, 96) },
-                    { "AxisColor", Color.FromArgb(128, 128, 64) },
-                    { "PickBoxSize", 6 },
-                    { "ControlPointSize", 7 },
-                    { "PointSize", 6 },
-                    { "Snap", true },
-                    { "SnapPointSize", 11 },
-                    { "SnapDistance", 25 },
-                    { "SnapMode", SnapPointType.All },
+                    { "DisplayPrecision",2 },
+                    { "BackColor",Color.FromArgb(33,40,48) },
+                    { "CursorPromptBackColor",Color.FromArgb(84,58,84) },
+                    { "CursorPromptForeColor",Color.FromArgb(128,Color.White) },
+                    { "SelectionWindowColor",Color.FromArgb(64,46,116,251) },
+                    { "SelectionWindowBorderColor",Color.White },
+                    { "ReverseSelectionWindowColor",Color.FromArgb(64,46,251,116) },
+                    { "ReverseSelectionWindowBorderColor",Color.White },
+                    { "SelectionHighlightColor",Color.FromArgb(64,46,116,251) },
+                    { "JigColor",Color.Orange },
+                    { "ControlPointColor",Color.FromArgb(46,116,251) },
+                    { "ActiveControlPointColor",Color.FromArgb(251,116,46) },
+                    { "SnapPointColor",Color.FromArgb(251,251,116) },
+                    { "MinorGridColor",Color.FromArgb(64,64,64) },
+                    { "MajorGridColor",Color.FromArgb(96,96,96) },
+                    { "AxisColor",Color.FromArgb(128,128,64) },
+                    { "PickBoxSize",6 },
+                    { "ControlPointSize",7 },
+                    { "PointSize",6 },
+                    { "Snap",true },
+                    { "SnapPointSize",11 },
+                    { "SnapDistance",25 },
+                    { "SnapMode",SnapPointType.All },
                 };
             }
         }
@@ -73,9 +73,9 @@ namespace SimpleCAD
         public void Reset()
         {
             items.Clear();
-            foreach(var pair in Defaults)
+            foreach (var pair in Defaults)
             {
-                 
+
                 items.Add(pair.Key, pair.Value);
             }
 
@@ -121,7 +121,7 @@ namespace SimpleCAD
                     writer.Write("bool");
                     writer.Write((bool)pair.Value);
                 }
-                else if (pair.Value is int)
+                else if (pair.Value is int || pair.Value is System.Enum)
                 {
                     writer.Write("int");
                     writer.Write((int)pair.Value);

@@ -8,9 +8,7 @@ namespace SimpleCAD.Drawables
 {
     public class Composite : Drawable, ICollection<Drawable>, INotifyCollectionChanged
     {
-        private Point2D location;
-
-        public Point2D Location { get => location; set { TransformBy(Matrix2D.Translation(value - location)); NotifyPropertyChanged(); } }
+        public string Name { get; set; }
 
         List<Drawable> items = new List<Drawable>();
 
@@ -18,10 +16,15 @@ namespace SimpleCAD.Drawables
 
         public Composite() { }
 
+        public Composite(string name)
+        {
+            Name = name;
+        }
+
         public override void Load(DocumentReader reader)
         {
             base.Load(reader);
-            Location = reader.ReadPoint2D();
+            Name = reader.ReadString();
             int count = reader.ReadInt();
             for (int i = 0; i < count; i++)
             {
@@ -33,7 +36,7 @@ namespace SimpleCAD.Drawables
         public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            writer.Write(Location);
+            writer.Write(Name);
             writer.Write(items.Count);
             foreach (var item in items)
             {
@@ -73,18 +76,9 @@ namespace SimpleCAD.Drawables
             return false;
         }
 
-        public override ControlPoint[] GetControlPoints()
-        {
-            return new[]
-            {
-                new ControlPoint("Location", Location),
-            };
-        }
-
         public override SnapPoint[] GetSnapPoints()
         {
             List<SnapPoint> points = new List<SnapPoint>();
-            points.Add(new SnapPoint("Location", SnapPointType.Point, Location));
             foreach (Drawable d in items)
             {
                 if (d.Visible && (d.Layer == null || d.Layer.Visible))
@@ -93,18 +87,8 @@ namespace SimpleCAD.Drawables
             return points.ToArray();
         }
 
-        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
-        {
-            foreach (int index in indices)
-            {
-                if (index == 0)
-                    TransformBy(transformation);
-            }
-        }
-
         public override void TransformBy(Matrix2D transformation)
         {
-            location = location.Transform(transformation);
             foreach (Drawable item in items)
             {
                 item.TransformBy(transformation);

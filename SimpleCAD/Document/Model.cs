@@ -10,12 +10,19 @@ namespace SimpleCAD
         public Model(CADDocument doc)
         {
             Document = doc;
+            Name = "<MODEL>";
         }
 
         public override void Add(Drawable item)
         {
             item.InModel = true;
             base.Add(item);
+        }
+
+        public override bool Remove(Drawable item)
+        {
+            item.InModel = false;
+            return base.Remove(item);
         }
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)

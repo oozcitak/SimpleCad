@@ -50,6 +50,7 @@
             this.btnDrawRectangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawTriangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
+            this.btnDrawQuadraticBezier = new System.Windows.Forms.ToolStripButton();
             this.tsStandard = new System.Windows.Forms.ToolStrip();
             this.btnNew = new System.Windows.Forms.ToolStripButton();
             this.btnOpen = new System.Windows.Forms.ToolStripButton();
@@ -80,7 +81,8 @@
             this.btnSnapCenter = new System.Windows.Forms.ToolStripButton();
             this.btnSnapQuadrant = new System.Windows.Forms.ToolStripButton();
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawQuadraticBezier = new System.Windows.Forms.ToolStripButton();
+            this.tsComposite = new System.Windows.Forms.ToolStrip();
+            this.btnCreateComposite = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -97,6 +99,7 @@
             this.tsGraphics.SuspendLayout();
             this.tsTransform.SuspendLayout();
             this.tsSnap.SuspendLayout();
+            this.tsComposite.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -109,7 +112,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 344);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 319);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -126,6 +129,7 @@
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsSnap);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsComposite);
             // 
             // statusStrip1
             // 
@@ -166,7 +170,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 344);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 319);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -176,7 +180,7 @@
             this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cadWindow1.Location = new System.Drawing.Point(0, 0);
             this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 344);
+            this.cadWindow1.Size = new System.Drawing.Size(759, 319);
             this.cadWindow1.TabIndex = 0;
             // 
             // propertyGrid1
@@ -184,7 +188,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 344);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 319);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -208,7 +212,7 @@
             this.btnDrawQuadraticBezier});
             this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
             this.tsPrimitives.Name = "tsPrimitives";
-            this.tsPrimitives.Size = new System.Drawing.Size(762, 25);
+            this.tsPrimitives.Size = new System.Drawing.Size(731, 25);
             this.tsPrimitives.TabIndex = 0;
             // 
             // btnDrawPoint
@@ -341,6 +345,16 @@
             this.btnDrawHatch.Size = new System.Drawing.Size(43, 22);
             this.btnDrawHatch.Text = "Hatch";
             this.btnDrawHatch.Click += new System.EventHandler(this.btnDrawHatch_Click);
+            // 
+            // btnDrawQuadraticBezier
+            // 
+            this.btnDrawQuadraticBezier.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDrawQuadraticBezier.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawQuadraticBezier.Image")));
+            this.btnDrawQuadraticBezier.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDrawQuadraticBezier.Name = "btnDrawQuadraticBezier";
+            this.btnDrawQuadraticBezier.Size = new System.Drawing.Size(97, 22);
+            this.btnDrawQuadraticBezier.Text = "Quadratic Bezier";
+            this.btnDrawQuadraticBezier.Click += new System.EventHandler(this.btnDrawQuadraticBezier_Click);
             // 
             // tsStandard
             // 
@@ -667,15 +681,25 @@
             this.btnSnapPoint.Text = "Point";
             this.btnSnapPoint.Click += new System.EventHandler(this.btnSnapPoint_Click);
             // 
-            // btnDrawQuadraticBezier
+            // tsComposite
             // 
-            this.btnDrawQuadraticBezier.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawQuadraticBezier.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawQuadraticBezier.Image")));
-            this.btnDrawQuadraticBezier.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawQuadraticBezier.Name = "btnDrawQuadraticBezier";
-            this.btnDrawQuadraticBezier.Size = new System.Drawing.Size(97, 22);
-            this.btnDrawQuadraticBezier.Text = "Quadratic Bezier";
-            this.btnDrawQuadraticBezier.Click += new System.EventHandler(this.btnDrawQuadraticBezier_Click);
+            this.tsComposite.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsComposite.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnCreateComposite});
+            this.tsComposite.Location = new System.Drawing.Point(3, 150);
+            this.tsComposite.Name = "tsComposite";
+            this.tsComposite.Size = new System.Drawing.Size(149, 25);
+            this.tsComposite.TabIndex = 7;
+            // 
+            // btnCreateComposite
+            // 
+            this.btnCreateComposite.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnCreateComposite.Image = ((System.Drawing.Image)(resources.GetObject("btnCreateComposite.Image")));
+            this.btnCreateComposite.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnCreateComposite.Name = "btnCreateComposite";
+            this.btnCreateComposite.Size = new System.Drawing.Size(106, 22);
+            this.btnCreateComposite.Text = "Create Composite";
+            this.btnCreateComposite.Click += new System.EventHandler(this.btnCreateComposite_Click);
             // 
             // MainForm
             // 
@@ -714,6 +738,8 @@
             this.tsTransform.PerformLayout();
             this.tsSnap.ResumeLayout(false);
             this.tsSnap.PerformLayout();
+            this.tsComposite.ResumeLayout(false);
+            this.tsComposite.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -771,6 +797,8 @@
         private System.Windows.Forms.ToolStripButton btnRotateCP;
         private System.Windows.Forms.ToolStripButton btnScaleCP;
         private System.Windows.Forms.ToolStripButton btnDrawQuadraticBezier;
+        private System.Windows.Forms.ToolStrip tsComposite;
+        private System.Windows.Forms.ToolStripButton btnCreateComposite;
     }
 }
 

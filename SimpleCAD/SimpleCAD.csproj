@@ -49,12 +49,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Command_Composite.cs" />
     <Compile Include="Commands\Command_Edit.cs" />
     <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
     <Compile Include="Document\DocumentWriter.cs" />
     <Compile Include="Document\DocumentReader.cs" />
     <Compile Include="Document\IDict.cs" />
+    <Compile Include="Document\CompositeDictionary.cs" />
     <Compile Include="Document\Model.cs" />
     <Compile Include="Document\SettingsProperties.cs">
       <AutoGen>True</AutoGen>
@@ -65,6 +67,7 @@
     <Compile Include="Document\LayerDictionary.cs" />
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
+    <Compile Include="Drawables\CompositeReference.cs" />
     <Compile Include="Drawables\Curve.cs" />
     <Compile Include="Geometry\CurveOperations.cs" />
     <Compile Include="Drawables\DrawableList.cs" />

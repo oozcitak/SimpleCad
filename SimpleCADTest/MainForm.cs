@@ -296,6 +296,11 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Point;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Point;
-        }   
+        }
+
+        private void btnCreateComposite_Click(object sender, EventArgs e)
+        {
+            ed.RunCommand("Composite.Create");
+        }
     }
 }

@@ -119,5 +119,19 @@ namespace SimpleCAD.Geometry
         {
             return (Xmax >= other.Xmin && Xmin <= other.Xmax && Ymax >= other.Ymin && Ymin <= other.Ymax);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void TransformBy(Matrix2D transformation)
+        {
+            if (IsEmpty) return;
+
+            Point2D pmin = Ptmin;
+            Point2D pmax = Ptmax;
+            pmin = pmin.Transform(transformation);
+            pmax = pmax.Transform(transformation);
+            Reset();
+            Add(pmin);
+            Add(pmax);
+        }
     }
 }

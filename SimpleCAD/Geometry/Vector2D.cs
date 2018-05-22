@@ -15,6 +15,7 @@ namespace SimpleCAD.Geometry
         public Vector2D Perpendicular { get => new Vector2D(-Y, X); }
 
         public static Vector2D Zero { get => new Vector2D(0, 0); }
+        public static Vector2D One { get => new Vector2D(1, 1); }
         public static Vector2D XAxis { get => new Vector2D(1, 0); }
         public static Vector2D YAxis { get => new Vector2D(0, 1); }
 

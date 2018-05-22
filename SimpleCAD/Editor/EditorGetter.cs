@@ -73,6 +73,7 @@ namespace SimpleCAD
                     getter.Editor.KeyPress += getter.Editor_KeyPress;
                 }
 
+                getter.SetCursorText("");
                 return await getter.Completion.Task;
             }
         }

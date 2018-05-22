@@ -38,6 +38,7 @@ namespace SimpleCAD.Graphics
 
         public CADView View { get; private set; }
         public bool ScaleLineWeights { get; set; }
+        public Matrix2D Transform { get => new Matrix2D(gdi.Transform); set { gdi.Transform = (System.Drawing.Drawing2D.Matrix)value; } }
         internal Style StyleOverride { get; set; }
 
         public Renderer(CADView view)
@@ -157,8 +158,8 @@ namespace SimpleCAD.Graphics
                 float sweepAngle = endAngle - startAngle;
                 while (sweepAngle < 0) sweepAngle += 2 * MathF.PI;
                 while (sweepAngle > 2 * MathF.PI) sweepAngle -= 2 * MathF.PI;
-                if(radius>0)
-                gdi.DrawArc(pen, center.X - radius, center.Y - radius, 2 * radius, 2 * radius, startAngle * 180 / MathF.PI, sweepAngle * 180 / MathF.PI);
+                if (radius > 0)
+                    gdi.DrawArc(pen, center.X - radius, center.Y - radius, 2 * radius, 2 * radius, startAngle * 180 / MathF.PI, sweepAngle * 180 / MathF.PI);
             }
         }
 
