@@ -7,6 +7,7 @@ namespace SimpleCAD.Drawables
 {
     public class Dimension : Drawable
     {
+        private Lazy<TextStyle> textStyleRef = new Lazy<TextStyle>(() => TextStyle.Default);
         private Point2D p1;
         private Point2D p2;
 
@@ -30,7 +31,7 @@ namespace SimpleCAD.Drawables
 
         public float Offset { get => offset; set { offset = value; NotifyPropertyChanged(); } }
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
-        public TextStyle TextStyle { get; set; } = TextStyle.Default;
+        public TextStyle TextStyle { get => textStyleRef.Value; set => textStyleRef = new Lazy<TextStyle>(() => value); }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Scale { get => scale; set { scale = value; NotifyPropertyChanged(); } }
         public int Precision { get => precision; set { precision = value; NotifyPropertyChanged(); } }
@@ -168,13 +169,15 @@ namespace SimpleCAD.Drawables
 
         public override void Load(DocumentReader reader)
         {
+            var doc = reader.Document;
             base.Load(reader);
             StartPoint = reader.ReadPoint2D();
             EndPoint = reader.ReadPoint2D();
             TextHeight = reader.ReadFloat();
             Offset = reader.ReadFloat();
             String = reader.ReadString();
-            TextStyle = reader.ReadPersistable<TextStyle>();
+            string textStyleName= reader.ReadString();
+            textStyleRef = new Lazy<TextStyle>(() => doc.TextStyles[textStyleName]);
             Scale = reader.ReadFloat();
             Precision = reader.ReadInt();
         }
@@ -187,7 +190,7 @@ namespace SimpleCAD.Drawables
             writer.Write(TextHeight);
             writer.Write(Offset);
             writer.Write(String);
-            writer.Write(TextStyle);
+            writer.Write(TextStyle.Name);
             writer.Write(Scale);
             writer.Write(Precision);
         }

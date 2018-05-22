@@ -1,11 +1,13 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
 {
     public class Text : Drawable
     {
+        private Lazy<TextStyle> textStyleRef = new Lazy<TextStyle>(() => TextStyle.Default);
         private Point2D location;
 
         public Point2D Location { get => location; set { location = value; NotifyPropertyChanged(); } }
@@ -21,7 +23,7 @@ namespace SimpleCAD.Drawables
         private TextHorizontalAlignment horizontalAlignment;
         private TextVerticalAlignment verticalAlignment;
 
-        public TextStyle TextStyle { get; set; } = TextStyle.Default;
+        public TextStyle TextStyle { get => textStyleRef.Value; set => textStyleRef = new Lazy<TextStyle>(() => value); }
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
@@ -136,11 +138,13 @@ namespace SimpleCAD.Drawables
 
         public override void Load(DocumentReader reader)
         {
+            var doc = reader.Document;
             base.Load(reader);
             Location = reader.ReadPoint2D();
             TextHeight = reader.ReadFloat();
             String = reader.ReadString();
-            TextStyle = reader.ReadPersistable<TextStyle>();
+            string textStyleName = reader.ReadString();
+            textStyleRef = new Lazy<TextStyle>(() => doc.TextStyles[textStyleName]);
             Rotation = reader.ReadFloat();
             HorizontalAlignment = (TextHorizontalAlignment)reader.ReadInt();
             VerticalAlignment = (TextVerticalAlignment)reader.ReadInt();
@@ -152,7 +156,7 @@ namespace SimpleCAD.Drawables
             writer.Write(Location);
             writer.Write(TextHeight);
             writer.Write(String);
-            writer.Write(TextStyle);
+            writer.Write(TextStyle.Name);
             writer.Write(Rotation);
             writer.Write((int)HorizontalAlignment);
             writer.Write((int)VerticalAlignment);
