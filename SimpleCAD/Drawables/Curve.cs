@@ -3,8 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace SimpleCAD.Drawables
+namespace SimpleCAD
 {
+    [Flags]
+    public enum ExtendType
+    {
+        None = 0,
+        This = 1,
+        Other = 2,
+        Both = This | Other,
+    }
+
     public abstract class Curve : Drawable
     {
         public const int MinCurveSegments = 4;
@@ -100,6 +109,12 @@ namespace SimpleCAD.Drawables
         public virtual bool Split(float[] @params, out Curve[] subCurves)
         {
             subCurves = new Curve[0];
+            return false;
+        }
+
+        public virtual bool IntersectWith(Curve other, ExtendType extend, out Point2D[] points)
+        {
+            points = new Point2D[0];
             return false;
         }
 

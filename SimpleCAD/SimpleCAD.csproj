@@ -66,6 +66,7 @@
     <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
     <Compile Include="Document\PersistableDictionary.cs" />
     <Compile Include="Drawables\Curve.cs" />
+    <Compile Include="Geometry\CurveOperations.cs" />
     <Compile Include="Drawables\DrawableList.cs" />
     <Compile Include="Drawables\QuadraticBezier.cs" />
     <Compile Include="Editor\CPSelectionSet.cs" />

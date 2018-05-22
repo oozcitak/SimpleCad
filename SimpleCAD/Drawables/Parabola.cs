@@ -1,6 +1,5 @@
 ﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
-using System;
 using System.ComponentModel;
 
 namespace SimpleCAD.Drawables
@@ -17,9 +16,7 @@ namespace SimpleCAD.Drawables
         {
             get
             {
-                Point2D p3 = StartPoint + Vector2D.FromAngle(StartAngle);
-                Point2D p4 = EndPoint + Vector2D.FromAngle(EndAngle);
-                Intersect(StartPoint, p3, EndPoint, p4, out Point2D c);
+                CurveOperations.IntersectLines(StartPoint, StartPoint + Vector2D.FromAngle(StartAngle), EndPoint, EndPoint + Vector2D.FromAngle(EndAngle), out _, out _, out Point2D c);
                 return c;
             }
         }
@@ -104,38 +101,6 @@ namespace SimpleCAD.Drawables
         public override bool Contains(Point2D pt, float pickBoxSize)
         {
             return poly.Contains(pt, pickBoxSize);
-        }
-
-        private bool Intersect(Point2D p1, Point2D p2, Point2D p3, Point2D p4, out Point2D p)
-        {
-            p = Point2D.Zero;
-
-            float x1 = p1.X; float y1 = p1.Y;
-            float x2 = p2.X; float y2 = p2.Y;
-            float x3 = p3.X; float y3 = p3.Y;
-            float x4 = p4.X; float y4 = p4.Y;
-
-            float det = Determinant(x1 - x2, y1 - y2, x3 - x4, y3 - y4);
-            if (Math.Abs(det) <= 10.0f * float.Epsilon) return false;
-
-            float p1p2det = Determinant(x1, y1, x2, y2);
-            float p3p4det = Determinant(x3, y3, x4, y4);
-
-            float xdet = Determinant(p1p2det, x1 - x2, p3p4det, x3 - x4);
-            float ydet = Determinant(p1p2det, y1 - y2, p3p4det, y3 - y4);
-
-            p = new Point2D(xdet / det, ydet / det);
-            return true;
-        }
-
-        /// <summary>
-        /// Returns the determinant of the given 2x2 matrix.
-        /// | a1 b1 |
-        /// | a2 b2 |
-        /// </summary>
-        private float Determinant(float a1, float b1, float a2, float b2)
-        {
-            return a1 * b2 - a2 * b1;
         }
 
         public override ControlPoint[] GetControlPoints()
