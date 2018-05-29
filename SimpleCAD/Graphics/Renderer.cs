@@ -307,7 +307,7 @@ namespace SimpleCAD.Graphics
 
         private System.Drawing.Pen CreatePen(Style style)
         {
-            Style appliedStyle = (StyleOverride == null ? style : StyleOverride);
+            Style appliedStyle = (StyleOverride ?? style);
 
             var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb((int)(appliedStyle.Color.IsByLayer ? Color.White : appliedStyle.Color).Argb));
             pen.Width = GetScaledLineWeight(appliedStyle.LineWeight == Style.ByLayer ? 1 : appliedStyle.LineWeight);
@@ -317,7 +317,7 @@ namespace SimpleCAD.Graphics
 
         private System.Drawing.Brush CreateBrush(Style style)
         {
-            Style appliedStyle = (StyleOverride == null ? style : StyleOverride);
+            Style appliedStyle = (StyleOverride ?? style);
 
             return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)(appliedStyle.Color.IsByLayer ? Color.White : appliedStyle.Color).Argb));
         }
