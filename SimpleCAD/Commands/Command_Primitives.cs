@@ -295,6 +295,31 @@ namespace SimpleCAD.Commands
         }
     }
 
+    public class DrawRectangle : Command
+    {
+        public override string RegisteredName => "Primitives.Rectangle";
+        public override string Name => "Rectangle";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            var p1 = await ed.GetPoint("Center point: ");
+            if (p1.Result != ResultMode.OK) return;
+            var p2 = await ed.GetPoint("Width: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
+            Rectangle consRec = new Rectangle(p1.Value, (p2.Value - p1.Value).Length * 2, 0, (p2.Value - p1.Value).Angle);
+            doc.Jigged.Add(consRec);
+            var d2 = await ed.GetDistance("Height: ", p1.Value, (p) => consRec.Height = p * 2);
+            if (d2.Result != ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
+            doc.Jigged.Remove(consRec);
+
+            Drawable newItem = new Rectangle(p1.Value, (p2.Value - p1.Value).Length * 2, d2.Value * 2, (p2.Value - p1.Value).Angle);
+            doc.Model.Add(newItem);
+        }
+    }
+
     public class DrawPolyline : Command
     {
         public override string RegisteredName => "Primitives.Polyline";
@@ -407,51 +432,6 @@ namespace SimpleCAD.Commands
 
             doc.Jigged.Remove(consPoly);
             Hatch newItem = new Hatch(points);
-            doc.Model.Add(newItem);
-        }
-    }
-
-    public class DrawRectangle : Command
-    {
-        public override string RegisteredName => "Primitives.Rectangle";
-        public override string Name => "Rectangle";
-
-        public override async Task Apply(CADDocument doc, params string[] args)
-        {
-            Editor ed = doc.Editor;
-            ed.PickedSelection.Clear();
-
-            var p1 = await ed.GetPoint("First corner point: ");
-            if (p1.Result != ResultMode.OK) return;
-            var p2 = await ed.GetCorner("Second corner point: ", p1.Value);
-            if (p2.Result != ResultMode.OK) return;
-
-            Polygon consRec = new Polygon(p1.Value, new Point2D(p2.Value.X, p1.Value.Y), p2.Value, new Point2D(p1.Value.X, p2.Value.Y));
-            doc.Model.Add(consRec);
-        }
-    }
-
-    public class DrawTriangle : Command
-    {
-        public override string RegisteredName => "Primitives.Triangle";
-        public override string Name => "Triangle";
-
-        public override async Task Apply(CADDocument doc, params string[] args)
-        {
-            Editor ed = doc.Editor;
-            ed.PickedSelection.Clear();
-
-            var p1 = await ed.GetPoint("First point: ");
-            if (p1.Result != ResultMode.OK) return;
-            var p2 = await ed.GetPoint("Second point: ", p1.Value);
-            if (p2.Result != ResultMode.OK) return;
-            Polygon consTri = new Polygon(p1.Value, p2.Value, p2.Value);
-            doc.Jigged.Add(consTri);
-            var p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.Points[2] = p);
-            doc.Jigged.Remove(consTri);
-            if (p3.Result != ResultMode.OK) return;
-
-            Drawable newItem = new Polygon(p1.Value, p2.Value, p3.Value);
             doc.Model.Add(newItem);
         }
     }

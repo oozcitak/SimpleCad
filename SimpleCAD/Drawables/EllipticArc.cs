@@ -105,7 +105,7 @@ namespace SimpleCAD.Drawables
             Center = Center.Transform(transformation);
             Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
             SemiMajorAxis = (Vector2D.XAxis * SemiMajorAxis).Transform(transformation).Length;
-            SemiMinorAxis = (Vector2D.XAxis * SemiMinorAxis).Transform(transformation).Length;
+            SemiMinorAxis = (Vector2D.YAxis * SemiMinorAxis).Transform(transformation).Length;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
@@ -150,7 +150,7 @@ namespace SimpleCAD.Drawables
                 else if (index == 1)
                     SemiMajorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMajorAxis;
                 else if (index == 2)
-                    SemiMinorAxis = Vector2D.XAxis.Transform(transformation).Length * SemiMinorAxis;
+                    SemiMinorAxis = Vector2D.YAxis.Transform(transformation).Length * SemiMinorAxis;
                 else if (index == 3)
                     Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
             }

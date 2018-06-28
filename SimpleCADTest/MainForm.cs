@@ -178,11 +178,6 @@ namespace SimpleCADTest
             ed.RunCommand("Primitives.Rectangle");
         }
 
-        private void btnDrawTriangle_Click(object sender, EventArgs e)
-        {
-            ed.RunCommand("Primitives.Triangle");
-        }
-
         private void btnDrawQuadraticBezier_Click(object sender, EventArgs e)
         {
             ed.RunCommand("Primitives.Quadratic_Bezier");

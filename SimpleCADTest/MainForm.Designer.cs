@@ -48,7 +48,6 @@
             this.btnDrawParabola = new System.Windows.Forms.ToolStripButton();
             this.btnDrawPolyline = new System.Windows.Forms.ToolStripButton();
             this.btnDrawRectangle = new System.Windows.Forms.ToolStripButton();
-            this.btnDrawTriangle = new System.Windows.Forms.ToolStripButton();
             this.btnDrawHatch = new System.Windows.Forms.ToolStripButton();
             this.btnDrawQuadraticBezier = new System.Windows.Forms.ToolStripButton();
             this.tsStandard = new System.Windows.Forms.ToolStrip();
@@ -207,12 +206,11 @@
             this.btnDrawParabola,
             this.btnDrawPolyline,
             this.btnDrawRectangle,
-            this.btnDrawTriangle,
             this.btnDrawHatch,
             this.btnDrawQuadraticBezier});
             this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
             this.tsPrimitives.Name = "tsPrimitives";
-            this.tsPrimitives.Size = new System.Drawing.Size(731, 25);
+            this.tsPrimitives.Size = new System.Drawing.Size(678, 25);
             this.tsPrimitives.TabIndex = 0;
             // 
             // btnDrawPoint
@@ -325,16 +323,6 @@
             this.btnDrawRectangle.Size = new System.Drawing.Size(63, 22);
             this.btnDrawRectangle.Text = "Rectangle";
             this.btnDrawRectangle.Click += new System.EventHandler(this.btnDrawRectangle_Click);
-            // 
-            // btnDrawTriangle
-            // 
-            this.btnDrawTriangle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnDrawTriangle.Image = ((System.Drawing.Image)(resources.GetObject("btnDrawTriangle.Image")));
-            this.btnDrawTriangle.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnDrawTriangle.Name = "btnDrawTriangle";
-            this.btnDrawTriangle.Size = new System.Drawing.Size(53, 22);
-            this.btnDrawTriangle.Text = "Triangle";
-            this.btnDrawTriangle.Click += new System.EventHandler(this.btnDrawTriangle_Click);
             // 
             // btnDrawHatch
             // 
@@ -688,7 +676,7 @@
             this.btnCreateComposite});
             this.tsComposite.Location = new System.Drawing.Point(3, 150);
             this.tsComposite.Name = "tsComposite";
-            this.tsComposite.Size = new System.Drawing.Size(149, 25);
+            this.tsComposite.Size = new System.Drawing.Size(118, 25);
             this.tsComposite.TabIndex = 7;
             // 
             // btnCreateComposite
@@ -762,7 +750,6 @@
         private System.Windows.Forms.ToolStripButton btnDrawParabola;
         private System.Windows.Forms.ToolStripButton btnDrawPolyline;
         private System.Windows.Forms.ToolStripButton btnDrawRectangle;
-        private System.Windows.Forms.ToolStripButton btnDrawTriangle;
         private System.Windows.Forms.ToolStrip tsStandard;
         private System.Windows.Forms.ToolStripButton btnSave;
         private System.Windows.Forms.ToolStrip tsTransform;

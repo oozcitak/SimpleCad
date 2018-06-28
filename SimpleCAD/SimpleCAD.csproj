@@ -69,6 +69,7 @@
     <Compile Include="Document\PersistableDictionary.cs" />
     <Compile Include="Drawables\CompositeReference.cs" />
     <Compile Include="Drawables\Curve.cs" />
+    <Compile Include="Drawables\Rectangle.cs" />
     <Compile Include="Geometry\CurveOperations.cs" />
     <Compile Include="Drawables\DrawableList.cs" />
     <Compile Include="Drawables\QuadraticBezier.cs" />

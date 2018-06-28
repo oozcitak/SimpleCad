@@ -7,6 +7,12 @@ namespace SimpleCAD
     [Docking(DockingBehavior.Ask)]
     public partial class CADWindow : UserControl
     {
+        private System.Drawing.Color backColor = System.Drawing.Color.FromArgb(33, 40, 48);
+        private bool interactive = true;
+        private bool showGrid = true;
+        private bool showAxes = true;
+        private bool showCursor = true;
+
         [Browsable(false)]
         public CADDocument Document { get; private set; }
 
@@ -15,21 +21,25 @@ namespace SimpleCAD
 
         public override System.Drawing.Color BackColor
         {
-            get => System.Drawing.Color.FromArgb((int)Document.Settings.BackColor.Argb);
-            set => Document.Settings.BackColor = Color.FromArgb((uint)value.ToArgb());
+            get => backColor;
+            set
+            {
+                backColor = value;
+                Document.Settings.BackColor = Color.FromArgb((uint)value.ToArgb());
+            }
         }
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
-        public bool Interactive { get => View.Interactive; set => View.Interactive = value; }
+        public bool Interactive { get => interactive; set { interactive = value; View.Interactive = value; } }
 
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cartesian grid is shown.")]
-        public bool ShowGrid { get => View.ShowGrid; set => View.ShowGrid = value; }
+        public bool ShowGrid { get => showGrid; set { showGrid = value; View.ShowGrid = value; } }
 
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the X and Y axes are shown.")]
-        public bool ShowAxes { get => View.ShowAxes; set => View.ShowAxes = value; }
+        public bool ShowAxes { get => showAxes; set { showAxes = value; View.ShowAxes = value; } }
 
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cursor is shown.")]
-        public bool ShowCursor { get => View.ShowCursor; set => View.ShowCursor = value; }
+        public bool ShowCursor { get => showCursor; set { showCursor = value; View.ShowCursor = value; } }
 
         public CADWindow()
         {
@@ -43,7 +53,13 @@ namespace SimpleCAD
             BorderStyle = BorderStyle.Fixed3D;
 
             Document = new CADDocument();
+            Document.Settings.BackColor = Color.FromArgb((uint)backColor.ToArgb());
+
             View = new CADView(this, Document);
+            View.Interactive = interactive;
+            View.ShowAxes = showAxes;
+            View.ShowGrid = showGrid;
+            View.ShowCursor = showCursor;
 
             Disposed += CADWindow_Disposed;
         }
