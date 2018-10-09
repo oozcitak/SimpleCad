@@ -5,17 +5,17 @@ namespace SimpleCAD
     public abstract class PersistableDictionaryWithDefault<TValue> : PersistableDictionary<TValue> where TValue : IPersistable, new()
     {
         public string DefaultKey { get; private set; }
-        public TValue Default { get => this[DefaultKey]; }
+        public TValue Default { get => dict[DefaultKey]; }
 
         public PersistableDictionaryWithDefault(string defaultKey, TValue defaultValue) : base()
         {
             DefaultKey = defaultKey;
-            Add(defaultKey, defaultValue);
+            dict.Add(defaultKey, defaultValue);
         }
 
         public TValue GetOrDefault(string key)
         {
-            if (TryGetValue(key, out var value))
+            if (dict.TryGetValue(key, out var value))
                 return value;
             else
                 return Default;
@@ -23,17 +23,17 @@ namespace SimpleCAD
 
         public override void Clear()
         {
-            TValue defaultValue = this[DefaultKey];
-            base.Clear();
-            Add(DefaultKey, defaultValue);
+            TValue defaultValue = dict[DefaultKey];
+            dict.Clear();
+            dict.Add(DefaultKey, defaultValue);
         }
 
         public override bool Remove(string key)
         {
-            if (string.Equals(key, DefaultKey, StringComparison.OrdinalIgnoreCase))
+            if(dict.Comparer.Equals(key, DefaultKey))
                 return false;
-
-            return base.Remove(key);
+            else
+                return dict.Remove(key);
         }
     }
 }

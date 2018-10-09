@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SimpleCAD
 {
-    public class CADView : IDisposable, IPersistable
+    public sealed class CADView : IDisposable, IPersistable
     {
         private bool panning;
         private Point2D lastMouseLocationWorld;

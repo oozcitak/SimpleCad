@@ -18,27 +18,24 @@ namespace SimpleCAD.Graphics
 
         public override bool IsValid(ITypeDescriptorContext context, object value)
         {
-            string str = value as string;
+            if (value is string str)
+            {
+                if (str.StartsWith("#"))
+                    str = str.Substring(1);
 
-            if (str == null) return false;
+                if (uint.TryParse(str, out uint _))
+                    return true;
 
-            if (str.StartsWith("#"))
-                str = str.Substring(1);
-
-            if (uint.TryParse(str, out uint _))
-                return true;
-
-            if (Enum.TryParse(str, out KnownColor _))
-                return true;
+                if (Enum.TryParse(str, out KnownColor _))
+                    return true;
+            }
 
             return false;
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
         {
-            string str = value as string;
-
-            if (str != null)
+            if (value is string str)
             {
                 if (str.StartsWith("#"))
                     str = str.Substring(1);
@@ -55,9 +52,8 @@ namespace SimpleCAD.Graphics
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is Color)
+            if (destinationType == typeof(string) && value is Color col)
             {
-                Color col = (Color)value;
                 if (col.IsKnownColor())
                     return col.ToKnownColor().ToString();
                 else

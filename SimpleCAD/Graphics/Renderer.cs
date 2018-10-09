@@ -30,7 +30,7 @@ namespace SimpleCAD.Graphics
     }
     #endregion
 
-    public class Renderer : IDisposable
+    public sealed class Renderer : IDisposable
     {
         Control control;
         private System.Drawing.BufferedGraphics gdiBuffer;

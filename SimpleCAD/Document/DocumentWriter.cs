@@ -5,7 +5,7 @@ using System.IO;
 
 namespace SimpleCAD
 {
-    public class DocumentWriter : IDisposable
+    public sealed class DocumentWriter : IDisposable
     {
         BinaryWriter writer;
 

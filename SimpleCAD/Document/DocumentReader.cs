@@ -5,7 +5,7 @@ using System.IO;
 
 namespace SimpleCAD
 {
-    public class DocumentReader : IDisposable
+    public sealed class DocumentReader : IDisposable
     {
         BinaryReader reader;
 
