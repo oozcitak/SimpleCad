@@ -82,6 +82,7 @@
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
             this.tsComposite = new System.Windows.Forms.ToolStrip();
             this.btnCreateComposite = new System.Windows.Forms.ToolStripButton();
+            this.lblSelection = new System.Windows.Forms.Label();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -168,6 +169,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.lblSelection);
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
             this.splitContainer1.Size = new System.Drawing.Size(1008, 319);
             this.splitContainer1.SplitterDistance = 759;
@@ -184,10 +186,12 @@
             // 
             // propertyGrid1
             // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
+            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertyGrid1.Location = new System.Drawing.Point(0, 28);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 319);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 291);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -689,6 +693,15 @@
             this.btnCreateComposite.Text = "Create Composite";
             this.btnCreateComposite.Click += new System.EventHandler(this.btnCreateComposite_Click);
             // 
+            // lblSelection
+            // 
+            this.lblSelection.AutoSize = true;
+            this.lblSelection.Location = new System.Drawing.Point(4, 9);
+            this.lblSelection.Name = "lblSelection";
+            this.lblSelection.Size = new System.Drawing.Size(35, 13);
+            this.lblSelection.TabIndex = 2;
+            this.lblSelection.Text = "label1";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -710,6 +723,7 @@
             this.statusStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.tsPrimitives.ResumeLayout(false);
@@ -786,6 +800,7 @@
         private System.Windows.Forms.ToolStripButton btnDrawQuadraticBezier;
         private System.Windows.Forms.ToolStrip tsComposite;
         private System.Windows.Forms.ToolStripButton btnCreateComposite;
+        private System.Windows.Forms.Label lblSelection;
     }
 }
 
