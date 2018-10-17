@@ -372,7 +372,13 @@ namespace SimpleCAD
 
         public void Zoom(float zoomFactor)
         {
+            Zoom(zoomFactor, Camera.Position);
+        }
+
+        public void Zoom(float zoomFactor, Point2D pt)
+        {
             Camera.Zoom *= zoomFactor;
+            Camera.Position = Camera.Position - (pt - Camera.Position) * (zoomFactor - 1F);
         }
 
         public void ZoomIn()
@@ -380,9 +386,19 @@ namespace SimpleCAD
             Zoom(0.9f);
         }
 
+        public void ZoomIn(Point2D pt)
+        {
+            Zoom(0.9f, pt);
+        }
+
         public void ZoomOut()
         {
             Zoom(1.1f);
+        }
+
+        public void ZoomOut(Point2D pt)
+        {
+            Zoom(1.1f, pt);
         }
 
         public void Pan(Vector2D distance)
@@ -607,11 +623,11 @@ namespace SimpleCAD
             {
                 if (e.Delta > 0)
                 {
-                    ZoomIn();
+                    ZoomIn(e.Location);
                 }
                 else
                 {
-                    ZoomOut();
+                    ZoomOut(e.Location);
                 }
                 Redraw();
             }
