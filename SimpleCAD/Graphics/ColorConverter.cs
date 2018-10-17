@@ -43,7 +43,7 @@ namespace SimpleCAD.Graphics
                 if (uint.TryParse(str, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out uint argb))
                     return Color.FromArgb(argb);
 
-                if (Enum.TryParse(str, out KnownColor knownColor))
+                if (Enum.TryParse(str, true, out KnownColor knownColor))
                     return Color.FromKnownColor(knownColor);
             }
 
