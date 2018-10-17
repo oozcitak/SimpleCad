@@ -17,19 +17,19 @@ namespace SimpleCADTest
             doc = cadWindow1.Document;
             ed = doc.Editor;
 
-            doc.DocumentChanged += Document_DocumentChanged;
-            doc.SelectionChanged += CadWindow1_SelectionChanged;
+            doc.DocumentChanged += doc_DocumentChanged;
+            doc.SelectionChanged += doc_SelectionChanged;
             cadWindow1.MouseMove += cadWindow1_MouseMove;
 
             UpdateUI();
         }
 
-        private void Document_DocumentChanged(object sender, EventArgs e)
+        private void doc_DocumentChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObjects = ed.PickedSelection.ToArray();
         }
 
-        private void CadWindow1_SelectionChanged(object sender, EventArgs e)
+        private void doc_SelectionChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObjects = ed.PickedSelection.ToArray();
         }
@@ -44,7 +44,7 @@ namespace SimpleCADTest
             statusCoords.Text = cadWindow1.View.CursorLocation.ToString(doc.Settings.NumberFormat);
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!EnsureDocumentSaved())
                 e.Cancel = true;
