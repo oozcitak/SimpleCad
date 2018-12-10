@@ -13,7 +13,7 @@ namespace SimpleCAD.Drawables
         private bool closed;
 
         public Point2DCollection Points { get; private set; }
-        public new bool Closed { get { return closed; } set { closed = value; NotifyPropertyChanged(); } }
+        public override bool Closed => closed;
 
         public Polyline()
         {
@@ -119,6 +119,9 @@ namespace SimpleCAD.Drawables
             base.Save(writer);
             writer.Write(Points);
         }
+
+        public void Open() => closed = false;
+        public void Close() => closed = true;
 
         public override float StartParam => 0;
         public override float EndParam => Points.Count - 1;

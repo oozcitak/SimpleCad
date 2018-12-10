@@ -75,7 +75,7 @@ namespace SimpleCAD.Drawables
                 poly.Points.Add(pt);
                 t += dt;
             }
-            poly.Closed = false;
+            poly.Close();
 
             // de Casteljau's algorithm
             Point2D GetPoint(Point2D[] points, float tp)

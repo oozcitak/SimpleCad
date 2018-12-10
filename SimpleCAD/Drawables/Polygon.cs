@@ -7,7 +7,7 @@ namespace SimpleCAD.Drawables
     public class Polygon : Polyline
     {
         [Browsable(false)]
-        public new bool Closed => true;
+        public override bool Closed => true;
 
         public Polygon() : base() { }
         public Polygon(Point2DCollection pts) : base(pts) { }

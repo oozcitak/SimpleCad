@@ -375,7 +375,7 @@ namespace SimpleCAD.Commands
 
             doc.Jigged.Remove(consPoly);
             Polyline newItem = new Polyline(points);
-            if (closed) newItem.Closed = true;
+            if (closed) newItem.Close();
             doc.Model.Add(newItem);
         }
     }
@@ -394,7 +394,7 @@ namespace SimpleCAD.Commands
             if (p1.Result != ResultMode.OK) return;
             Point2D pt = p1.Value;
             Polyline consPoly = new Polyline(new Point2D[] { pt, pt });
-            consPoly.Closed = true;
+            consPoly.Close();
             doc.Jigged.Add(consPoly);
 
             Point2DCollection points = new Point2DCollection();
