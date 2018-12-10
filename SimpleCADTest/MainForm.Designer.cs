@@ -33,7 +33,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.lblSelection = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsStandard = new System.Windows.Forms.ToolStrip();
@@ -87,6 +86,7 @@
             this.btnDelete = new System.Windows.Forms.ToolStripButton();
             this.btnZoom = new System.Windows.Forms.ToolStripButton();
             this.btnPan = new System.Windows.Forms.ToolStripButton();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -166,15 +166,6 @@
             this.splitContainer1.Size = new System.Drawing.Size(1008, 394);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 394);
-            this.cadWindow1.TabIndex = 0;
             // 
             // lblSelection
             // 
@@ -700,6 +691,15 @@
             this.btnPan.Size = new System.Drawing.Size(23, 22);
             this.btnPan.Text = "Pan";
             this.btnPan.Click += new System.EventHandler(this.btnPan_Click);
+            // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 394);
+            this.cadWindow1.TabIndex = 0;
             // 
             // MainForm
             // 

@@ -20,6 +20,11 @@ namespace SimpleCAD
         public SnapPointType SnapMode { get => Document.Settings.SnapMode; }
         internal SnapPointCollection SnapPoints { get; set; } = new SnapPointCollection();
 
+        internal string LastCommandName { get; private set; } = string.Empty;
+        internal string[] LastCommandArgs { get; private set; } = new string[0];
+
+        public bool CommandInProgress { get; private set; } = false;
+
         static Editor()
         {
             // Search the assembly for commands
@@ -56,6 +61,10 @@ namespace SimpleCAD
         {
             if (commands.ContainsKey(registeredName))
             {
+                CommandInProgress = true;
+                LastCommandName = registeredName;
+                LastCommandArgs = args;
+
                 Command com = commands[registeredName];
                 Command clearSelection = new Commands.SelectionClear();
                 Task runTask = com.Apply(Document, args).ContinueWith(
@@ -66,11 +75,24 @@ namespace SimpleCAD
                         else if (t.IsCompleted)
                             clearSelection.Apply(Document, args);
                     }
+                ).ContinueWith(
+                    (t) => 
+                    {
+                        CommandInProgress = false;
+                    }
                 );
             }
             else
             {
                 OnError(new EditorErrorEventArgs(new InvalidOperationException("Unknown command name: " + registeredName)));
+            }
+        }
+
+        public void RepeatCommand()
+        {
+            if (!string.IsNullOrEmpty(LastCommandName))
+            {
+                RunCommand(LastCommandName, LastCommandArgs);
             }
         }
 
@@ -417,22 +439,26 @@ namespace SimpleCAD
 
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
-            CursorMove?.Invoke(sender, e);
+            if (CommandInProgress)
+                CursorMove?.Invoke(sender, e);
         }
 
         internal void OnViewMouseClick(object sender, CursorEventArgs e)
         {
-            CursorClick?.Invoke(sender, e);
+            if (CommandInProgress)
+                CursorClick?.Invoke(sender, e);
         }
 
         internal void OnViewKeyDown(object sender, KeyEventArgs e)
         {
-            KeyDown?.Invoke(sender, e);
+            if (CommandInProgress)
+                KeyDown?.Invoke(sender, e);
         }
 
         internal void OnViewKeyPress(object sender, KeyPressEventArgs e)
         {
-            KeyPress?.Invoke(sender, e);
+            if (CommandInProgress)
+                KeyPress?.Invoke(sender, e);
         }
         #endregion
 
