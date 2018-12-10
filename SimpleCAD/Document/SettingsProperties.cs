@@ -118,5 +118,10 @@ namespace SimpleCAD
             get => Get<SimpleCAD.SnapPointType>("SnapMode");
             set => Set("SnapMode", value);
         }
+        public SimpleCAD.AngleMode AngleMode 
+        {
+            get => Get<SimpleCAD.AngleMode>("AngleMode");
+            set => Set("AngleMode", value);
+        }
     }
 }

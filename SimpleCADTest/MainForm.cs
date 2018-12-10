@@ -119,6 +119,12 @@ namespace SimpleCADTest
             btnSnapQuadrant.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None;
             btnSnapPoint.Checked = (doc.Settings.SnapMode & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None;
 
+            btnAngleRadians.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Radians);
+            btnAngleDegrees.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Degrees);
+            btnAngleGrads.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Grads);
+            btnAngleDMS.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.DegreesMinutesSeconds);
+            btnAngleSurveyor.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Surveyor);
+
             if (ed.PickedSelection.Count == 0)
                 lblSelection.Text = "No selection";
             else if (ed.PickedSelection.Count == 1)
@@ -305,6 +311,31 @@ namespace SimpleCADTest
         private void btnCreateComposite_Click(object sender, EventArgs e)
         {
             ed.RunCommand("Composite.Create");
+        }
+
+        private void btnAngleRadians_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Radians;
+        }
+
+        private void btnAngleDegrees_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Degrees;
+        }
+
+        private void btnAngleGrads_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Grads;
+        }
+
+        private void btnAngleDMS_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.DegreesMinutesSeconds;
+        }
+
+        private void btnAngleSurveyor_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Surveyor;
         }
     }
 }

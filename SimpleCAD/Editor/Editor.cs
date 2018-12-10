@@ -1,9 +1,9 @@
-﻿using SimpleCAD.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SimpleCAD.Geometry;
 
 namespace SimpleCAD
 {
@@ -73,6 +73,124 @@ namespace SimpleCAD
                 OnError(new EditorErrorEventArgs(new InvalidOperationException("Unknown command name: " + registeredName)));
             }
         }
+
+        #region Helper Functions
+        public string AngleToString(float angle)
+        {
+            switch (Document.Settings.AngleMode)
+            {
+                case AngleMode.Radians:
+                    return angle.ToString(Document.Settings.NumberFormat);
+                case AngleMode.Degrees:
+                    return (angle * 180f / MathF.PI).ToString(Document.Settings.NumberFormat);
+                case AngleMode.Grads:
+                    return (angle * 200f / MathF.PI).ToString(Document.Settings.NumberFormat);
+                case AngleMode.DegreesMinutesSeconds:
+                    float totalDegrees = angle * 180f / MathF.PI;
+                    float degrees = MathF.Floor(totalDegrees);
+                    float totalMinutes = (totalDegrees - degrees) * 60f;
+                    float minutes = MathF.Floor(totalMinutes);
+                    float totalSeconds = (totalMinutes - minutes) * 60f;
+                    return string.Format("{0:0}° {1:0}' {2}\"", degrees, minutes, totalSeconds.ToString(Document.Settings.NumberFormat));
+                case AngleMode.Surveyor:
+                    if (angle < MathF.PI / 2) // NE
+                        return string.Format("N {0} E", ((MathF.PI / 2f - angle) * 180f / MathF.PI).ToString(Document.Settings.NumberFormat));
+                    else if (angle < MathF.PI) // NW
+                        return string.Format("N {0} W", ((angle - MathF.PI / 2f) * 180f / MathF.PI).ToString(Document.Settings.NumberFormat));
+                    else if (angle < 3f * MathF.PI / 2f) // SW
+                        return string.Format("S {0} W", ((3f * MathF.PI / 2f - angle) * 180f / MathF.PI).ToString(Document.Settings.NumberFormat));
+                    else  // SE
+                        return string.Format("S {0} E", ((angle - 3f * MathF.PI / 2f) * 180f / MathF.PI).ToString(Document.Settings.NumberFormat));
+                default:
+                    return angle.ToString(Document.Settings.NumberFormat);
+            }
+        }
+
+        public bool TryAngleFromString(string str, out float angle)
+        {
+            str = str.Replace(" ", "");
+            angle = 0f;
+
+            switch (Document.Settings.AngleMode)
+            {
+                case AngleMode.Radians:
+                    return float.TryParse(str, out angle);
+                case AngleMode.Degrees:
+                    if (float.TryParse(str, out angle))
+                    {
+                        angle = angle * MathF.PI / 180f;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                case AngleMode.Grads:
+                    if (float.TryParse(str, out angle))
+                    {
+                        angle = angle * MathF.PI / 200f;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                case AngleMode.DegreesMinutesSeconds:
+                    float degrees = 0f;
+                    float minutes = 0f;
+                    float seconds = 0f;
+
+                    int degreeSign = str.IndexOf('°');
+                    if (degreeSign != -1)
+                    {
+                        if (!float.TryParse(str.Substring(0, degreeSign), out degrees))
+                            return false;
+                        str = str.Substring(degreeSign + 1);
+                    }
+                    int minuteSign = str.IndexOf('\'');
+                    if (minuteSign != -1)
+                    {
+                        if (!float.TryParse(str.Substring(0, minuteSign), out minutes))
+                            return false;
+                        str = str.Substring(minuteSign + 1);
+                    }
+                    int secondSign = str.IndexOf('"');
+                    if (secondSign != -1)
+                    {
+                        if (!float.TryParse(str.Substring(0, secondSign), out seconds))
+                            return false;
+                        str = str.Substring(secondSign + 1);
+                    }
+
+                    angle = (degrees + minutes / 60f + seconds / 3600f) * MathF.PI / 180f;
+                    return true;
+                case AngleMode.Surveyor:
+                    if (str.Length < 3) return false;
+                    bool fromNorth = str.StartsWith("N");
+                    bool fromSouth = str.StartsWith("S");
+                    if (!fromNorth && !fromSouth) return false;
+                    bool toWest = str.EndsWith("W");
+                    bool toEast = str.EndsWith("E");
+                    if (!toWest && !toEast) return false;
+                    if (float.TryParse(str.Substring(1, str.Length - 2), out angle))
+                    {
+                        angle = angle * MathF.PI / 180f;
+                        if (fromNorth && toEast) // NE
+                            angle = MathF.PI / 2f - angle;
+                        else if (fromNorth && toWest) // NW
+                            angle = angle + MathF.PI / 2f;
+                        else if (fromSouth && toWest) // SW
+                            angle = 3f * MathF.PI / 2f - angle;
+                        else  // SE
+                            angle = angle + 3f * MathF.PI / 2f;
+                        return true;
+                    }
+                    return false;
+                default:
+                    return float.TryParse(str, out angle);
+            }
+        }
+        #endregion
 
         #region Editor Getters
         public async Task<InputResult<string>> GetOpenFilename(string message)

@@ -33,10 +33,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cadWindow1 = new SimpleCAD.CADWindow();
-            this.lblSelection = new System.Windows.Forms.Label();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsPrimitives = new System.Windows.Forms.ToolStrip();
             this.btnDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.btnDrawLine = new System.Windows.Forms.ToolStripButton();
@@ -83,15 +79,21 @@
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
             this.tsComposite = new System.Windows.Forms.ToolStrip();
             this.btnCreateComposite = new System.Windows.Forms.ToolStripButton();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.cadWindow1 = new SimpleCAD.CADWindow();
+            this.lblSelection = new System.Windows.Forms.Label();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.tsAngle = new System.Windows.Forms.ToolStrip();
+            this.btnAngleRadians = new System.Windows.Forms.ToolStripButton();
+            this.btnAngleDegrees = new System.Windows.Forms.ToolStripButton();
+            this.btnAngleGrads = new System.Windows.Forms.ToolStripButton();
+            this.btnAngleDMS = new System.Windows.Forms.ToolStripButton();
+            this.btnAngleSurveyor = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
             this.tsPrimitives.SuspendLayout();
             this.tsStandard.SuspendLayout();
             this.tsEdit.SuspendLayout();
@@ -100,6 +102,11 @@
             this.tsTransform.SuspendLayout();
             this.tsSnap.SuspendLayout();
             this.tsComposite.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            this.tsAngle.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -112,7 +119,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 419);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 394);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -122,14 +129,15 @@
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsStandard);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsEdit);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsSnap);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsGraphics);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsPrimitives);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsTransform);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsEdit);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsComposite);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.tsAngle);
             // 
             // statusStrip1
             // 
@@ -155,54 +163,6 @@
             this.statusCoords.Name = "statusCoords";
             this.statusCoords.Size = new System.Drawing.Size(25, 17);
             this.statusCoords.Text = "0, 0";
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.cadWindow1);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.lblSelection);
-            this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 419);
-            this.splitContainer1.SplitterDistance = 759;
-            this.splitContainer1.TabIndex = 2;
-            // 
-            // cadWindow1
-            // 
-            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
-            this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
-            this.cadWindow1.TabIndex = 0;
-            // 
-            // lblSelection
-            // 
-            this.lblSelection.AutoSize = true;
-            this.lblSelection.Location = new System.Drawing.Point(4, 9);
-            this.lblSelection.Name = "lblSelection";
-            this.lblSelection.Size = new System.Drawing.Size(35, 13);
-            this.lblSelection.TabIndex = 2;
-            this.lblSelection.Text = "label1";
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.propertyGrid1.Location = new System.Drawing.Point(0, 28);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 366);
-            this.propertyGrid1.TabIndex = 1;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // tsPrimitives
             // 
@@ -702,6 +662,118 @@
             this.btnCreateComposite.Text = "Create Composite";
             this.btnCreateComposite.Click += new System.EventHandler(this.btnCreateComposite_Click);
             // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.cadWindow1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.lblSelection);
+            this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 394);
+            this.splitContainer1.SplitterDistance = 759;
+            this.splitContainer1.TabIndex = 2;
+            // 
+            // cadWindow1
+            // 
+            this.cadWindow1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cadWindow1.Location = new System.Drawing.Point(0, 0);
+            this.cadWindow1.Name = "cadWindow1";
+            this.cadWindow1.Size = new System.Drawing.Size(759, 394);
+            this.cadWindow1.TabIndex = 0;
+            // 
+            // lblSelection
+            // 
+            this.lblSelection.AutoSize = true;
+            this.lblSelection.Location = new System.Drawing.Point(4, 9);
+            this.lblSelection.Name = "lblSelection";
+            this.lblSelection.Size = new System.Drawing.Size(35, 13);
+            this.lblSelection.TabIndex = 2;
+            this.lblSelection.Text = "label1";
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertyGrid1.Location = new System.Drawing.Point(0, 28);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 341);
+            this.propertyGrid1.TabIndex = 1;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            // 
+            // tsAngle
+            // 
+            this.tsAngle.Dock = System.Windows.Forms.DockStyle.None;
+            this.tsAngle.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnAngleRadians,
+            this.btnAngleDegrees,
+            this.btnAngleGrads,
+            this.btnAngleDMS,
+            this.btnAngleSurveyor});
+            this.tsAngle.Location = new System.Drawing.Point(3, 75);
+            this.tsAngle.Name = "tsAngle";
+            this.tsAngle.Size = new System.Drawing.Size(292, 25);
+            this.tsAngle.TabIndex = 8;
+            // 
+            // btnAngleRadians
+            // 
+            this.btnAngleRadians.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAngleRadians.Image = ((System.Drawing.Image)(resources.GetObject("btnAngleRadians.Image")));
+            this.btnAngleRadians.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAngleRadians.Name = "btnAngleRadians";
+            this.btnAngleRadians.Size = new System.Drawing.Size(52, 22);
+            this.btnAngleRadians.Text = "Radians";
+            this.btnAngleRadians.Click += new System.EventHandler(this.btnAngleRadians_Click);
+            // 
+            // btnAngleDegrees
+            // 
+            this.btnAngleDegrees.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAngleDegrees.Image = ((System.Drawing.Image)(resources.GetObject("btnAngleDegrees.Image")));
+            this.btnAngleDegrees.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAngleDegrees.Name = "btnAngleDegrees";
+            this.btnAngleDegrees.Size = new System.Drawing.Size(53, 22);
+            this.btnAngleDegrees.Text = "Degrees";
+            this.btnAngleDegrees.Click += new System.EventHandler(this.btnAngleDegrees_Click);
+            // 
+            // btnAngleGrads
+            // 
+            this.btnAngleGrads.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAngleGrads.Image = ((System.Drawing.Image)(resources.GetObject("btnAngleGrads.Image")));
+            this.btnAngleGrads.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAngleGrads.Name = "btnAngleGrads";
+            this.btnAngleGrads.Size = new System.Drawing.Size(41, 22);
+            this.btnAngleGrads.Text = "Grads";
+            this.btnAngleGrads.Click += new System.EventHandler(this.btnAngleGrads_Click);
+            // 
+            // btnAngleDMS
+            // 
+            this.btnAngleDMS.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAngleDMS.Image = ((System.Drawing.Image)(resources.GetObject("btnAngleDMS.Image")));
+            this.btnAngleDMS.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAngleDMS.Name = "btnAngleDMS";
+            this.btnAngleDMS.Size = new System.Drawing.Size(46, 22);
+            this.btnAngleDMS.Text = "D/M/S";
+            this.btnAngleDMS.Click += new System.EventHandler(this.btnAngleDMS_Click);
+            // 
+            // btnAngleSurveyor
+            // 
+            this.btnAngleSurveyor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAngleSurveyor.Image = ((System.Drawing.Image)(resources.GetObject("btnAngleSurveyor.Image")));
+            this.btnAngleSurveyor.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAngleSurveyor.Name = "btnAngleSurveyor";
+            this.btnAngleSurveyor.Size = new System.Drawing.Size(57, 22);
+            this.btnAngleSurveyor.Text = "Surveyor";
+            this.btnAngleSurveyor.Click += new System.EventHandler(this.btnAngleSurveyor_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -721,11 +793,6 @@
             this.toolStripContainer1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
             this.tsPrimitives.ResumeLayout(false);
             this.tsPrimitives.PerformLayout();
             this.tsStandard.ResumeLayout(false);
@@ -742,6 +809,13 @@
             this.tsSnap.PerformLayout();
             this.tsComposite.ResumeLayout(false);
             this.tsComposite.PerformLayout();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            this.tsAngle.ResumeLayout(false);
+            this.tsAngle.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -801,6 +875,12 @@
         private System.Windows.Forms.ToolStrip tsComposite;
         private System.Windows.Forms.ToolStripButton btnCreateComposite;
         private System.Windows.Forms.Label lblSelection;
+        private System.Windows.Forms.ToolStrip tsAngle;
+        private System.Windows.Forms.ToolStripButton btnAngleRadians;
+        private System.Windows.Forms.ToolStripButton btnAngleDegrees;
+        private System.Windows.Forms.ToolStripButton btnAngleGrads;
+        private System.Windows.Forms.ToolStripButton btnAngleDMS;
+        private System.Windows.Forms.ToolStripButton btnAngleSurveyor;
     }
 }
 

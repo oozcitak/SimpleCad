@@ -1,6 +1,6 @@
-﻿using SimpleCAD.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using SimpleCAD.Graphics;
 
 namespace SimpleCAD
 {
@@ -12,29 +12,30 @@ namespace SimpleCAD
             {
                 return new Dictionary<string, object>()
                 {
-                    { "DisplayPrecision",2 },
-                    { "BackColor",Color.FromArgb(33,40,48) },
-                    { "CursorPromptBackColor",Color.FromArgb(84,58,84) },
-                    { "CursorPromptForeColor",Color.FromArgb(128,Color.White) },
-                    { "SelectionWindowColor",Color.FromArgb(64,46,116,251) },
-                    { "SelectionWindowBorderColor",Color.White },
-                    { "ReverseSelectionWindowColor",Color.FromArgb(64,46,251,116) },
-                    { "ReverseSelectionWindowBorderColor",Color.White },
-                    { "SelectionHighlightColor",Color.FromArgb(64,46,116,251) },
-                    { "JigColor",Color.Orange },
-                    { "ControlPointColor",Color.FromArgb(46,116,251) },
-                    { "ActiveControlPointColor",Color.FromArgb(251,116,46) },
-                    { "SnapPointColor",Color.FromArgb(251,251,116) },
-                    { "MinorGridColor",Color.FromArgb(64,64,64) },
-                    { "MajorGridColor",Color.FromArgb(96,96,96) },
-                    { "AxisColor",Color.FromArgb(128,128,64) },
-                    { "PickBoxSize",6 },
-                    { "ControlPointSize",7 },
-                    { "PointSize",6 },
-                    { "Snap",true },
-                    { "SnapPointSize",11 },
-                    { "SnapDistance",25 },
-                    { "SnapMode",SnapPointType.All },
+                    { "DisplayPrecision", 2 },
+                    { "BackColor", Color.FromArgb(33,40,48) },
+                    { "CursorPromptBackColor", Color.FromArgb(84,58,84) },
+                    { "CursorPromptForeColor", Color.FromArgb(128,Color.White) },
+                    { "SelectionWindowColor", Color.FromArgb(64,46,116,251) },
+                    { "SelectionWindowBorderColor", Color.White },
+                    { "ReverseSelectionWindowColor", Color.FromArgb(64,46,251,116) },
+                    { "ReverseSelectionWindowBorderColor", Color.White },
+                    { "SelectionHighlightColor", Color.FromArgb(64,46,116,251) },
+                    { "JigColor", Color.Orange },
+                    { "ControlPointColor", Color.FromArgb(46,116,251) },
+                    { "ActiveControlPointColor", Color.FromArgb(251,116,46) },
+                    { "SnapPointColor", Color.FromArgb(251,251,116) },
+                    { "MinorGridColor", Color.FromArgb(64,64,64) },
+                    { "MajorGridColor", Color.FromArgb(96,96,96) },
+                    { "AxisColor", Color.FromArgb(128,128,64) },
+                    { "PickBoxSize", 6 },
+                    { "ControlPointSize", 7 },
+                    { "PointSize", 6 },
+                    { "Snap", true },
+                    { "SnapPointSize", 11 },
+                    { "SnapDistance", 25 },
+                    { "SnapMode", SnapPointType.All },
+                    { "AngleMode", AngleMode.Degrees },
                 };
             }
         }

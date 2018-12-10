@@ -55,6 +55,7 @@
     <Compile Include="Document\CADDocument.cs" />
     <Compile Include="Document\DocumentWriter.cs" />
     <Compile Include="Document\DocumentReader.cs" />
+    <Compile Include="Document\Enums.cs" />
     <Compile Include="Document\IDict.cs" />
     <Compile Include="Document\CompositeDictionary.cs" />
     <Compile Include="Document\Model.cs" />
