@@ -7,6 +7,11 @@ namespace SimpleCADTest
 {
     public partial class MainForm : Form
     {
+        private CheckBox btnShowGrid;
+        private CheckBox btnShowAxes;
+        private ToolStripControlHost tsShowGrid;
+        private ToolStripControlHost tsShowAxes;
+
         private SimpleCAD.CADDocument doc;
         private SimpleCAD.Editor ed;
 
@@ -20,6 +25,24 @@ namespace SimpleCADTest
             doc.DocumentChanged += doc_DocumentChanged;
             doc.SelectionChanged += doc_SelectionChanged;
             cadWindow1.MouseMove += cadWindow1_MouseMove;
+
+            btnShowGrid = new CheckBox();
+            btnShowGrid.Appearance = Appearance.Button;
+            btnShowGrid.Image = Properties.Resources.grid;
+            btnShowGrid.Text = "Grid";
+            btnShowGrid.TextImageRelation = TextImageRelation.ImageBeforeText;
+            tsShowGrid = new ToolStripControlHost(btnShowGrid);
+            tsShowGrid.Click += btnShowGrid_Click;
+            statusStrip1.Items.Add(tsShowGrid);
+
+            btnShowAxes = new CheckBox();
+            btnShowAxes.Appearance = Appearance.Button;
+            btnShowAxes.Image = Properties.Resources.axis;
+            btnShowAxes.Text = "Axes";
+            btnShowAxes.TextImageRelation = TextImageRelation.ImageBeforeText;
+            tsShowAxes = new ToolStripControlHost(btnShowAxes);
+            tsShowAxes.Click += btnShowAxes_Click;
+            statusStrip1.Items.Add(tsShowAxes);
 
             UpdateUI();
         }
@@ -124,6 +147,24 @@ namespace SimpleCADTest
             btnAngleGrads.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Grads);
             btnAngleDMS.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.DegreesMinutesSeconds);
             btnAngleSurveyor.Checked = (doc.Settings.AngleMode == SimpleCAD.AngleMode.Surveyor);
+
+            btnAngleMode.Text =
+                (doc.Settings.AngleMode == SimpleCAD.AngleMode.Radians ? "Radians" :
+                doc.Settings.AngleMode == SimpleCAD.AngleMode.Degrees ? "Degrees" :
+                doc.Settings.AngleMode == SimpleCAD.AngleMode.Grads ? "Grads" :
+                doc.Settings.AngleMode == SimpleCAD.AngleMode.DegreesMinutesSeconds ? "Degrees/Minutes/Seconds" :
+                doc.Settings.AngleMode == SimpleCAD.AngleMode.Surveyor ? "Surveyor" : "<Unkown>");
+
+            btnSnapMode.Text = "Snap " + (doc.Settings.Snap ? "" : "(Off)") + ":" +
+                (doc.Settings.SnapMode == SimpleCAD.SnapPointType.None ? " None" :
+                (((doc.Settings.SnapMode & SimpleCAD.SnapPointType.End) != SimpleCAD.SnapPointType.None) ? " E" : "") +
+                (((doc.Settings.SnapMode & SimpleCAD.SnapPointType.Middle) != SimpleCAD.SnapPointType.None) ? " M" : "") +
+                (((doc.Settings.SnapMode & SimpleCAD.SnapPointType.Center) != SimpleCAD.SnapPointType.None) ? " C" : "") +
+                (((doc.Settings.SnapMode & SimpleCAD.SnapPointType.Quadrant) != SimpleCAD.SnapPointType.None) ? " Q" : "") +
+                (((doc.Settings.SnapMode & SimpleCAD.SnapPointType.Point) != SimpleCAD.SnapPointType.None) ? " P" : ""));
+
+            btnShowGrid.Checked = cadWindow1.View.ShowGrid;
+            btnShowAxes.Checked = cadWindow1.View.ShowAxes;
 
             if (ed.PickedSelection.Count == 0)
                 lblSelection.Text = "No selection";
@@ -238,16 +279,6 @@ namespace SimpleCADTest
             ed.RunCommand("Transform.ScaleControlPoints");
         }
 
-        private void btnShowGrid_Click(object sender, EventArgs e)
-        {
-            cadWindow1.View.ShowGrid = btnShowGrid.Checked;
-        }
-
-        private void btnShowAxes_Click(object sender, EventArgs e)
-        {
-            cadWindow1.View.ShowAxes = btnShowAxes.Checked;
-        }
-
         private void btnZoom_Click(object sender, EventArgs e)
         {
             ed.RunCommand("View.Zoom");
@@ -263,9 +294,45 @@ namespace SimpleCADTest
             ed.RunCommand("Edit.Delete");
         }
 
+        private void btnCreateComposite_Click(object sender, EventArgs e)
+        {
+            ed.RunCommand("Composite.Create");
+        }
+
+        private void btnAngleDegrees_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Degrees;
+            UpdateUI();
+        }
+
+        private void btnAngleRadians_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Radians;
+            UpdateUI();
+        }
+
+        private void btnAngleGrads_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Grads;
+            UpdateUI();
+        }
+
+        private void btnAngleDMS_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.DegreesMinutesSeconds;
+            UpdateUI();
+        }
+
+        private void btnAngleSurveyor_Click(object sender, EventArgs e)
+        {
+            doc.Settings.AngleMode = SimpleCAD.AngleMode.Surveyor;
+            UpdateUI();
+        }
+
         private void btnSnap_Click(object sender, EventArgs e)
         {
             doc.Settings.Snap = btnSnap.Checked;
+            UpdateUI();
         }
 
         private void btnSnapEnd_Click(object sender, EventArgs e)
@@ -274,6 +341,7 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.End;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.End;
+            UpdateUI();
         }
 
         private void btnSnapMiddle_Click(object sender, EventArgs e)
@@ -282,6 +350,7 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Middle;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Middle;
+            UpdateUI();
         }
 
         private void btnSnapCenter_Click(object sender, EventArgs e)
@@ -290,6 +359,7 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Center;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Center;
+            UpdateUI();
         }
 
         private void btnSnapQuadrant_Click(object sender, EventArgs e)
@@ -298,6 +368,7 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Quadrant;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Quadrant;
+            UpdateUI();
         }
 
         private void btnSnapPoint_Click(object sender, EventArgs e)
@@ -306,36 +377,21 @@ namespace SimpleCADTest
                 doc.Settings.SnapMode |= SimpleCAD.SnapPointType.Point;
             else
                 doc.Settings.SnapMode &= ~SimpleCAD.SnapPointType.Point;
+            UpdateUI();
         }
 
-        private void btnCreateComposite_Click(object sender, EventArgs e)
+        private void btnShowGrid_Click(object sender, EventArgs e)
         {
-            ed.RunCommand("Composite.Create");
+            cadWindow1.View.ShowGrid = !cadWindow1.View.ShowGrid;
+            cadWindow1.Focus();
+            UpdateUI();
         }
 
-        private void btnAngleRadians_Click(object sender, EventArgs e)
+        private void btnShowAxes_Click(object sender, EventArgs e)
         {
-            doc.Settings.AngleMode = SimpleCAD.AngleMode.Radians;
-        }
-
-        private void btnAngleDegrees_Click(object sender, EventArgs e)
-        {
-            doc.Settings.AngleMode = SimpleCAD.AngleMode.Degrees;
-        }
-
-        private void btnAngleGrads_Click(object sender, EventArgs e)
-        {
-            doc.Settings.AngleMode = SimpleCAD.AngleMode.Grads;
-        }
-
-        private void btnAngleDMS_Click(object sender, EventArgs e)
-        {
-            doc.Settings.AngleMode = SimpleCAD.AngleMode.DegreesMinutesSeconds;
-        }
-
-        private void btnAngleSurveyor_Click(object sender, EventArgs e)
-        {
-            doc.Settings.AngleMode = SimpleCAD.AngleMode.Surveyor;
+            cadWindow1.View.ShowAxes = !cadWindow1.View.ShowAxes;
+            cadWindow1.Focus();
+            UpdateUI();
         }
     }
 }

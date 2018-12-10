@@ -86,5 +86,20 @@
       <Name>SimpleCAD</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\coordinates.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\angle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\snap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\axis.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
