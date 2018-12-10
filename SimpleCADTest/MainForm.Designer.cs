@@ -35,6 +35,7 @@
             this.statusCoords = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cadWindow1 = new SimpleCAD.CADWindow();
+            this.lblSelection = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tsPrimitives = new System.Windows.Forms.ToolStrip();
             this.btnDrawPoint = new System.Windows.Forms.ToolStripButton();
@@ -82,7 +83,6 @@
             this.btnSnapPoint = new System.Windows.Forms.ToolStripButton();
             this.tsComposite = new System.Windows.Forms.ToolStrip();
             this.btnCreateComposite = new System.Windows.Forms.ToolStripButton();
-            this.lblSelection = new System.Windows.Forms.Label();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -112,7 +112,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 319);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 419);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -171,7 +171,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.lblSelection);
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 319);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 419);
             this.splitContainer1.SplitterDistance = 759;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -181,8 +181,17 @@
             this.cadWindow1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cadWindow1.Location = new System.Drawing.Point(0, 0);
             this.cadWindow1.Name = "cadWindow1";
-            this.cadWindow1.Size = new System.Drawing.Size(759, 319);
+            this.cadWindow1.Size = new System.Drawing.Size(759, 419);
             this.cadWindow1.TabIndex = 0;
+            // 
+            // lblSelection
+            // 
+            this.lblSelection.AutoSize = true;
+            this.lblSelection.Location = new System.Drawing.Point(4, 9);
+            this.lblSelection.Name = "lblSelection";
+            this.lblSelection.Size = new System.Drawing.Size(35, 13);
+            this.lblSelection.TabIndex = 2;
+            this.lblSelection.Text = "label1";
             // 
             // propertyGrid1
             // 
@@ -191,7 +200,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.propertyGrid1.Location = new System.Drawing.Point(0, 28);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(245, 291);
+            this.propertyGrid1.Size = new System.Drawing.Size(245, 366);
             this.propertyGrid1.TabIndex = 1;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -212,7 +221,7 @@
             this.btnDrawRectangle,
             this.btnDrawHatch,
             this.btnDrawQuadraticBezier});
-            this.tsPrimitives.Location = new System.Drawing.Point(3, 0);
+            this.tsPrimitives.Location = new System.Drawing.Point(3, 25);
             this.tsPrimitives.Name = "tsPrimitives";
             this.tsPrimitives.Size = new System.Drawing.Size(678, 25);
             this.tsPrimitives.TabIndex = 0;
@@ -356,7 +365,7 @@
             this.btnOpen,
             this.btnSave,
             this.btnSaveAs});
-            this.tsStandard.Location = new System.Drawing.Point(3, 25);
+            this.tsStandard.Location = new System.Drawing.Point(3, 0);
             this.tsStandard.Name = "tsStandard";
             this.tsStandard.Size = new System.Drawing.Size(173, 25);
             this.tsStandard.TabIndex = 1;
@@ -406,7 +415,7 @@
             this.tsEdit.Dock = System.Windows.Forms.DockStyle.None;
             this.tsEdit.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnDelete});
-            this.tsEdit.Location = new System.Drawing.Point(3, 50);
+            this.tsEdit.Location = new System.Drawing.Point(517, 50);
             this.tsEdit.Name = "tsEdit";
             this.tsEdit.Size = new System.Drawing.Size(56, 25);
             this.tsEdit.TabIndex = 5;
@@ -427,7 +436,7 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnZoom,
             this.btnPan});
-            this.toolStrip1.Location = new System.Drawing.Point(3, 75);
+            this.toolStrip1.Location = new System.Drawing.Point(176, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(86, 25);
             this.toolStrip1.TabIndex = 4;
@@ -458,7 +467,7 @@
             this.tsGraphics.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnShowGrid,
             this.btnShowAxes});
-            this.tsGraphics.Location = new System.Drawing.Point(89, 75);
+            this.tsGraphics.Location = new System.Drawing.Point(536, 0);
             this.tsGraphics.Name = "tsGraphics";
             this.tsGraphics.Size = new System.Drawing.Size(144, 25);
             this.tsGraphics.TabIndex = 3;
@@ -502,7 +511,7 @@
             this.btnStretch,
             this.btnRotateCP,
             this.btnScaleCP});
-            this.tsTransform.Location = new System.Drawing.Point(3, 100);
+            this.tsTransform.Location = new System.Drawing.Point(3, 50);
             this.tsTransform.Name = "tsTransform";
             this.tsTransform.Size = new System.Drawing.Size(514, 25);
             this.tsTransform.TabIndex = 2;
@@ -602,7 +611,7 @@
             this.btnSnapCenter,
             this.btnSnapQuadrant,
             this.btnSnapPoint});
-            this.tsSnap.Location = new System.Drawing.Point(3, 125);
+            this.tsSnap.Location = new System.Drawing.Point(262, 0);
             this.tsSnap.Name = "tsSnap";
             this.tsSnap.Size = new System.Drawing.Size(274, 25);
             this.tsSnap.TabIndex = 6;
@@ -678,7 +687,7 @@
             this.tsComposite.Dock = System.Windows.Forms.DockStyle.None;
             this.tsComposite.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnCreateComposite});
-            this.tsComposite.Location = new System.Drawing.Point(3, 150);
+            this.tsComposite.Location = new System.Drawing.Point(573, 50);
             this.tsComposite.Name = "tsComposite";
             this.tsComposite.Size = new System.Drawing.Size(118, 25);
             this.tsComposite.TabIndex = 7;
@@ -692,15 +701,6 @@
             this.btnCreateComposite.Size = new System.Drawing.Size(106, 22);
             this.btnCreateComposite.Text = "Create Composite";
             this.btnCreateComposite.Click += new System.EventHandler(this.btnCreateComposite_Click);
-            // 
-            // lblSelection
-            // 
-            this.lblSelection.AutoSize = true;
-            this.lblSelection.Location = new System.Drawing.Point(4, 9);
-            this.lblSelection.Name = "lblSelection";
-            this.lblSelection.Size = new System.Drawing.Size(35, 13);
-            this.lblSelection.TabIndex = 2;
-            this.lblSelection.Text = "label1";
             // 
             // MainForm
             // 
