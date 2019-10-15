@@ -1,43 +1,46 @@
 ﻿using SimpleCAD.Geometry;
-using System;
+using SimpleCAD.Graphics;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
     public class Composite : Drawable, ICollection<Drawable>, INotifyCollectionChanged
     {
+        public string Name { get; set; }
+
         List<Drawable> items = new List<Drawable>();
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public Composite()
+        public Composite() { }
+
+        public Composite(string name)
         {
-            ;
+            Name = name;
         }
 
-        public Composite(BinaryReader reader) : base(reader)
+        public override void Load(DocumentReader reader)
         {
-            int count = reader.ReadInt32();
+            base.Load(reader);
+            Name = reader.ReadString();
+            int count = reader.ReadInt();
             for (int i = 0; i < count; i++)
             {
-                string name = reader.ReadString();
-                Type itemType = Type.GetType(name);
-                Drawable item = (Drawable)Activator.CreateInstance(itemType, reader);
+                Drawable item = reader.ReadPersistable<Drawable>();
                 items.Add(item);
             }
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
+            writer.Write(Name);
             writer.Write(items.Count);
-            foreach (Drawable item in items)
+            foreach (var item in items)
             {
-                writer.Write(item.GetType().FullName);
-                item.Save(writer);
+                writer.Write(item);
             }
         }
 
@@ -45,7 +48,7 @@ namespace SimpleCAD.Drawables
         {
             foreach (Drawable item in items)
             {
-                if (item.Visible)
+                if (item.Visible && (item.Layer == null || item.Layer.Visible))
                 {
                     renderer.Draw(item);
                 }
@@ -57,7 +60,8 @@ namespace SimpleCAD.Drawables
             Extents2D extents = new Extents2D();
             foreach (Drawable item in items)
             {
-                if (item.Visible) extents.Add(item.GetExtents());
+                if (item.Visible && (item.Layer == null || item.Layer.Visible))
+                    extents.Add(item.GetExtents());
             }
             return extents;
         }
@@ -66,9 +70,21 @@ namespace SimpleCAD.Drawables
         {
             foreach (Drawable d in items)
             {
-                if (d.Contains(pt, pickBoxSize)) return true;
+                if (d.Visible && (d.Layer == null || d.Layer.Visible) && d.Contains(pt, pickBoxSize))
+                    return true;
             }
             return false;
+        }
+
+        public override SnapPoint[] GetSnapPoints()
+        {
+            List<SnapPoint> points = new List<SnapPoint>();
+            foreach (Drawable d in items)
+            {
+                if (d.Visible && (d.Layer == null || d.Layer.Visible))
+                    points.AddRange(d.GetSnapPoints());
+            }
+            return points.ToArray();
         }
 
         public override void TransformBy(Matrix2D transformation)
@@ -89,39 +105,32 @@ namespace SimpleCAD.Drawables
             return newComposite;
         }
 
-        public void Add(Drawable item)
+        public virtual void Add(Drawable item)
         {
             items.Add(item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             items.Clear();
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        public bool Contains(Drawable item)
+        public virtual bool Contains(Drawable item)
         {
             return items.Contains(item);
         }
 
-        public void CopyTo(Drawable[] array, int arrayIndex)
+        public virtual void CopyTo(Drawable[] array, int arrayIndex)
         {
             items.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get { return items.Count; }
-        }
+        public virtual int Count => items.Count;
+        public bool IsReadOnly => false;
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public bool Remove(Drawable item)
+        public virtual bool Remove(Drawable item)
         {
             bool check = items.Remove(item);
             if (check)
@@ -131,7 +140,7 @@ namespace SimpleCAD.Drawables
             return check;
         }
 
-        public IEnumerator<Drawable> GetEnumerator()
+        public virtual IEnumerator<Drawable> GetEnumerator()
         {
             return items.GetEnumerator();
         }
@@ -141,12 +150,14 @@ namespace SimpleCAD.Drawables
             return GetEnumerator();
         }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {
                 foreach (Drawable item in e.NewItems)
+                {
                     item.PropertyChanged += Drawable_PropertyChanged;
+                }
             }
             if (e.OldItems != null)
             {

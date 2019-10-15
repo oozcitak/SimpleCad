@@ -1,16 +1,11 @@
 ﻿using SimpleCAD.Geometry;
-using System;
-using System.ComponentModel;
+using SimpleCAD.Graphics;
 using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
-    public class Hatch : Polyline
+    public class Hatch : Polygon
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Closed { get => true; set => throw new InvalidOperationException("Hatch must be a closed area."); }
-
         public Hatch() : base()
         {
             ;
@@ -33,20 +28,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            Style.Fill = true;
-            renderer.DrawPolygon(Style, Points);
-            Style.Fill = false;
-            renderer.DrawPolygon(Style, Points);
-        }
-
-        public Hatch(BinaryReader reader) : base(reader)
-        {
-            ;
-        }
-
-        public override void Save(BinaryWriter writer)
-        {
-            base.Save(writer);
+            renderer.FillPolygon(Style.ApplyLayer(Layer), Points);
         }
     }
 }

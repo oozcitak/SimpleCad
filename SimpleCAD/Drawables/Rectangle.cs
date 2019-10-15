@@ -1,61 +1,40 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
-    public class Rectangle : Drawable
+    public class Rectangle : Curve
     {
         private Point2D center;
+
+        public Point2D Center { get => center; set { center = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+
         private float width;
         private float height;
         private float rotation;
 
-        public Point2D Center { get { return center; } set { center = value; UpdatePolyline(); NotifyPropertyChanged(); } }
-        public float Width { get { return width; } set { width = Math.Abs(value); UpdatePolyline(); NotifyPropertyChanged(); } }
-        public float Height { get { return height; } set { height = Math.Abs(value); UpdatePolyline(); NotifyPropertyChanged(); } }
-        public Point2D Corner
-        {
-            get
-            {
-                return Center + new Vector2D(Width / 2, Height / 2).Transform(Matrix2D.Rotation(Rotation)); ;
-            }
-            set
-            {
-                Vector2D size = (value - center).Transform(Matrix2D.Rotation(-Rotation));
-                width = size.X * 2;
-                height = size.Y * 2;
-                UpdatePolyline();
-                NotifyPropertyChanged();
-            }
-        }
-        public float Rotation { get { return rotation; } set { rotation = value; UpdatePolyline(); NotifyPropertyChanged(); } }
-
-        [Browsable(false)]
-        public float X { get { return Center.X; } }
-        [Browsable(false)]
-        public float Y { get { return Center.Y; } }
+        public float Width { get => width; set { width = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float Height { get => height; set { height = value; UpdatePolyline(); NotifyPropertyChanged(); } }
+        public float Rotation { get => rotation; set { rotation = value; UpdatePolyline(); NotifyPropertyChanged(); } }
 
         private Polyline poly;
+        private float cpSize = 0;
 
-        public Rectangle(Point2D center, float width, float height, float rotation = 0)
+        public Rectangle() { }
+
+        public Rectangle(Point2D center, float w, float h, float rotation = 0)
         {
             Center = center;
-            Width = width;
-            Height = height;
+            Width = w;
+            Height = h;
             Rotation = rotation;
             UpdatePolyline();
         }
 
-        public Rectangle(float x, float y, float width, float height, float rotation = 0)
-            : this(new Point2D(x, y), width, height, rotation)
-        {
-            ;
-        }
-
-        public Rectangle(Point2D center, Point2D corner, float rotation = 0)
-            : this(center, (corner - center).X * 2, (corner - center).Y * 2, rotation)
+        public Rectangle(float x, float y, float w, float h, float rotation = 0)
+            : this(new Point2D(x, y), w, h, rotation)
         {
             ;
         }
@@ -68,13 +47,14 @@ namespace SimpleCAD.Drawables
             poly.Points.Add(+Width / 2, +Height / 2);
             poly.Points.Add(-Width / 2, +Height / 2);
             poly.Closed = true;
-            poly.TransformBy(Matrix2D.Rotation(rotation));
-            poly.TransformBy(Matrix2D.Translation(X, Y));
+            poly.TransformBy(Matrix2D.Rotation(Rotation));
+            poly.TransformBy(Matrix2D.Translation(Center.X, Center.Y));
         }
 
         public override void Draw(Renderer renderer)
         {
-            poly.Style = Style;
+            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.ControlPointSize, 0)).X;
+            poly.Style = Style.ApplyLayer(Layer);
             renderer.Draw(poly);
         }
 
@@ -87,7 +67,8 @@ namespace SimpleCAD.Drawables
         {
             Center = Center.Transform(transformation);
             Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
-            UpdatePolyline();
+            Width = (Vector2D.XAxis * Width).Transform(transformation).Length;
+            Height = (Vector2D.YAxis * Height).Transform(transformation).Length;
         }
 
         public override bool Contains(Point2D pt, float pickBoxSize)
@@ -99,26 +80,67 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
-                new ControlPoint("Corner"),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Center, Center + Vector2D.FromAngle(Rotation) * Width / 2),
+                new ControlPoint("Center point", Center),
+                new ControlPoint("Width", ControlPointType.Distance, Center, Center + Width / 2 * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Height", ControlPointType.Distance, Center, Center + Height / 2 * Vector2D.FromAngle(Rotation).Perpendicular),
+                new ControlPoint("Rotation", ControlPointType.Angle, Center, Center + (Width / 2 + cpSize) * Vector2D.FromAngle(Rotation)),
             };
         }
 
-        public Rectangle(BinaryReader reader) : base(reader)
+        public override SnapPoint[] GetSnapPoints()
         {
-            Center = new Point2D(reader);
-            Rotation = reader.ReadSingle();
-            Corner = new Point2D(reader);
+            return poly.GetSnapPoints();
+        }
+
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
+        {
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    Center = Center.Transform(transformation);
+                else if (index == 1)
+                    Width = Vector2D.XAxis.Transform(transformation).Length * Width;
+                else if (index == 2)
+                    Height = Vector2D.YAxis.Transform(transformation).Length * Height;
+                else if (index == 3)
+                    Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+            }
+        }
+
+        public override void Load(DocumentReader reader)
+        {
+            base.Load(reader);
+            Center = reader.ReadPoint2D();
+            Width = reader.ReadFloat();
+            Height = reader.ReadFloat();
+            Rotation = reader.ReadFloat();
             UpdatePolyline();
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Center.Save(writer);
+            writer.Write(Center);
+            writer.Write(Width);
+            writer.Write(Height);
             writer.Write(Rotation);
-            Corner.Save(writer);
         }
+
+        public override float StartParam => poly.StartParam;
+        public override float EndParam => poly.EndParam;
+
+        public override float Area => Width * Height;
+
+        [Browsable(false)]
+        public override bool Closed => true;
+
+        public override float GetDistAtParam(float param) => poly.GetDistAtParam(param);
+        public override Point2D GetPointAtParam(float param) => poly.GetPointAtParam(param);
+        public override Vector2D GetNormalAtParam(float param) => poly.GetNormalAtParam(param);
+        public override float GetParamAtPoint(Point2D pt) => poly.GetParamAtPoint(pt);
+
+        public override void Reverse() { }
+
+        public override bool Split(float[] @params, out Curve[] subCurves) => poly.Split(@params, out subCurves);
     }
 }

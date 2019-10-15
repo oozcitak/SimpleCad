@@ -14,15 +14,11 @@ namespace SimpleCAD
         public CADDocument Document { get; private set; }
         internal bool InputMode { get; set; } = false;
 
-        public event EditorPromptEventHandler Prompt;
-
-        internal event CursorEventHandler CursorMove;
-        internal event CursorEventHandler CursorClick;
-        internal event KeyEventHandler KeyDown;
-        internal event KeyPressEventHandler KeyPress;
-
         internal SelectionSet CurrentSelection { get; private set; } = new SelectionSet();
         public SelectionSet PickedSelection { get; private set; } = new SelectionSet();
+
+        public SnapPointType SnapMode { get => Document.Settings.SnapMode; }
+        internal SnapPointCollection SnapPoints { get; set; } = new SnapPointCollection();
 
         static Editor()
         {
@@ -62,15 +58,23 @@ namespace SimpleCAD
             {
                 Command com = commands[registeredName];
                 Command clearSelection = new Commands.SelectionClear();
-                Task runTask = com.Apply(Document, args);
-                runTask.ContinueWith(a => clearSelection.Apply(Document, args));
+                Task runTask = com.Apply(Document, args).ContinueWith(
+                    (t) =>
+                    {
+                        if (t.IsFaulted)
+                            OnError(new EditorErrorEventArgs(t.Exception));
+                        else if (t.IsCompleted)
+                            clearSelection.Apply(Document, args);
+                    }
+                );
             }
             else
             {
-                throw new InvalidOperationException("Unknown command name: " + registeredName);
+                OnError(new EditorErrorEventArgs(new InvalidOperationException("Unknown command name: " + registeredName)));
             }
         }
 
+        #region Editor Getters
         public async Task<InputResult<string>> GetOpenFilename(string message)
         {
             return await GetOpenFilename(new FilenameOptions(message));
@@ -128,7 +132,57 @@ namespace SimpleCAD
 
         public async Task<InputResult<SelectionSet>> GetSelection(SelectionOptions options)
         {
-            return await SelectionGetter.Run<SelectionGetter>(this, options);
+            CurrentSelection.Clear();
+
+            while (true)
+            {
+                var result = await SelectionGetter.Run<SelectionGetter>(this, options);
+                if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Escape || result.CancelReason == CancelReason.Init))
+                {
+                    return result;
+                }
+                else if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Enter || result.CancelReason == CancelReason.Space))
+                {
+                    return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Coords);
+                }
+                else if (result.Result == ResultMode.OK)
+                {
+                    CurrentSelection.UnionWith(result.Value);
+                }
+
+                if (result.Result == ResultMode.OK && result.AcceptReason == AcceptReason.Init)
+                    return InputResult<SelectionSet>.AcceptResult(CurrentSelection, AcceptReason.Init);
+            }
+        }
+
+        public async Task<InputResult<CPSelectionSet>> GetControlPoints(string message)
+        {
+            return await GetControlPoints(new CPSelectionOptions(message));
+        }
+
+        public async Task<InputResult<CPSelectionSet>> GetControlPoints(CPSelectionOptions options)
+        {
+            CurrentSelection.Clear();
+
+            CPSelectionSet ss = new CPSelectionSet();
+            while (true)
+            {
+                var result = await CPSelectionGetter.Run<CPSelectionGetter>(this, options);
+                if (result.Result == ResultMode.Cancel && result.CancelReason == CancelReason.Escape)
+                {
+                    return result;
+                }
+                else if (result.Result == ResultMode.Cancel && (result.CancelReason == CancelReason.Enter || result.CancelReason == CancelReason.Space))
+                {
+                    CurrentSelection = ss.ToSelectionSet();
+                    return InputResult<CPSelectionSet>.AcceptResult(ss, AcceptReason.Coords);
+                }
+                else if (result.Result == ResultMode.OK)
+                {
+                    ss.UnionWith(result.Value);
+                    CurrentSelection = ss.ToSelectionSet();
+                }
+            }
         }
 
         public async Task<InputResult<Point2D>> GetPoint(string message)
@@ -235,6 +289,13 @@ namespace SimpleCAD
         {
             return await FloatGetter.Run<FloatGetter>(this, options);
         }
+        #endregion
+
+        #region View Events
+        internal event CursorEventHandler CursorMove;
+        internal event CursorEventHandler CursorClick;
+        internal event KeyEventHandler KeyDown;
+        internal event KeyPressEventHandler KeyPress;
 
         internal void OnViewMouseMove(object sender, CursorEventArgs e)
         {
@@ -255,10 +316,21 @@ namespace SimpleCAD
         {
             KeyPress?.Invoke(sender, e);
         }
+        #endregion
+
+        #region Events
+        public event EditorPromptEventHandler Prompt;
+        public event EditorErrorEventHandler Error;
 
         protected void OnPrompt(EditorPromptEventArgs e)
         {
             Prompt?.Invoke(this, e);
         }
+
+        protected void OnError(EditorErrorEventArgs e)
+        {
+            Error?.Invoke(this, e);
+        }
+        #endregion
     }
 }

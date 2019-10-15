@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 
 namespace SimpleCAD.View
@@ -16,7 +11,7 @@ namespace SimpleCAD.View
             var doc = view.Document;
 
             Extents2D bounds = view.GetViewport();
-            Color axisColor = doc.Settings.Get<Color>("AxisColor");
+            Color axisColor = doc.Settings.AxisColor;
 
             renderer.DrawLine(new Style(axisColor), new Point2D(0, bounds.Ymin), new Point2D(0, bounds.Ymax));
             renderer.DrawLine(new Style(axisColor), new Point2D(bounds.Xmin, 0), new Point2D(bounds.Xmax, 0));

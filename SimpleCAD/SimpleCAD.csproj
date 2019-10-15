@@ -39,24 +39,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Desktop, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Desktop.4.0.1\lib\net45\SharpDX.Desktop.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct2D1, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Direct2D1.4.0.1\lib\net45\SharpDX.Direct2D1.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D11, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Direct3D11.4.0.1\lib\net45\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.DXGI.4.0.1\lib\net45\SharpDX.DXGI.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Mathematics, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Mathematics.4.0.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -67,9 +49,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Command_Composite.cs" />
     <Compile Include="Commands\Command_Edit.cs" />
     <Compile Include="Commands\Command_View.cs" />
     <Compile Include="Document\CADDocument.cs" />
+    <Compile Include="Document\DocumentWriter.cs" />
+    <Compile Include="Document\DocumentReader.cs" />
+    <Compile Include="Document\IDict.cs" />
+    <Compile Include="Document\CompositeDictionary.cs" />
+    <Compile Include="Document\Model.cs" />
+    <Compile Include="Document\SettingsProperties.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingsProperties.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Document\TextStyleDictionary.cs" />
+    <Compile Include="Document\LayerDictionary.cs" />
+    <Compile Include="Document\PersistableDictionaryWithDefault.cs" />
+    <Compile Include="Document\PersistableDictionary.cs" />
+    <Compile Include="Drawables\CompositeReference.cs" />
+    <Compile Include="Drawables\Curve.cs" />
+    <Compile Include="Drawables\Rectangle.cs" />
+    <Compile Include="Geometry\CurveOperations.cs" />
+    <Compile Include="Drawables\DrawableList.cs" />
+    <Compile Include="Drawables\QuadraticBezier.cs" />
+    <Compile Include="Editor\CPSelectionSet.cs" />
+    <Compile Include="Editor\CPSelectionGetter.cs" />
+    <Compile Include="Editor\SnapPoint.cs" />
+    <Compile Include="Drawables\Point.cs" />
     <Compile Include="Drawables\Polygon.cs" />
     <Compile Include="Editor\FloatGetter.cs" />
     <Compile Include="Editor\SelectionGetter.cs" />
@@ -77,6 +84,7 @@
     <Compile Include="Editor\InitArgs.cs" />
     <Compile Include="Editor\IntGetter.cs" />
     <Compile Include="Editor\OpenFilenameGetter.cs" />
+    <Compile Include="Editor\SnapPointCollection.cs" />
     <Compile Include="Editor\TextGetter.cs" />
     <Compile Include="Editor\DistanceGetter.cs" />
     <Compile Include="Editor\CornerGetter.cs" />
@@ -85,32 +93,33 @@
     <Compile Include="Editor\AngleGetter.cs" />
     <Compile Include="Editor\PointGetter.cs" />
     <Compile Include="Editor\EditorGetter.cs" />
+    <Compile Include="Document\TextStyle.cs" />
+    <Compile Include="Document\Layer.cs" />
+    <Compile Include="Geometry\Segment2DConverter.cs" />
+    <Compile Include="Geometry\Segment2D.cs" />
+    <Compile Include="View\SelectionWindow.cs" />
     <Compile Include="View\ViewEvents.cs" />
     <Compile Include="Drawables\DrawableDictionary.cs" />
     <Compile Include="View\Camera.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\Color.cs" />
-    <Compile Include="Graphics\SafeNativeMethods.cs" />
-    <Compile Include="Graphics\DirectXRenderer.cs" />
-    <Compile Include="Graphics\OpenGLRenderer.cs" />
-    <Compile Include="Graphics\GDIRenderer.cs" />
+    <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Document\Settings.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Command_Selection.cs" />
     <Compile Include="Commands\Command_Document.cs" />
     <Compile Include="Commands\Command_Transform.cs" />
     <Compile Include="Commands\Command_Primitives.cs" />
-    <Compile Include="Drawables\ControlPoint.cs" />
+    <Compile Include="Editor\ControlPoint.cs" />
     <Compile Include="Editor\InputArgs.cs" />
     <Compile Include="Drawables\Hatch.cs" />
     <Compile Include="Document\IPersistable.cs" />
     <Compile Include="MathF.cs" />
-    <Compile Include="Document\SelectionSet.cs" />
+    <Compile Include="Editor\SelectionSet.cs" />
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\EditorEvents.cs" />
     <Compile Include="Geometry\Vector2DConverter.cs" />
     <Compile Include="Geometry\Point2DConverter.cs" />
-    <Compile Include="Graphics\StyleConverter.cs" />
     <Compile Include="Geometry\Point2DCollection.cs" />
     <Compile Include="View\CADView.cs" />
     <Compile Include="CADWindow.cs">
@@ -127,22 +136,18 @@
     <Compile Include="Geometry\Point2D.cs" />
     <Compile Include="Geometry\Vector2D.cs" />
     <Compile Include="Geometry\Matrix2D.cs" />
-    <Compile Include="Drawables\Triangle.cs" />
     <Compile Include="Drawables\Dimension.cs" />
     <Compile Include="Drawables\Ellipse.cs" />
     <Compile Include="Geometry\Extents2D.cs" />
     <Compile Include="Graphics\Style.cs" />
     <Compile Include="Drawables\Text.cs" />
     <Compile Include="Drawables\Polyline.cs" />
-    <Compile Include="Drawables\Rectangle.cs" />
     <Compile Include="Drawables\Drawable.cs" />
-    <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Drawables\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="View\Axes.cs" />
     <Compile Include="View\Grid.cs" />
     <Compile Include="View\Cursor.cs" />
-    <Compile Include="View\ViewItems.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CADWindow.resx">
@@ -153,7 +158,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="Document\SettingsProperties.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SettingsProperties.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

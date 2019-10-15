@@ -1,5 +1,4 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 
 namespace SimpleCAD
 {

@@ -1,6 +1,5 @@
 ﻿using SimpleCAD.Drawables;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -12,12 +11,16 @@ namespace SimpleCAD
         public delegate void TransientsChangedEventHandler(object sender, EventArgs e);
         public delegate void SelectionChangedEventHandler(object sender, EventArgs e);
 
-        public Composite Model { get; private set; }
+        public Model Model { get; private set; }
         public Composite Jigged { get; private set; }
         public Composite Transients { get; private set; }
         public Editor Editor { get; private set; }
         public Settings Settings { get; private set; }
-        public CADView ActiveView { get; internal set; }
+        public CADView ActiveView { get; set; }
+
+        public LayerDictionary Layers { get; private set; }
+        public TextStyleDictionary TextStyles { get; private set; }
+        public CompositeDictionary Composites { get; private set; }
 
         public string FileName { get; private set; }
         public bool IsModified { get; private set; } = false;
@@ -28,12 +31,18 @@ namespace SimpleCAD
 
         public CADDocument()
         {
-            Model = new Composite();
             Editor = new Editor(this);
+
             Settings = new Settings();
+            Layers = new LayerDictionary();
+            TextStyles = new TextStyleDictionary();
+            Composites = new CompositeDictionary();
+            Model = new Model(this);
             Jigged = new Composite();
             Transients = new Composite();
+
             ActiveView = null;
+
             Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
             Model.CollectionChanged += Model_CollectionChanged;
             Jigged.CollectionChanged += Jigged_CollectionChanged;
@@ -41,36 +50,32 @@ namespace SimpleCAD
 
         public void New()
         {
-            Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
-            Model.CollectionChanged -= Model_CollectionChanged;
-            Jigged.CollectionChanged -= Jigged_CollectionChanged;
-            Model = new Composite();
-            Settings = new Settings();
-            Jigged = new Composite();
-            Transients = new Composite();
-            Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
-            Model.CollectionChanged += Model_CollectionChanged;
-            Jigged.CollectionChanged += Jigged_CollectionChanged;
-            OnDocumentChanged(new EventArgs());
-            IsModified = false;
+            Settings.Reset();
+            Layers.Clear();
+            TextStyles.Clear();
+            Composites.Clear();
+            Model.Clear();
+            Jigged.Clear();
+            Transients.Clear();
+
             FileName = "";
+            IsModified = false;
         }
 
         public void Open(Stream stream)
         {
-            using (BinaryReader reader = new BinaryReader(stream))
+            using (var reader = new DocumentReader(this, stream))
             {
-                Editor.PickedSelection.CollectionChanged -= Selection_CollectionChanged;
-                Model.CollectionChanged -= Model_CollectionChanged;
-                Jigged.CollectionChanged -= Jigged_CollectionChanged;
-                Model = new Composite(reader);
-                Settings = new Settings(reader);
-                Jigged = new Composite();
-                Transients = new Composite();
-                Editor.PickedSelection.CollectionChanged += Selection_CollectionChanged;
-                Model.CollectionChanged += Model_CollectionChanged;
-                Jigged.CollectionChanged += Jigged_CollectionChanged;
-                OnDocumentChanged(new EventArgs());
+                Editor.PickedSelection.Clear();
+                Jigged.Clear();
+                Transients.Clear();
+
+                Settings.Load(reader);
+                Layers.Load(reader);
+                TextStyles.Load(reader);
+                Composites.Load(reader);
+                Model.Load(reader);
+
                 FileName = "";
                 IsModified = false;
             }
@@ -82,16 +87,19 @@ namespace SimpleCAD
             {
                 Open(stream);
                 FileName = filename;
-                IsModified = false;
             }
         }
 
         public void Save(Stream stream)
         {
-            using (BinaryWriter writer = new BinaryWriter(stream))
+            using (var writer = new DocumentWriter(this, stream))
             {
-                Model.Save(writer);
                 Settings.Save(writer);
+                Layers.Save(writer);
+                TextStyles.Save(writer);
+                Composites.Save(writer);
+                Model.Save(writer);
+
                 FileName = "";
                 IsModified = false;
             }
@@ -103,7 +111,6 @@ namespace SimpleCAD
             {
                 Save(stream);
                 FileName = filename;
-                IsModified = false;
             }
         }
 

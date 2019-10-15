@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
+using System;
 
 namespace SimpleCAD.View
 {
     internal class Cursor : Drawable
     {
         public Point2D Location { get; set; }
-        public string FontFamily { get; set; }
+        public TextStyle TextStyle { get; set; }
         public float TextHeight { get; set; }
         public string Message { get; set; }
 
         public Cursor()
         {
             // Assign the default system font by default
-            FontFamily = System.Drawing.SystemFonts.MessageBoxFont.FontFamily.Name;
+            TextStyle = new TextStyle("_Cursor", System.Drawing.SystemFonts.MessageBoxFont.FontFamily.Name, FontStyle.Regular);
             // Default text height in pixels
             TextHeight = 12;
         }
@@ -29,9 +25,11 @@ namespace SimpleCAD.View
             var doc = view.Document;
 
             Extents2D ex = view.GetViewport();
-            Style cursorStyle = new Style(doc.Settings.Get<Color>("CursorColor"));
-            float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize") + 4, 0)).X / 2;
-            float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.Get<int>("PickBoxSize"), 0)).X / 2;
+            Color c = doc.Settings.BackColor;
+            var luma = (int)Math.Sqrt(c.R * c.R * .299 + c.G * c.G * .587 + c.B * c.B * .114);
+            Style cursorStyle = new Style(luma > 130 ? Color.Black : Color.White);
+            float emptyBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.PickBoxSize + 4, 0)).X / 2;
+            float pickBoxSize = view.ScreenToWorld(new Vector2D(doc.Settings.PickBoxSize, 0)).X / 2;
             float pxSize = view.ScreenToWorld(new Vector2D(1, 0)).X / 2;
 
             // Draw cursor
@@ -62,7 +60,7 @@ namespace SimpleCAD.View
                 // position cursor prompt to lower-right of cursor by default
                 float x = Location.X + margin + offset;
                 float y = Location.Y - margin - offset;
-                Vector2D sz = renderer.MeasureString(Message, FontFamily, FontStyle.Regular, height);
+                Vector2D sz = renderer.MeasureString(Message, TextStyle, height);
                 Point2D lowerRight = new Point2D(ex.Xmax, ex.Ymin);
                 // check if the prompt text fits into the window horizontally
                 if (x + sz.X + offset > lowerRight.X)
@@ -76,20 +74,18 @@ namespace SimpleCAD.View
                 }
 
                 // Draw cursor prompt
-                Style fore = new Style(doc.Settings.Get<Color>("CursorPromptForeColor"));
-                Style back = new Style(doc.Settings.Get<Color>("CursorPromptBackColor"));
-                back.Fill = true;
-                renderer.DrawRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                back.Fill = false;
+                Style fore = new Style(doc.Settings.CursorPromptForeColor);
+                Style back = new Style(doc.Settings.CursorPromptBackColor);
+                renderer.FillRectangle(back, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
                 renderer.DrawRectangle(fore, new Point2D(x - offset, y + offset), new Point2D(x + offset + sz.X, y - offset - sz.Y));
-                renderer.DrawString(fore, new Point2D(x, y), Message, FontFamily, height,
-                    hAlign: TextHorizontalAlignment.Left, vAlign: TextVerticalAlignment.Top);
+                renderer.DrawString(fore, new Point2D(x, y), Message, TextStyle, height, 0,
+                    TextHorizontalAlignment.Left, TextVerticalAlignment.Top);
             }
         }
 
         public override Extents2D GetExtents()
         {
-            return Extents2D.Empty;
+            return Extents2D.Infinity;
         }
 
         public override void TransformBy(Matrix2D transformation)

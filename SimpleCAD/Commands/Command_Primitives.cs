@@ -4,6 +4,34 @@ using System.Threading.Tasks;
 
 namespace SimpleCAD.Commands
 {
+    public class DrawPoint : Command
+    {
+        public override string RegisteredName => "Primitives.Point";
+        public override string Name => "Point";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            while (true)
+            {
+                var p1 = await ed.GetPoint("Location: ");
+                if (p1.Result != ResultMode.OK) return;
+
+                if (p1.Result == ResultMode.OK)
+                {
+                    Drawable point = new Point(p1.Value);
+                    doc.Model.Add(point);
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+    }
+
     public class DrawLine : Command
     {
         public override string RegisteredName => "Primitives.Line";
@@ -17,15 +45,35 @@ namespace SimpleCAD.Commands
             var p1 = await ed.GetPoint("First point: ");
             if (p1.Result != ResultMode.OK) return;
             Point2D lastPt = p1.Value;
+
+            int i = 0;
             while (true)
             {
-                var p2 = await ed.GetPoint("Next point: ", lastPt);
-                if (p2.Result != ResultMode.OK) return;
+                var opts = new PointOptions("Next point: ", lastPt);
+                if (i > 1)
+                    opts.AddKeyword("Close");
+                var p3 = await ed.GetPoint(opts);
 
-                Drawable newItem = new Line(lastPt, p2.Value);
-                doc.Model.Add(newItem);
+                if (p3.Result == ResultMode.OK)
+                {
+                    Drawable nextLine = new Line(lastPt, p3.Value);
+                    doc.Model.Add(nextLine);
 
-                lastPt = p2.Value;
+                    lastPt = p3.Value;
+                }
+                else if (p3.Result == ResultMode.Keyword && p3.Keyword == "Close")
+                {
+                    Drawable nextLine = new Line(lastPt, p1.Value);
+                    doc.Model.Add(nextLine);
+
+                    lastPt = p3.Value;
+                    return;
+                }
+                else
+                {
+                    return;
+                }
+                i++;
             }
         }
     }
@@ -195,6 +243,31 @@ namespace SimpleCAD.Commands
         }
     }
 
+    public class DrawQuadraticBezier : Command
+    {
+        public override string RegisteredName => "Primitives.Quadratic_Bezier";
+        public override string Name => "Quadratic Bezier";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            var p1 = await ed.GetPoint("Start point: ");
+            if (p1.Result != ResultMode.OK) return;
+            var p2 = await ed.GetPoint("End point: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
+            QuadraticBezier cons = new QuadraticBezier(p1.Value, Point2D.Average(p1.Value, p2.Value), p2.Value);
+            doc.Jigged.Add(cons);
+            var p3 = await ed.GetPoint("Control point: ", (p) => cons.P1 = p);
+            doc.Jigged.Remove(cons);
+            if (p3.Result != ResultMode.OK) return;
+
+            Drawable newItem = new QuadraticBezier(p1.Value, p3.Value, p2.Value);
+            doc.Model.Add(newItem);
+        }
+    }
+
     public class DrawParabola : Command
     {
         public override string RegisteredName => "Primitives.Parabola";
@@ -218,6 +291,31 @@ namespace SimpleCAD.Commands
             if (a2.Result != ResultMode.OK) return;
 
             Drawable newItem = new Parabola(p1.Value, p2.Value, a1.Value, a2.Value);
+            doc.Model.Add(newItem);
+        }
+    }
+
+    public class DrawRectangle : Command
+    {
+        public override string RegisteredName => "Primitives.Rectangle";
+        public override string Name => "Rectangle";
+
+        public override async Task Apply(CADDocument doc, params string[] args)
+        {
+            Editor ed = doc.Editor;
+            ed.PickedSelection.Clear();
+
+            var p1 = await ed.GetPoint("Center point: ");
+            if (p1.Result != ResultMode.OK) return;
+            var p2 = await ed.GetPoint("Width: ", p1.Value);
+            if (p2.Result != ResultMode.OK) return;
+            Rectangle consRec = new Rectangle(p1.Value, (p2.Value - p1.Value).Length * 2, 0, (p2.Value - p1.Value).Angle);
+            doc.Jigged.Add(consRec);
+            var d2 = await ed.GetDistance("Height: ", p1.Value, (p) => consRec.Height = p * 2);
+            if (d2.Result != ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
+            doc.Jigged.Remove(consRec);
+
+            Drawable newItem = new Rectangle(p1.Value, (p2.Value - p1.Value).Length * 2, d2.Value * 2, (p2.Value - p1.Value).Angle);
             doc.Model.Add(newItem);
         }
     }
@@ -334,54 +432,6 @@ namespace SimpleCAD.Commands
 
             doc.Jigged.Remove(consPoly);
             Hatch newItem = new Hatch(points);
-            doc.Model.Add(newItem);
-        }
-    }
-
-    public class DrawRectangle : Command
-    {
-        public override string RegisteredName => "Primitives.Rectangle";
-        public override string Name => "Rectangle";
-
-        public override async Task Apply(CADDocument doc, params string[] args)
-        {
-            Editor ed = doc.Editor;
-            ed.PickedSelection.Clear();
-
-            var p1 = await ed.GetPoint("Center point: ");
-            if (p1.Result != ResultMode.OK) return;
-            Rectangle consRec = new Rectangle(p1.Value, 0, 0);
-            doc.Jigged.Add(consRec);
-            var p2 = await ed.GetPoint("Corner point: ", p1.Value, (p) => consRec.Corner = p);
-            if (p2.Result != ResultMode.OK) { doc.Jigged.Remove(consRec); return; }
-            doc.Jigged.Remove(consRec);
-
-            Drawable newItem = new Rectangle(p1.Value, p2.Value);
-            doc.Model.Add(newItem);
-        }
-    }
-
-    public class DrawTriangle : Command
-    {
-        public override string RegisteredName => "Primitives.Triangle";
-        public override string Name => "Triangle";
-
-        public override async Task Apply(CADDocument doc, params string[] args)
-        {
-            Editor ed = doc.Editor;
-            ed.PickedSelection.Clear();
-
-            var p1 = await ed.GetPoint("First point: ");
-            if (p1.Result != ResultMode.OK) return;
-            var p2 = await ed.GetPoint("Second point: ", p1.Value);
-            if (p2.Result != ResultMode.OK) return;
-            Triangle consTri = new Triangle(p1.Value, p2.Value, p2.Value);
-            doc.Jigged.Add(consTri);
-            var p3 = await ed.GetPoint("Third point: ", p1.Value, (p) => consTri.Point3 = p);
-            doc.Jigged.Remove(consTri);
-            if (p3.Result != ResultMode.OK) return;
-
-            Drawable newItem = new Triangle(p1.Value, p2.Value, p3.Value);
             doc.Model.Add(newItem);
         }
     }

@@ -1,20 +1,19 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace SimpleCAD
 {
-    [Serializable]
     public abstract class Drawable : INotifyPropertyChanged, IPersistable
     {
-        public Style Style { get; set; } = new Style(Color.White);
+        public Lazy<Layer> layerRef = new Lazy<Layer>(() => Layer.Default);
+
+        public Style Style { get; set; } = Style.Default;
+        public Layer Layer { get => layerRef.Value; set => layerRef = new Lazy<Layer>(() => value); }
         public bool Visible { get; set; } = true;
+        internal bool InModel { get; set; } = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -23,61 +22,33 @@ namespace SimpleCAD
         public virtual bool Contains(Point2D pt, float pickBoxSize) { return GetExtents().Contains(pt); }
         public abstract void TransformBy(Matrix2D transformation);
         public virtual ControlPoint[] GetControlPoints() { return new ControlPoint[0]; }
-        public virtual void TransformControlPoint(ControlPoint cp, Matrix2D transformation)
-        {
-            PropertyInfo prop = GetType().GetProperty(cp.PropertyName);
-            Point2D point = cp.Location.Transform(transformation);
-
-            if (cp.PropertyIndex == -1)
-            {
-                if (cp.Type == ControlPoint.ControlPointType.Point)
-                    prop.SetValue(this, point);
-                else if (cp.Type == ControlPoint.ControlPointType.Angle)
-                    prop.SetValue(this, (point - cp.BasePoint).Angle);
-                else if (cp.Type == ControlPoint.ControlPointType.Distance)
-                    prop.SetValue(this, (point - cp.BasePoint).Length);
-            }
-            else
-            {
-                if (cp.Type == ControlPoint.ControlPointType.Point)
-                {
-                    IList<Point2D> items = (IList<Point2D>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = point;
-                }
-                else if (cp.Type == ControlPoint.ControlPointType.Angle)
-                {
-                    IList<float> items = (IList<float>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = (point - cp.BasePoint).Angle;
-                }
-                else if (cp.Type == ControlPoint.ControlPointType.Distance)
-                {
-                    IList<float> items = (IList<float>)prop.GetValue(this);
-                    items[cp.PropertyIndex] = (point - cp.BasePoint).Length;
-                }
-            }
-        }
+        public virtual ControlPoint[] GetStretchPoints() { return GetControlPoints(); }
+        public virtual SnapPoint[] GetSnapPoints() { return new SnapPoint[0]; }
+        public virtual void TransformControlPoints(int[] indices, Matrix2D transformation) { }
+        public virtual void TransformStretchPoints(int[] indices, Matrix2D transformation) { TransformControlPoints(indices, transformation); }
 
         public virtual Drawable Clone() { return (Drawable)MemberwiseClone(); }
 
-        protected Drawable()
-        {
-            ;
-        }
+        protected Drawable() { }
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public Drawable(BinaryReader reader)
+        public virtual void Load(DocumentReader reader)
         {
-            Style = new Style(reader);
+            var doc = reader.Document;
+            string layerName = reader.ReadString();
+            layerRef = new Lazy<Layer>(() => doc.Layers[layerName]);
+            Style = reader.ReadPersistable<Style>();
             Visible = reader.ReadBoolean();
         }
 
-        public virtual void Save(BinaryWriter writer)
+        public virtual void Save(DocumentWriter writer)
         {
-            Style.Save(writer);
+            writer.Write(Layer.Name);
+            writer.Write(Style);
             writer.Write(Visible);
         }
     }

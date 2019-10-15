@@ -1,12 +1,11 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
-    public class Arc : Drawable
+    public class Arc : Curve
     {
         private Point2D center;
         private float radius;
@@ -22,6 +21,8 @@ namespace SimpleCAD.Drawables
         public float X { get { return Center.X; } }
         [Browsable(false)]
         public float Y { get { return Center.Y; } }
+
+        public Arc() { }
 
         public Arc(Point2D center, float radius, float startAngle, float endAngle)
         {
@@ -39,7 +40,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            renderer.DrawArc(Style, Center, Radius, StartAngle, EndAngle);
+            renderer.DrawArc(Style.ApplyLayer(Layer), Center, Radius, StartAngle, EndAngle);
         }
 
         public override Extents2D GetExtents()
@@ -70,28 +71,118 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("Center"),
-                new ControlPoint("Radius", ControlPoint.ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
-                new ControlPoint("StartAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
-                new ControlPoint("EndAngle", ControlPoint.ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
+                new ControlPoint("Center point", Center),
+                new ControlPoint("Radius", ControlPointType.Distance, Center, Center + Radius * Vector2D.FromAngle((StartAngle + EndAngle) / 2)),
+                new ControlPoint("Start angle", ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new ControlPoint("End angle", ControlPointType.Angle, Center, Center + Radius * Vector2D.FromAngle(EndAngle)),
             };
         }
 
-        public Arc(BinaryReader reader) : base(reader)
+        public override SnapPoint[] GetSnapPoints()
         {
-            Center = new Point2D(reader);
-            Radius = reader.ReadSingle();
-            StartAngle = reader.ReadSingle();
-            EndAngle = reader.ReadSingle();
+            return new[]
+            {
+                new SnapPoint("Center point", SnapPointType.Center, Center),
+                new SnapPoint("Start point", Center + Radius * Vector2D.FromAngle(StartAngle)),
+                new SnapPoint("End point", Center + Radius * Vector2D.FromAngle(EndAngle)),
+                new SnapPoint("Mid point", SnapPointType.Middle, Center + Radius * Vector2D.FromAngle(StartAngle + (EndAngle - StartAngle) / 2)),
+            };
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
+        {
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    Center = Center.Transform(transformation);
+                else if (index == 1)
+                    Radius = Vector2D.XAxis.Transform(transformation).Length * Radius;
+                else if (index == 2)
+                    StartAngle = Vector2D.FromAngle(StartAngle).Transform(transformation).Angle;
+                else if (index == 3)
+                    EndAngle = Vector2D.FromAngle(EndAngle).Transform(transformation).Angle;
+            }
+        }
+
+        public override void Load(DocumentReader reader)
+        {
+            base.Load(reader);
+            Center = reader.ReadPoint2D();
+            Radius = reader.ReadFloat();
+            StartAngle = reader.ReadFloat();
+            EndAngle = reader.ReadFloat();
+        }
+
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Center.Save(writer);
+            writer.Write(Center);
             writer.Write(Radius);
             writer.Write(StartAngle);
             writer.Write(EndAngle);
+        }
+
+        public override float StartParam => StartAngle;
+        public override float EndParam => EndAngle;
+
+        public override float Area => (Math.Abs(EndAngle - StartAngle) - MathF.Sin(System.Math.Abs(EndAngle - StartAngle))) / 2 * Radius * Radius;
+
+        [Browsable(false)]
+        public override bool Closed => false;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return (param - StartParam) * Radius;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return Center + Vector2D.FromAngle(param) * Radius;
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return Vector2D.FromAngle(param);
+        }
+
+        public override float GetParamAtDist(float dist)
+        {
+            float param = dist / Radius + StartParam;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            float param = ((pt - Center) / Radius).Angle;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override void Reverse()
+        {
+            MathF.Swap(ref startAngle, ref endAngle);
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (@params.Length == 0)
+            {
+                subCurves = new Curve[0];
+                return false;
+            }
+
+            subCurves = new Curve[@params.Length + 1];
+            for (int i = 0; i < @params.Length + 1; i++)
+            {
+                float sp = (i == 0 ? StartParam : @params[i - 1]);
+                float ep = (i == @params.Length ? EndParam : @params[i]);
+                subCurves[i] = new Arc(Center, Radius, sp, ep);
+            }
+
+            return true;
         }
     }
 }

@@ -1,33 +1,28 @@
 ﻿using SimpleCAD.Geometry;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCAD
 {
     public class Camera
     {
-        private Point2D _position;
-        private float _zoom;
+        private Point2D position;
+        private float zoom;
 
         [Category("Appearance"), DefaultValue(5f / 3f), Description("Determines the zoom factor of the view.")]
         public float Zoom
         {
             get
             {
-                return _zoom;
+                return zoom;
             }
             set
             {
-                _zoom = value;
+                zoom = value;
 
-                if (float.IsNaN(_zoom) || float.IsNegativeInfinity(_zoom) || float.IsPositiveInfinity(_zoom) ||
-                    _zoom < float.Epsilon * 1000.0f || _zoom > float.MaxValue / 1000.0f)
+                if (float.IsNaN(zoom) || float.IsNegativeInfinity(zoom) || float.IsPositiveInfinity(zoom) ||
+                    zoom < float.Epsilon * 1000.0f || zoom > float.MaxValue / 1000.0f)
                 {
-                    _zoom = 1;
+                    zoom = 1;
                 }
             }
         }
@@ -37,13 +32,13 @@ namespace SimpleCAD
         {
             get
             {
-                return _position;
+                return position;
             }
             set
             {
-                _position = value;
-                float x = _position.X;
-                float y = _position.Y;
+                position = value;
+                float x = position.X;
+                float y = position.Y;
                 if (float.IsNaN(x) || float.IsNegativeInfinity(x) || float.IsPositiveInfinity(x) ||
                     x < float.MinValue / 1000.0f || x > float.MaxValue / 1000.0f)
                 {
@@ -54,14 +49,14 @@ namespace SimpleCAD
                 {
                     y = 0;
                 }
-                _position = new Point2D(x, y);
+                position = new Point2D(x, y);
             }
         }
 
         public Camera(Point2D position, float zoom)
         {
-            _position = position;
-            _zoom = zoom;
+            this.position = position;
+            this.zoom = zoom;
         }
     }
 }

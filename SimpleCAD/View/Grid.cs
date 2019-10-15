@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 
 namespace SimpleCAD.View
@@ -24,8 +19,8 @@ namespace SimpleCAD.View
                 spacing *= 10;
 
             Extents2D bounds = view.GetViewport();
-            Style majorStyle = new Style(doc.Settings.Get<Color>("MajorGridColor"));
-            Style minorStyle = new Style(doc.Settings.Get<Color>("MinorGridColor"));
+            Style majorStyle = new Style(doc.Settings.MajorGridColor);
+            Style minorStyle = new Style(doc.Settings.MinorGridColor);
 
             int k = 0;
             for (float i = 0; i > bounds.Xmin; i -= spacing)
@@ -59,7 +54,7 @@ namespace SimpleCAD.View
 
         public override Extents2D GetExtents()
         {
-            return Extents2D.Empty;
+            return Extents2D.Infinity;
         }
 
         public override void TransformBy(Matrix2D transformation)

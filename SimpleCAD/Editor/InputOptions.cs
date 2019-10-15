@@ -118,7 +118,29 @@ namespace SimpleCAD
 
     public class SelectionOptions : InputOptions<SelectionSet>
     {
-        public SelectionOptions(string message) : base(message)
+        internal List<Type> AllowedClasses { get; } = new List<Type>();
+
+        public bool UsePickedSelection { get; set; }
+        public void AddAllowedClass(Type type) => AllowedClasses.Add(type);
+
+        public SelectionOptions(string message, bool usePickedSelection) : base(message)
+        {
+            UsePickedSelection = usePickedSelection;
+        }
+
+        public SelectionOptions(string message) : this(message, true)
+        {
+            ;
+        }
+    }
+
+    public class CPSelectionOptions : InputOptions<CPSelectionSet>
+    {
+        internal List<Type> AllowedClasses { get; } = new List<Type>();
+
+        public void AddAllowedClass(Type type) => AllowedClasses.Add(type);
+
+        public CPSelectionOptions(string message) : base(message)
         {
             ;
         }

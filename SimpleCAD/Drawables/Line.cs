@@ -1,17 +1,16 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
-    public class Line : Drawable, IPersistable
+    public class Line : Curve
     {
         private Point2D p1;
         private Point2D p2;
 
-        public Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
-        public Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
+        public new Point2D StartPoint { get => p1; set { p1 = value; NotifyPropertyChanged(); } }
+        public new Point2D EndPoint { get => p2; set { p2 = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X1 { get { return StartPoint.X; } }
@@ -21,6 +20,8 @@ namespace SimpleCAD.Drawables
         public float X2 { get { return EndPoint.X; } }
         [Browsable(false)]
         public float Y2 { get { return EndPoint.Y; } }
+
+        public Line() { }
 
         public Line(Point2D p1, Point2D p2)
         {
@@ -36,7 +37,7 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            renderer.DrawLine(Style, StartPoint, EndPoint);
+            renderer.DrawLine(Style.ApplyLayer(Layer), StartPoint, EndPoint);
         }
 
         public override Extents2D GetExtents()
@@ -55,33 +56,117 @@ namespace SimpleCAD.Drawables
 
         public override bool Contains(Point2D pt, float pickBoxSize)
         {
-            Vector2D w = pt - StartPoint;
-            Vector2D vL = (EndPoint - StartPoint);
-            float b = w.DotProduct(vL) / vL.DotProduct(vL);
-            float dist = (w - b * vL).Length;
-            return b >= 0 && b <= 1 && dist <= pickBoxSize / 2;
+            return new Segment2D(StartPoint, EndPoint).Contains(pt, pickBoxSize / 2, out _);
         }
 
         public override ControlPoint[] GetControlPoints()
         {
             return new[]
             {
-                new ControlPoint("StartPoint"),
-                new ControlPoint("EndPoint"),
+                new ControlPoint("Start point", StartPoint),
+                new ControlPoint("End point", EndPoint),
+                new ControlPoint("Mid point", Point2D.Average(StartPoint, EndPoint)),
             };
         }
 
-        public Line(BinaryReader reader) : base(reader)
+        public override SnapPoint[] GetSnapPoints()
         {
-            StartPoint = new Point2D(reader);
-            EndPoint = new Point2D(reader);
+            return new[]
+            {
+                new SnapPoint("Start point", StartPoint),
+                new SnapPoint("End point", EndPoint),
+                new SnapPoint("Mid point", SnapPointType.Middle, Point2D.Average(StartPoint, EndPoint)),
+            };
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
+        {
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    StartPoint = StartPoint.Transform(transformation);
+                else if (index == 1)
+                    EndPoint = EndPoint.Transform(transformation);
+                else if (index == 2)
+                    TransformBy(transformation);
+            }
+        }
+
+        public override void Load(DocumentReader reader)
+        {
+            base.Load(reader);
+            StartPoint = reader.ReadPoint2D();
+            EndPoint = reader.ReadPoint2D();
+        }
+
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            StartPoint.Save(writer);
-            EndPoint.Save(writer);
+            writer.Write(StartPoint);
+            writer.Write(EndPoint);
+        }
+
+        public override float StartParam => 0;
+        public override float EndParam => 1;
+
+        [Browsable(false)]
+        public override float Area => 0;
+
+        [Browsable(false)]
+        public override bool Closed => false;
+
+        public override float GetDistAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return (param - StartParam) * (EndPoint - StartPoint).Length;
+        }
+
+        public override Point2D GetPointAtParam(float param)
+        {
+            param = MathF.Clamp(param, StartParam, EndParam);
+            return StartPoint + param * (EndPoint - StartPoint);
+        }
+
+        public override Vector2D GetNormalAtParam(float param)
+        {
+            return (EndPoint - StartPoint).Perpendicular;
+        }
+
+        public override float GetParamAtDist(float dist)
+        {
+            float param = dist / (EndPoint - StartPoint).Length + StartParam;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override float GetParamAtPoint(Point2D pt)
+        {
+            float param = (pt - StartPoint).Length / (EndPoint - StartPoint).Length;
+            return MathF.Clamp(param, StartParam, EndParam);
+        }
+
+        public override void Reverse()
+        {
+            MathF.Swap(ref p1, ref p2);
+        }
+
+        public override bool Split(float[] @params, out Curve[] subCurves)
+        {
+            @params = ValidateParams(@params);
+            if (@params.Length == 0)
+            {
+                subCurves = new Curve[0];
+                return false;
+            }
+
+            subCurves = new Curve[@params.Length + 1];
+            for (int i = 0; i < @params.Length + 1; i++)
+            {
+                float sp = (i == 0 ? StartParam : @params[i - 1]);
+                float ep = (i == @params.Length ? EndParam : @params[i]);
+                subCurves[i] = new Line(StartPoint + sp * (EndPoint - StartPoint), StartPoint + ep * (EndPoint - StartPoint));
+            }
+
+            return true;
         }
     }
 }

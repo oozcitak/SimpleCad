@@ -1,5 +1,4 @@
-﻿using SimpleCAD.Drawables;
-using SimpleCAD.Geometry;
+﻿using SimpleCAD.Geometry;
 using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
@@ -7,10 +6,8 @@ using System.Windows.Forms;
 
 namespace SimpleCAD
 {
-    public class CADView : IDisposable
+    public sealed class CADView : IDisposable, IPersistable
     {
-        private Control control;
-
         private bool panning;
         private Point2D lastMouseLocationWorld;
         private Drawable mouseDownItem;
@@ -18,9 +15,13 @@ namespace SimpleCAD
         private ControlPoint mouseDownCP;
         private ControlPoint activeCP;
         private Renderer renderer;
-        private Type rendererType;
 
-        private View.ViewItems ViewItems { get; set; } = new View.ViewItems();
+        private View.Grid viewGrid = new View.Grid();
+        private View.Axes viewAxes = new View.Axes();
+        private View.Cursor viewCursor = new View.Cursor();
+        private bool showGrid = true;
+        private bool showAxes = true;
+        private bool showCursor = true;
 
         [Category("Behavior"), DefaultValue(true), Description("Indicates whether the control responds to interactive user input.")]
         public bool Interactive { get; set; } = true;
@@ -32,58 +33,33 @@ namespace SimpleCAD
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the cartesian grid is shown.")]
         public bool ShowGrid
         {
-            get
-            {
-                return ViewItems.Grid.Visible;
-            }
+            get => showGrid;
             set
             {
-                ViewItems.Grid.Visible = value;
-                if (control != null)
-                    control.Invalidate();
+                showGrid = value;
+                Redraw();
             }
         }
 
         [Category("Appearance"), DefaultValue(true), Description("Determines whether the X and Y axes are shown.")]
         public bool ShowAxes
         {
-            get
-            {
-                return ViewItems.Axes.Visible;
-            }
+            get => showAxes;
             set
             {
-                ViewItems.Axes.Visible = value;
-                if (control != null)
-                    control.Invalidate();
+                showAxes = value;
+                Redraw();
             }
         }
 
-        [Browsable(false)]
-        public Type Renderer
+        [Category("Appearance"), DefaultValue(true), Description("Determines whether the cursor is shown.")]
+        public bool ShowCursor
         {
-            get
-            {
-                return (renderer?.GetType());
-            }
+            get => showCursor;
             set
             {
-                if (renderer != null)
-                {
-                    renderer.Dispose();
-                    renderer = null;
-                }
-
-                rendererType = value;
-
-                if (rendererType != null)
-                    renderer = (Renderer)Activator.CreateInstance(rendererType, this);
-
-                if (renderer != null && control != null)
-                {
-                    renderer.Init(control);
-                    control.Invalidate();
-                }
+                showCursor = value;
+                Redraw();
             }
         }
 
@@ -93,112 +69,71 @@ namespace SimpleCAD
         public int Height { get; private set; }
 
         [Browsable(false)]
+        public Control Control { get; private set; }
+
+        [Browsable(false)]
         public CADDocument Document { get; private set; }
 
         [Browsable(false)]
         public Point2D CursorLocation { get; private set; }
 
-        public CADView(CADDocument document)
+        internal Drawables.DrawableList VisibleItems { get; private set; } = new Drawables.DrawableList();
+
+        public CADView(Control ctrl, CADDocument document)
         {
+            Control = ctrl;
             Document = document;
 
             Width = 1;
             Height = 1;
 
             Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-            Renderer = typeof(DirectXRenderer);
+            renderer = new Renderer(this);
+            renderer.Init(Control);
+            Redraw();
 
             panning = false;
+
+            Width = ctrl.ClientRectangle.Width;
+            Height = ctrl.ClientRectangle.Height;
+
+            Control.Resize += CadView_Resize;
+            Control.MouseDown += CadView_MouseDown;
+            Control.MouseUp += CadView_MouseUp;
+            Control.MouseMove += CadView_MouseMove;
+            Control.MouseClick += CadView_MouseClick;
+            Control.MouseDoubleClick += CadView_MouseDoubleClick;
+            Control.MouseWheel += CadView_MouseWheel;
+            Control.KeyDown += CadView_KeyDown;
+            Control.KeyPress += CadView_KeyPress;
+            Control.Paint += CadView_Paint;
+            Control.MouseEnter += CadView_MouseEnter;
+            Control.MouseLeave += CadView_MouseLeave;
 
             Document.DocumentChanged += Document_Changed;
             Document.TransientsChanged += Document_TransientsChanged;
             Document.SelectionChanged += Document_SelectionChanged;
             Document.Editor.Prompt += Editor_Prompt;
+            Document.Editor.Error += Editor_Error;
         }
 
-        public void Attach(Control ctrl)
+        public void Redraw()
         {
-            if (control != null)
-            {
-                Width = 1;
-                Height = 1;
-
-                Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-
-                control.Resize -= CadView_Resize;
-                control.MouseDown -= CadView_MouseDown;
-                control.MouseUp -= CadView_MouseUp;
-                control.MouseMove -= CadView_MouseMove;
-                control.MouseClick -= CadView_MouseClick;
-                control.MouseDoubleClick -= CadView_MouseDoubleClick;
-                control.MouseWheel -= CadView_MouseWheel;
-                control.KeyDown -= CadView_KeyDown;
-                control.KeyPress -= CadView_KeyPress;
-                control.Paint -= CadView_Paint;
-                control.MouseEnter -= CadView_MouseEnter;
-                control.MouseLeave -= CadView_MouseLeave;
-                control.GotFocus -= Control_GotFocus;
-                control.LostFocus -= Control_LostFocus;
-            }
-
-            if (renderer != null)
-            {
-                rendererType = renderer.GetType();
-                renderer.Dispose();
-            }
-
-            control = ctrl;
-
-            if (rendererType != null)
-                Renderer = rendererType;
-
-            Color backColor = Document.Settings.Get<Color>("BackColor");
-            control.BackColor = System.Drawing.Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B);
-
-            Width = ctrl.ClientRectangle.Width;
-            Height = ctrl.ClientRectangle.Height;
-
-            Camera = new Camera(new Point2D(0, 0), 5.0f / 3.0f);
-
-            control.Resize += CadView_Resize;
-            control.MouseDown += CadView_MouseDown;
-            control.MouseUp += CadView_MouseUp;
-            control.MouseMove += CadView_MouseMove;
-            control.MouseClick += CadView_MouseClick;
-            control.MouseDoubleClick += CadView_MouseDoubleClick;
-            control.MouseWheel += CadView_MouseWheel;
-            control.KeyDown += CadView_KeyDown;
-            control.KeyPress += CadView_KeyPress;
-            control.Paint += CadView_Paint;
-            control.MouseEnter += CadView_MouseEnter;
-            control.MouseLeave += CadView_MouseLeave;
-            control.GotFocus += Control_GotFocus;
-            control.LostFocus += Control_LostFocus;
-
-            control.Invalidate();
-        }
-
-        private void Control_LostFocus(object sender, EventArgs e)
-        {
-            if (ReferenceEquals(Document.ActiveView, this))
-                Document.ActiveView = null;
-        }
-
-        private void Control_GotFocus(object sender, EventArgs e)
-        {
-            Document.ActiveView = this;
+            Control.Invalidate();
         }
 
         public void Render(System.Drawing.Graphics graphics)
         {
             // Start drawing
             renderer.InitFrame(graphics);
-            renderer.Clear(Document.Settings.Get<Color>("BackColor"));
+            renderer.Clear(Document.Settings.BackColor);
 
             // Grid and axes
-            renderer.Draw(ViewItems.Background);
+            if (showGrid && viewGrid.Visible) renderer.Draw(viewGrid);
+            if (showAxes && viewAxes.Visible) renderer.Draw(viewAxes);
 
             // Render drawing objects
+            VisibleItems.Clear();
             renderer.Draw(Document.Model);
 
             // Render selected objects
@@ -211,15 +146,18 @@ namespace SimpleCAD
             renderer.Draw(Document.Transients);
 
             // Render cursor
-            renderer.Draw(ViewItems.Foreground);
+            if (showCursor && viewCursor.Visible) renderer.Draw(viewCursor);
+
+            // Render snap point
+            DrawSnapPoint(renderer);
 
             // End drawing view
-            renderer.EndFrame();
+            renderer.EndFrame(graphics);
         }
 
         private void DrawSelection(Renderer renderer)
         {
-            renderer.StyleOverride = new Style(Document.Settings.Get<Color>("SelectionHighlightColor"), 5, DashStyle.Solid);
+            renderer.StyleOverride = new Style(Document.Settings.SelectionHighlightColor, 5, DashStyle.Solid);
             // Current selection
             foreach (Drawable selected in Document.Editor.CurrentSelection)
             {
@@ -233,13 +171,13 @@ namespace SimpleCAD
             renderer.StyleOverride = null;
 
             // Control points
-            Style cpStyle = new Style(Document.Settings.Get<Color>("ControlPointColor"), 2);
-            Style cpActiveStyle = new Style(Document.Settings.Get<Color>("ActiveControlPointColor"), 2);
-            float cpSize = ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X;
+            Style cpStyle = new Style(Document.Settings.ControlPointColor, 2);
+            Style cpActiveStyle = new Style(Document.Settings.ActiveControlPointColor, 2);
+            float cpSize = ScreenToWorld(new Vector2D(Document.Settings.ControlPointSize, 0)).X;
 
             foreach (Drawable selected in Document.Editor.PickedSelection)
             {
-                foreach (ControlPoint pt in ControlPoint.FromDrawable(selected))
+                foreach (ControlPoint pt in selected.GetControlPoints())
                 {
                     renderer.DrawRectangle(pt.Equals(activeCP) ? cpActiveStyle : cpStyle,
                         new Point2D(pt.Location.X - cpSize / 2, pt.Location.Y - cpSize / 2),
@@ -248,9 +186,70 @@ namespace SimpleCAD
             }
         }
 
+        private void DrawSnapPoint(Renderer renderer)
+        {
+            if (!Document.Editor.SnapPoints.IsEmpty)
+            {
+                var pt = Document.Editor.SnapPoints.Current();
+                Style style = new Style(Document.Settings.SnapPointColor, 2);
+                float size = ScreenToWorld(new Vector2D(Document.Settings.SnapPointSize, 0)).X;
+
+                switch (pt.Type)
+                {
+                    case SnapPointType.End:
+                        renderer.DrawRectangle(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y + size / 2));
+                        break;
+                    case SnapPointType.Middle:
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y - size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X, pt.Location.Y + size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X, pt.Location.Y + size / 2),
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y - size / 2));
+                        break;
+                    case SnapPointType.Point:
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y + size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y + size / 2),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y - size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X, pt.Location.Y + size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y));
+                        break;
+                    case SnapPointType.Center:
+                        renderer.DrawCircle(style, pt.Location, size / 2);
+                        break;
+                    case SnapPointType.Quadrant:
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X, pt.Location.Y - size / 2),
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X + size / 2, pt.Location.Y),
+                            new Point2D(pt.Location.X, pt.Location.Y + size / 2));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X, pt.Location.Y + size / 2),
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y));
+                        renderer.DrawLine(style,
+                            new Point2D(pt.Location.X - size / 2, pt.Location.Y),
+                            new Point2D(pt.Location.X, pt.Location.Y - size / 2));
+                        break;
+                }
+            }
+        }
+
         private void DrawJigged(Renderer renderer)
         {
-            renderer.StyleOverride = new Style(Document.Settings.Get<Color>("JigColor"), 0, DashStyle.Dash);
+            renderer.StyleOverride = new Style(Document.Settings.JigColor, 0, DashStyle.Dash);
             renderer.Draw(Document.Jigged);
             renderer.StyleOverride = null;
         }
@@ -396,34 +395,41 @@ namespace SimpleCAD
             Width = width;
             Height = height;
 
-            renderer.Resize(width, height);
+            if (renderer != null)
+                renderer.Resize(width, height);
         }
 
         private void Document_SelectionChanged(object sender, EventArgs e)
         {
-            control.Invalidate();
+            Redraw();
         }
 
         private void Document_Changed(object sender, EventArgs e)
         {
-            control.Invalidate();
+            Redraw();
         }
 
         private void Document_TransientsChanged(object sender, EventArgs e)
         {
-            control.Invalidate();
+            Redraw();
         }
 
         private void Editor_Prompt(object sender, EditorPromptEventArgs e)
         {
-            ViewItems.Cursor.Message = e.Status;
-            control.Invalidate();
+            viewCursor.Message = e.Status;
+            Redraw();
+        }
+
+        private void Editor_Error(object sender, EditorErrorEventArgs e)
+        {
+            viewCursor.Message = e.Error.Message;
+            Redraw();
         }
 
         void CadView_Resize(object sender, EventArgs e)
         {
-            Resize(control.ClientRectangle.Width, control.ClientRectangle.Height);
-            control.Invalidate();
+            Resize(Control.ClientRectangle.Width, Control.ClientRectangle.Height);
+            Redraw();
         }
 
         void CadView_MouseDown(object sender, MouseEventArgs e)
@@ -463,10 +469,10 @@ namespace SimpleCAD
                 panning = true;
                 lastMouseLocationWorld = e.Location;
             }
-            else if (e.Button == MouseButtons.Left && Interactive)
+            else if (e.Button == MouseButtons.Left && Interactive && !Document.Editor.InputMode)
             {
-                mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("PickBoxSize"), 0)).X);
-                Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
+                mouseDownItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.PickBoxSize, 0)).X);
+                Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.ControlPointSize, 0)).X);
                 mouseDownCPItem = find.Item1;
                 mouseDownCP = find.Item2;
             }
@@ -477,13 +483,13 @@ namespace SimpleCAD
             if (e.Button == MouseButtons.Middle && Interactive && panning)
             {
                 panning = false;
-                control.Invalidate();
+                Redraw();
             }
             else if (e.Button == MouseButtons.Left && Interactive && !Document.Editor.InputMode)
             {
                 if (mouseDownItem != null)
                 {
-                    Drawable mouseUpItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("PickBoxSize"), 0)).X);
+                    Drawable mouseUpItem = FindItem(e.Location, ScreenToWorld(new Vector2D(Document.Settings.PickBoxSize, 0)).X);
                     if (mouseUpItem != null && ReferenceEquals(mouseDownItem, mouseUpItem) && !Document.Editor.PickedSelection.Contains(mouseDownItem))
                     {
                         if ((Control.ModifierKeys & Keys.Shift) != Keys.None)
@@ -492,6 +498,7 @@ namespace SimpleCAD
                         }
                         else
                         {
+                            float cpSize = ScreenToWorld(new Vector2D(Document.Settings.ControlPointSize + 4, 0)).X;
                             Document.Editor.PickedSelection.Add(mouseDownItem);
                         }
                     }
@@ -499,10 +506,10 @@ namespace SimpleCAD
 
                 if (mouseDownCP != null)
                 {
-                    Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.Get<int>("ControlPointSize"), 0)).X);
+                    Tuple<Drawable, ControlPoint> find = FindControlPoint(e.Location, ScreenToWorld(new Vector2D(Document.Settings.ControlPointSize, 0)).X);
                     Drawable item = find.Item1;
                     ControlPoint mouseUpCP = find.Item2;
-                    if (mouseUpCP != null && mouseDownCP.Equals(mouseUpCP))
+                    if (ReferenceEquals(item, mouseDownCPItem) && mouseDownCP.Index == mouseUpCP.Index)
                     {
                         activeCP = mouseDownCP;
                         ControlPoint cp = mouseDownCP;
@@ -510,47 +517,50 @@ namespace SimpleCAD
                         Document.Transients.Add(consItem);
                         ResultMode result = ResultMode.Cancel;
                         Matrix2D trans = Matrix2D.Identity;
-                        if (cp.Type == ControlPoint.ControlPointType.Point)
+                        if (cp.Type == ControlPointType.Point)
                         {
-                            var res = await Document.Editor.GetPoint(cp.PropertyName, cp.BasePoint,
+                            var res = await Document.Editor.GetPoint(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
                                     trans = Matrix2D.Translation(p - cp.BasePoint);
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
                             trans = Matrix2D.Translation(res.Value - cp.BasePoint);
                             result = res.Result;
                         }
-                        else if (cp.Type == ControlPoint.ControlPointType.Angle)
+                        else if (cp.Type == ControlPointType.Angle)
                         {
                             float orjVal = (cp.Location - cp.BasePoint).Angle;
-                            var res = await Document.Editor.GetAngle(cp.PropertyName, cp.BasePoint,
+                            var res = await Document.Editor.GetAngle(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
                                     trans = Matrix2D.Rotation(cp.BasePoint, p - orjVal);
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
                             trans = Matrix2D.Rotation(cp.BasePoint, res.Value - orjVal);
                             result = res.Result;
                         }
-                        else if (cp.Type == ControlPoint.ControlPointType.Distance)
+                        else if (cp.Type == ControlPointType.Distance)
                         {
                             Vector2D dir = (cp.Location - cp.BasePoint).Normal;
                             float orjVal = (cp.Location - cp.BasePoint).Length;
-                            var res = await Document.Editor.GetDistance(cp.PropertyName, cp.BasePoint,
+                            var res = await Document.Editor.GetDistance(cp.Name, cp.BasePoint,
                                 (p) =>
                                 {
-                                    trans = Matrix2D.Translation(dir * (p - orjVal));
-                                    consItem.TransformControlPoint(cp, trans);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans.Inverse);
+                                    trans = Matrix2D.Scale(cp.BasePoint, p / orjVal);
+                                    consItem.TransformControlPoints(new int[] { cp.Index }, trans);
                                 });
-                            trans = Matrix2D.Translation(dir * (res.Value - orjVal));
+                            trans = Matrix2D.Scale(cp.BasePoint, res.Value / orjVal);
                             result = res.Result;
                         }
 
-                        // Transform the control point1
+                        // Transform the control point
                         if (result == ResultMode.OK)
                         {
-                            item.TransformControlPoint(cp, trans);
+                            item.TransformControlPoints(new int[] { cp.Index }, trans);
                         }
                         Document.Transients.Remove(consItem);
                         activeCP = null;
@@ -565,8 +575,8 @@ namespace SimpleCAD
         void CadView_CursorMove(object sender, CursorEventArgs e)
         {
             CursorLocation = e.Location;
-            ViewItems.Cursor.Location = CursorLocation;
-            control.Invalidate();
+            viewCursor.Location = CursorLocation;
+            Redraw();
 
             if (e.Button == MouseButtons.Middle && panning)
             {
@@ -574,7 +584,7 @@ namespace SimpleCAD
                 Point2D scrPt = WorldToScreen(e.Location);
                 Pan(lastMouseLocationWorld - CursorLocation);
                 lastMouseLocationWorld = ScreenToWorld(scrPt);
-                control.Invalidate();
+                Redraw();
             }
 
             if (Document.Editor.InputMode)
@@ -603,7 +613,7 @@ namespace SimpleCAD
                 {
                     ZoomOut();
                 }
-                control.Invalidate();
+                Redraw();
             }
         }
 
@@ -617,16 +627,23 @@ namespace SimpleCAD
 
         private void CadView_MouseLeave(object sender, EventArgs e)
         {
-            ViewItems.Cursor.Visible = false;
+            viewCursor.Visible = false;
             Cursor.Show();
-            control.Invalidate();
+
+            if (ReferenceEquals(Document.ActiveView, this))
+                Document.ActiveView = null;
+
+            Redraw();
         }
 
         private void CadView_MouseEnter(object sender, EventArgs e)
         {
-            ViewItems.Cursor.Visible = true;
+            viewCursor.Visible = true;
             Cursor.Hide();
-            control.Invalidate();
+
+            Document.ActiveView = this;
+
+            Redraw();
         }
 
         private void CadView_KeyDown(object sender, KeyEventArgs e)
@@ -638,6 +655,7 @@ namespace SimpleCAD
             else if (e.KeyCode == Keys.Escape)
             {
                 Document.Editor.PickedSelection.Clear();
+                viewCursor.Message = "";
             }
         }
 
@@ -657,7 +675,7 @@ namespace SimpleCAD
         private Drawable FindItem(Point2D pt, float pickBox)
         {
             float pickBoxWorld = ScreenToWorld(new Vector2D(pickBox, 0)).X;
-            foreach (Drawable d in Document.Model)
+            foreach (Drawable d in VisibleItems)
             {
                 if (d.Contains(pt, pickBoxWorld)) return d;
             }
@@ -668,8 +686,11 @@ namespace SimpleCAD
         {
             foreach (Drawable item in Document.Editor.PickedSelection)
             {
-                foreach (ControlPoint cp in ControlPoint.FromDrawable(item))
+                int i = 0;
+                foreach (ControlPoint cp in item.GetControlPoints())
                 {
+                    cp.Index = i;
+                    i++;
                     if (pt.X >= cp.Location.X - controlPointSize / 2 && pt.X <= cp.Location.X + controlPointSize / 2 &&
                         pt.Y >= cp.Location.Y - controlPointSize / 2 && pt.Y <= cp.Location.Y + controlPointSize / 2)
                         return new Tuple<Drawable, ControlPoint>(item, cp);
@@ -680,16 +701,61 @@ namespace SimpleCAD
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            if (Document != null)
+            {
+                Document.DocumentChanged -= Document_Changed;
+                Document.TransientsChanged -= Document_TransientsChanged;
+                Document.SelectionChanged -= Document_SelectionChanged;
+                Document.Editor.Prompt -= Editor_Prompt;
+                Document.Editor.Error -= Editor_Error;
+            }
+
+            if (Control != null)
+            {
+                Control.Resize -= CadView_Resize;
+                Control.MouseDown -= CadView_MouseDown;
+                Control.MouseUp -= CadView_MouseUp;
+                Control.MouseMove -= CadView_MouseMove;
+                Control.MouseClick -= CadView_MouseClick;
+                Control.MouseDoubleClick -= CadView_MouseDoubleClick;
+                Control.MouseWheel -= CadView_MouseWheel;
+                Control.KeyDown -= CadView_KeyDown;
+                Control.KeyPress -= CadView_KeyPress;
+                Control.Paint -= CadView_Paint;
+                Control.MouseEnter -= CadView_MouseEnter;
+                Control.MouseLeave -= CadView_MouseLeave;
+            }
+
+            if (renderer != null)
+            {
+                renderer.Dispose();
+                renderer = null;
+            }
         }
 
-        protected virtual void Dispose(bool disposing)
+        public System.Drawing.Image ToBitmap()
         {
-            if (renderer != null)
-                renderer.Dispose();
-            renderer = null;
-            rendererType = null;
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            using (var g = System.Drawing.Graphics.FromImage(bmp))
+            {
+                Render(g);
+                g.Flush();
+            }
+            return bmp;
+        }
+
+        public void Load(DocumentReader reader)
+        {
+            Camera = reader.ReadCamera();
+            ShowGrid = reader.ReadBoolean();
+            ShowAxes = reader.ReadBoolean();
+        }
+
+        public void Save(DocumentWriter writer)
+        {
+            writer.Write(Camera);
+            writer.Write(ShowGrid);
+            writer.Write(ShowAxes);
         }
     }
 }

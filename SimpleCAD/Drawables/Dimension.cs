@@ -1,13 +1,13 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
     public class Dimension : Drawable
     {
+        private Lazy<TextStyle> textStyleRef = new Lazy<TextStyle>(() => TextStyle.Default);
         private Point2D p1;
         private Point2D p2;
 
@@ -25,19 +25,18 @@ namespace SimpleCAD.Drawables
 
         private float offset;
         private string str;
-        private string fontFamily;
-        private FontStyle fontStyle;
         private float textHeight;
         private float scale;
         private int precision;
 
         public float Offset { get => offset; set { offset = value; NotifyPropertyChanged(); } }
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
-        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
-        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
+        public TextStyle TextStyle { get => textStyleRef.Value; set { textStyleRef = new Lazy<TextStyle>(() => value); NotifyPropertyChanged(); } }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Scale { get => scale; set { scale = value; NotifyPropertyChanged(); } }
         public int Precision { get => precision; set { precision = value; NotifyPropertyChanged(); } }
+
+        public Dimension() { }
 
         public Dimension(Point2D p1, Point2D p2, float textHeight)
         {
@@ -47,8 +46,6 @@ namespace SimpleCAD.Drawables
             Offset = 0.4f;
             TextHeight = textHeight;
             String = "<>";
-            FontFamily = "Arial";
-            FontStyle = FontStyle.Regular;
             Scale = 1;
             Precision = 2;
         }
@@ -112,28 +109,27 @@ namespace SimpleCAD.Drawables
 
             // Dimension line
             Line dim = new Line(0, Offset, len, Offset);
-            dim.Style = Style;
+            dim.Style = Style.ApplyLayer(Layer);
             items.Add(dim);
 
             // Left tick
             Line tick1 = new Line(0, -tickSize + Offset, 0, tickSize + Offset);
-            tick1.Style = Style;
+            tick1.Style = Style.ApplyLayer(Layer);
             items.Add(tick1);
 
             // Right tick
             Line tick2 = new Line(len, -tickSize + Offset, len, tickSize + Offset);
-            tick2.Style = Style;
+            tick2.Style = Style.ApplyLayer(Layer);
             items.Add(tick2);
 
             // Text
             float dist = (StartPoint - EndPoint).Length * Scale;
             string txt = String.Replace("<>", dist.ToString("F" + Precision.ToString()));
             Text textObj = new Text(len / 2, Offset, txt, TextHeight);
-            textObj.FontFamily = FontFamily;
-            textObj.FontStyle = FontStyle;
+            textObj.TextStyle = TextStyle;
             textObj.HorizontalAlignment = TextHorizontalAlignment.Center;
             textObj.VerticalAlignment = TextVerticalAlignment.Middle;
-            textObj.Style = Style;
+            textObj.Style = Style.ApplyLayer(Layer);
             items.Add(textObj);
 
             Matrix2D trans = Matrix2D.Transformation(1, 1, angle, StartPoint.X, StartPoint.Y);
@@ -146,34 +142,55 @@ namespace SimpleCAD.Drawables
         {
             return new[]
             {
-                new ControlPoint("StartPoint"),
-                new ControlPoint("EndPoint"),
+                new ControlPoint("Start point", StartPoint),
+                new ControlPoint("End point", EndPoint),
             };
         }
 
-        public Dimension(BinaryReader reader) : base(reader)
+        public override SnapPoint[] GetSnapPoints()
         {
-            StartPoint = new Point2D(reader);
-            EndPoint = new Point2D(reader);
-            TextHeight = reader.ReadSingle();
-            Offset = reader.ReadSingle();
-            String = reader.ReadString();
-            FontFamily = reader.ReadString();
-            FontStyle = (FontStyle)reader.ReadInt32();
-            Scale = reader.ReadSingle();
-            Precision = reader.ReadInt32();
+            return new[]
+            {
+                new SnapPoint("Start point", SnapPointType.Point, StartPoint),
+                new SnapPoint("End point", SnapPointType.Point, EndPoint),
+            };
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
+        {
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    StartPoint = StartPoint.Transform(transformation);
+                else if (index == 1)
+                    EndPoint = EndPoint.Transform(transformation);
+            }
+        }
+
+        public override void Load(DocumentReader reader)
+        {
+            var doc = reader.Document;
+            base.Load(reader);
+            StartPoint = reader.ReadPoint2D();
+            EndPoint = reader.ReadPoint2D();
+            TextHeight = reader.ReadFloat();
+            Offset = reader.ReadFloat();
+            String = reader.ReadString();
+            string textStyleName = reader.ReadString();
+            textStyleRef = new Lazy<TextStyle>(() => doc.TextStyles[textStyleName]);
+            Scale = reader.ReadFloat();
+            Precision = reader.ReadInt();
+        }
+
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            StartPoint.Save(writer);
-            EndPoint.Save(writer);
+            writer.Write(StartPoint);
+            writer.Write(EndPoint);
             writer.Write(TextHeight);
             writer.Write(Offset);
             writer.Write(String);
-            writer.Write(FontFamily);
-            writer.Write((int)FontStyle);
+            writer.Write(TextStyle.Name);
             writer.Write(Scale);
             writer.Write(Precision);
         }

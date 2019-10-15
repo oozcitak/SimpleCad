@@ -1,15 +1,16 @@
 ﻿using SimpleCAD.Geometry;
+using SimpleCAD.Graphics;
+using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 
 namespace SimpleCAD.Drawables
 {
     public class Text : Drawable
     {
-        private Point2D p;
+        private Lazy<TextStyle> textStyleRef = new Lazy<TextStyle>(() => TextStyle.Default);
+        private Point2D location;
 
-        public Point2D Location { get => p; set { p = value; NotifyPropertyChanged(); } }
+        public Point2D Location { get => location; set { location = value; NotifyPropertyChanged(); } }
 
         [Browsable(false)]
         public float X { get { return Location.X; } }
@@ -17,16 +18,13 @@ namespace SimpleCAD.Drawables
         public float Y { get { return Location.Y; } }
 
         private string str;
-        private string fontFamily;
-        private FontStyle fontStyle;
         private float textHeight;
         private float rotation;
         private TextHorizontalAlignment horizontalAlignment;
         private TextVerticalAlignment verticalAlignment;
 
+        public TextStyle TextStyle { get => textStyleRef.Value; set { textStyleRef = new Lazy<TextStyle>(() => value); NotifyPropertyChanged(); } }
         public string String { get => str; set { str = value; NotifyPropertyChanged(); } }
-        public string FontFamily { get => fontFamily; set { fontFamily = value; NotifyPropertyChanged(); } }
-        public FontStyle FontStyle { get => fontStyle; set { fontStyle = value; NotifyPropertyChanged(); } }
         public float TextHeight { get => textHeight; set { textHeight = value; NotifyPropertyChanged(); } }
         public float Width { get; private set; }
         public float Rotation { get => rotation; set { rotation = value; NotifyPropertyChanged(); } }
@@ -35,17 +33,17 @@ namespace SimpleCAD.Drawables
 
         private float cpSize = 0;
 
-        public Text(Point2D p, string text, float height)
+        public Text() { }
+
+        public Text(Point2D loc, string text, float height)
         {
-            Location = p;
+            Location = loc;
             TextHeight = height;
             Width = height;
             String = text;
             Rotation = 0;
             HorizontalAlignment = TextHorizontalAlignment.Left;
             VerticalAlignment = TextVerticalAlignment.Bottom;
-            FontFamily = "Arial";
-            FontStyle = FontStyle.Regular;
         }
 
         public Text(float x, float y, string text, float height)
@@ -56,9 +54,9 @@ namespace SimpleCAD.Drawables
 
         public override void Draw(Renderer renderer)
         {
-            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.Get<int>("ControlPointSize"), 0)).X;
-            Width = renderer.MeasureString(String, FontFamily, FontStyle, TextHeight).X;
-            renderer.DrawString(Style, Location, String, FontFamily, TextHeight, FontStyle.Regular, Rotation, HorizontalAlignment, VerticalAlignment);
+            cpSize = 2 * renderer.View.ScreenToWorld(new Vector2D(renderer.View.Document.Settings.ControlPointSize, 0)).X;
+            Width = renderer.MeasureString(String, TextStyle, TextHeight).X;
+            renderer.DrawString(Style.ApplyLayer(Layer), Location, String, TextStyle, TextHeight, Rotation, HorizontalAlignment, VerticalAlignment);
         }
 
         public override Extents2D GetExtents()
@@ -111,32 +109,54 @@ namespace SimpleCAD.Drawables
             Vector2D upDir = Vector2D.FromAngle(Rotation).Perpendicular;
             return new[]
             {
-                new ControlPoint("Location"),
-                new ControlPoint("Rotation", ControlPoint.ControlPointType.Angle, Location, Location + cpSize * Vector2D.FromAngle(Rotation)),
-                new ControlPoint("TextHeight", ControlPoint.ControlPointType.Distance, Location, Location + TextHeight * upDir),
+                new ControlPoint("Location", Location),
+                new ControlPoint("Rotation", ControlPointType.Angle, Location, Location + System.Math.Max(Width, cpSize) * Vector2D.FromAngle(Rotation)),
+                new ControlPoint("Text height", ControlPointType.Distance, Location, Location + TextHeight * upDir),
             };
         }
 
-        public Text(BinaryReader reader) : base(reader)
+        public override SnapPoint[] GetSnapPoints()
         {
-            Location = new Point2D(reader);
-            TextHeight = reader.ReadSingle();
-            String = reader.ReadString();
-            FontFamily = reader.ReadString();
-            FontStyle = (FontStyle)reader.ReadInt32();
-            Rotation = reader.ReadSingle();
-            HorizontalAlignment = (TextHorizontalAlignment)reader.ReadInt32();
-            VerticalAlignment = (TextVerticalAlignment)reader.ReadInt32();
+            return new[]
+            {
+                new SnapPoint("Location", SnapPointType.Point, Location),
+            };
         }
 
-        public override void Save(BinaryWriter writer)
+        public override void TransformControlPoints(int[] indices, Matrix2D transformation)
+        {
+            foreach (int index in indices)
+            {
+                if (index == 0)
+                    Location = Location.Transform(transformation);
+                else if (index == 1)
+                    Rotation = Vector2D.FromAngle(Rotation).Transform(transformation).Angle;
+                else if (index == 2)
+                    TextHeight = Vector2D.XAxis.Transform(transformation).Length * TextHeight;
+            }
+        }
+
+        public override void Load(DocumentReader reader)
+        {
+            var doc = reader.Document;
+            base.Load(reader);
+            Location = reader.ReadPoint2D();
+            TextHeight = reader.ReadFloat();
+            String = reader.ReadString();
+            string textStyleName = reader.ReadString();
+            textStyleRef = new Lazy<TextStyle>(() => doc.TextStyles[textStyleName]);
+            Rotation = reader.ReadFloat();
+            HorizontalAlignment = (TextHorizontalAlignment)reader.ReadInt();
+            VerticalAlignment = (TextVerticalAlignment)reader.ReadInt();
+        }
+
+        public override void Save(DocumentWriter writer)
         {
             base.Save(writer);
-            Location.Save(writer);
+            writer.Write(Location);
             writer.Write(TextHeight);
             writer.Write(String);
-            writer.Write(FontFamily);
-            writer.Write((int)FontStyle);
+            writer.Write(TextStyle.Name);
             writer.Write(Rotation);
             writer.Write((int)HorizontalAlignment);
             writer.Write((int)VerticalAlignment);

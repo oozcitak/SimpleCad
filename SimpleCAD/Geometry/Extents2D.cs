@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Drawing;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace SimpleCAD.Geometry
 {
@@ -11,19 +12,22 @@ namespace SimpleCAD.Geometry
         public float Ymin { get; private set; }
         public float Xmax { get; private set; }
         public float Ymax { get; private set; }
-        public float Width { get { return Math.Abs(Xmax - Xmin); } }
-        public float Height { get { return Math.Abs(Ymax - Ymin); } }
-        public Point2D Center { get { return IsEmpty ? Point2D.Zero : new Point2D((Xmin + Xmax) / 2, (Ymin + Ymax) / 2); } }
-        public Point2D Ptmin { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmin, Ymin); } }
-        public Point2D Ptmax { get { return IsEmpty ? Point2D.Zero : new Point2D(Xmax, Ymax); } }
+        public float Width { get => Math.Abs(Xmax - Xmin); }
+        public float Height { get => Math.Abs(Ymax - Ymin); }
+        public Point2D Center { get => IsEmpty ? Point2D.Zero : new Point2D((Xmin + Xmax) / 2, (Ymin + Ymax) / 2); }
+        public Point2D Ptmin { get => IsEmpty ? Point2D.Zero : new Point2D(Xmin, Ymin); }
+        public Point2D Ptmax { get => IsEmpty ? Point2D.Zero : new Point2D(Xmax, Ymax); }
 
         public static Extents2D Empty { get { return new Extents2D(); } }
+        public static Extents2D Infinity { get { return new Extents2D(float.NegativeInfinity, float.NegativeInfinity, float.PositiveInfinity, float.PositiveInfinity); } }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Extents2D()
         {
             IsEmpty = true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Extents2D(float xmin, float ymin, float xmax, float ymax)
         {
             IsEmpty = true;
@@ -31,11 +35,13 @@ namespace SimpleCAD.Geometry
             Add(xmax, ymax);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset()
         {
             IsEmpty = true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(float x, float y)
         {
             if (IsEmpty || x < Xmin) Xmin = x;
@@ -46,11 +52,13 @@ namespace SimpleCAD.Geometry
             IsEmpty = false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Point2D pt)
         {
             Add(pt.X, pt.Y);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(IEnumerable<Point2D> points)
         {
             foreach (Point2D pt in points)
@@ -59,12 +67,14 @@ namespace SimpleCAD.Geometry
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(RectangleF rectangle)
         {
             Add(rectangle.X, rectangle.Y);
             Add(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Extents2D extents)
         {
             if (!extents.IsEmpty)
@@ -74,6 +84,7 @@ namespace SimpleCAD.Geometry
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator RectangleF(Extents2D extents)
         {
             if (extents.IsEmpty)
@@ -82,11 +93,13 @@ namespace SimpleCAD.Geometry
                 return new RectangleF(extents.Xmin, extents.Ymin, extents.Xmax - extents.Xmin, extents.Ymax - extents.Ymin);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Point2D pt)
         {
             return Contains(pt.X, pt.Y);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(float x, float y)
         {
             if (IsEmpty)
@@ -95,14 +108,30 @@ namespace SimpleCAD.Geometry
                 return (x >= Xmin && x <= Xmax && y >= Ymin && y <= Ymax);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Extents2D other)
         {
             return (Xmin <= other.Xmin && Xmax >= other.Xmax && Ymin <= other.Ymin && Ymax >= other.Ymax);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IntersectsWith(Extents2D other)
         {
             return (Xmax >= other.Xmin && Xmin <= other.Xmax && Ymax >= other.Ymin && Ymin <= other.Ymax);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void TransformBy(Matrix2D transformation)
+        {
+            if (IsEmpty) return;
+
+            Point2D pmin = Ptmin;
+            Point2D pmax = Ptmax;
+            pmin = pmin.Transform(transformation);
+            pmax = pmax.Transform(transformation);
+            Reset();
+            Add(pmin);
+            Add(pmax);
         }
     }
 }

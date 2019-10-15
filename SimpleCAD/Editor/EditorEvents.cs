@@ -1,10 +1,9 @@
-﻿using SimpleCAD.Geometry;
-using System;
-using System.Windows.Forms;
+﻿using System;
 
 namespace SimpleCAD
 {
     public delegate void EditorPromptEventHandler(object sender, EditorPromptEventArgs e);
+    public delegate void EditorErrorEventHandler(object sender, EditorErrorEventArgs e);
 
     public class EditorPromptEventArgs : EventArgs
     {
@@ -18,6 +17,16 @@ namespace SimpleCAD
         public EditorPromptEventArgs(string status) : base()
         {
             Status = status;
+        }
+    }
+
+    public class EditorErrorEventArgs : EventArgs
+    {
+        public Exception Error { get; private set; }
+
+        public EditorErrorEventArgs(Exception  error) : base()
+        {
+            Error = error;
         }
     }
 }

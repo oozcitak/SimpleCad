@@ -8,7 +8,6 @@ namespace SimpleCAD
     internal abstract class EditorGetter<TOptions, TValue> : IDisposable where TOptions : InputOptions<TValue>
     {
         private Drawable jigged = null;
-        private string currentText = "";
 
         protected Editor Editor { get; private set; }
         protected TOptions Options { get; private set; }
@@ -24,6 +23,7 @@ namespace SimpleCAD
                     Editor.Document.Jigged.Add(jigged);
             }
         }
+        protected string CurrentText { get; private set; } = "";
         protected bool SpaceAccepts { get; set; } = true;
         protected TaskCompletionSource<InputResult<TValue>> Completion { get; private set; }
 
@@ -38,12 +38,13 @@ namespace SimpleCAD
             Editor.KeyDown -= Editor_KeyDown;
             Editor.KeyPress -= Editor_KeyPress;
 
+            Editor.SnapPoints.Clear();
             Editor.InputMode = false;
         }
 
-        public static async Task<InputResult<TValue>> Run<T>(Editor editor, TOptions options) where T : EditorGetter<TOptions, TValue>
+        public static async Task<InputResult<TValue>> Run<TGetter>(Editor editor, TOptions options) where TGetter : EditorGetter<TOptions, TValue>
         {
-            using (var getter = Activator.CreateInstance<T>())
+            using (var getter = Activator.CreateInstance<TGetter>())
             {
                 getter.Editor = editor;
 
@@ -59,9 +60,9 @@ namespace SimpleCAD
                 if (!initArgs.ContinueAsync)
                 {
                     if (initArgs.InputValid)
-                        getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value));
+                        getter.Completion.SetResult(InputResult<TValue>.AcceptResult(initArgs.Value, AcceptReason.Init));
                     else
-                        getter.Completion.SetResult(InputResult<TValue>.CancelResult());
+                        getter.Completion.SetResult(InputResult<TValue>.CancelResult(CancelReason.Init));
                 }
 
                 if (initArgs.ContinueAsync)
@@ -72,12 +73,26 @@ namespace SimpleCAD
                     getter.Editor.KeyPress += getter.Editor_KeyPress;
                 }
 
+                getter.SetCursorText("");
                 return await getter.Completion.Task;
             }
         }
 
         private void Editor_CursorMove(object sender, CursorEventArgs e)
         {
+            // check snap mode
+            Editor.SnapPoints.Clear();
+            if (Editor.Document.Settings.Snap)
+            {
+                SnapPointType snapMode = Editor.SnapMode;
+                float snapDist = Editor.Document.ActiveView.ScreenToWorld(new Vector2D(Editor.Document.Settings.SnapDistance, 0)).X;
+                foreach (Drawable item in Editor.Document.Model)
+                {
+                    if (item.Visible && (item.Layer == null || item.Layer.Visible))
+                        Editor.SnapPoints.AddFromDrawable(item, e.Location, snapMode, snapDist);
+                }
+            }
+
             CoordsChanged(e.Location);
         }
 
@@ -90,18 +105,18 @@ namespace SimpleCAD
         {
             if (e.Button == MouseButtons.Left)
             {
-                var args = new InputArgs<Point2D, TValue>(e.Location);
+                var args = new InputArgs<Point2D, TValue>(Editor.SnapPoints.IsEmpty ? e.Location : Editor.SnapPoints.Current().Location);
                 AcceptCoordsInput(args);
                 if (args.InputValid)
                 {
                     Editor.DoPrompt("");
-                    var result = InputResult<TValue>.AcceptResult(args.Value);
+                    var result = InputResult<TValue>.AcceptResult(args.Value, AcceptReason.Coords);
                     if (args.InputCompleted)
                         Completion.SetResult(result);
                 }
                 else
                 {
-                    currentText = "";
+                    CurrentText = "";
                     Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                 }
             }
@@ -118,12 +133,12 @@ namespace SimpleCAD
             {
                 Editor.DoPrompt("");
                 CancelInput();
-                var result = InputResult<TValue>.CancelResult();
+                var result = InputResult<TValue>.CancelResult(CancelReason.Escape);
                 Completion.SetResult(result);
             }
             else if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return || (SpaceAccepts && e.KeyCode == Keys.Space))
             {
-                string keyword = Options.MatchKeyword(currentText);
+                string keyword = Options.MatchKeyword(CurrentText);
 
                 if (!string.IsNullOrEmpty(keyword))
                 {
@@ -131,23 +146,38 @@ namespace SimpleCAD
                     var result = InputResult<TValue>.KeywordResult(keyword);
                     Completion.SetResult(result);
                 }
-                else
+                else if (!string.IsNullOrEmpty(CurrentText))
                 {
-                    var args = new InputArgs<string, TValue>(currentText);
+                    var args = new InputArgs<string, TValue>(CurrentText);
                     AcceptTextInput(args);
                     if (args.InputValid)
                     {
                         Editor.DoPrompt("");
-                        var result = InputResult<TValue>.AcceptResult(args.Value);
+                        var result = InputResult<TValue>.AcceptResult(args.Value, AcceptReason.Text);
                         if (args.InputCompleted)
                             Completion.SetResult(result);
                     }
                     else
                     {
-                        currentText = "";
+                        CurrentText = "";
                         Editor.DoPrompt(Options.GetFullPrompt() + args.ErrorMessage);
                     }
                 }
+                else
+                {
+                    Editor.DoPrompt("");
+                    CancelInput();
+                    var result = InputResult<TValue>.CancelResult(e.KeyCode == Keys.Space ? CancelReason.Space : CancelReason.Enter);
+                    Completion.SetResult(result);
+                }
+            }
+            else if (e.KeyCode == Keys.Tab)
+            {
+                if (e.Shift)
+                    Editor.SnapPoints.Next();
+                else
+                    Editor.SnapPoints.Previous();
+                Editor.Document.ActiveView.Redraw();
             }
         }
 
@@ -157,27 +187,27 @@ namespace SimpleCAD
 
             if (e.KeyChar == '\b') // backspace
             {
-                if (currentText.Length > 0)
+                if (CurrentText.Length > 0)
                 {
-                    currentText = currentText.Remove(currentText.Length - 1);
+                    CurrentText = CurrentText.Remove(CurrentText.Length - 1);
                     textChanged = true;
                 }
             }
             else if (e.KeyChar == ' ' && !SpaceAccepts)
             {
-                currentText += e.KeyChar;
+                CurrentText += e.KeyChar;
                 textChanged = true;
             }
             else if (!char.IsControl(e.KeyChar))
             {
-                currentText += e.KeyChar;
+                CurrentText += e.KeyChar;
                 textChanged = true;
             }
 
             if (textChanged)
             {
-                Editor.DoPrompt(Options.GetFullPrompt() + currentText);
-                TextChanged(currentText);
+                Editor.DoPrompt(Options.GetFullPrompt() + CurrentText);
+                TextChanged(CurrentText);
             }
         }
 
